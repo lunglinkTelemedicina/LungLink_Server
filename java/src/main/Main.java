@@ -8,6 +8,8 @@ public class Main {
         // to see how IntelliJ IDEA suggests fixing it.
         IO.println(String.format("Hello and welcome!"));
         //ARECHA NO MOLA
+        //test paula
+
 
 
         for (int i = 1; i <= 5; i++) {

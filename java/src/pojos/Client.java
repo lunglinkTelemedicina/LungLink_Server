@@ -10,10 +10,10 @@ public class Client {
     private String surname;
     private String mail;
     private int age;
-   //? private Sex sex;
+    // private Sex sex;
     private int clientId;
     //private User user;
-    //private List<MedicalRecords> medicalRecords;
+    //private List<MedicalHistory> medicalHistory;
     //private List <Doctor> doctors;
 
 
@@ -21,13 +21,13 @@ public class Client {
         //constructor vacío
     }
 
-    public Client(String name, String surname, int clientId){
+    /*public Client(String name, String surname, int clientId){
         this.name=name;
         this.surname=surname;
         this.clientId=clientId;
-        //this.medicalRedords=new ArrayList<MedicalRecords>()
+        //this.medicalHistory=new ArrayList<MedicalHistory>()
         //this.doctors=new ArrayList<Doctor>();
-    }
+    }*/
 
     public String getName() {
         return name;
@@ -36,6 +36,22 @@ public class Client {
     public void setName(String name) {
         this.name = name;
     }
+
+   /* public List<MedicalHistory> getMedicalHistory () {
+        return medicalHistory;
+    }
+
+    public void List<MedicalHistory> setMedicalHistory(List<MedicalHistory> medicalHistory) {
+        this.medicalHistory = medicalHistory;
+    }*/
+
+    /* public List<Doctor> getDoctors () {
+        return doctors;
+    }
+
+    public void List<Doctor> setDoctors(List<Doctor> doctors) {
+        this.doctors = doctors;
+    }*/
 
     public String getSurname() {
         return surname;
@@ -56,14 +72,14 @@ public class Client {
     }
 
     /*private void createRecord(){
-        MedicalRecord newRecord=extraInfo();
+        medicalHistory newRecord=extraInfo();
         newRecord.setClientName(this.name);
         newRecord.setClientSurname(this.surname);
-        this.getMedicalRecords().add(newRecord);
+        this.getMedicalHistory().add(newRecord);
 
     }*/
 
-    /*private MedicalRecord extraInfo(){
+    /*private MedicalHistory extraInfo(){
     Scanner sc=new Scanner(System.in);
     Sex sex;
     sout("Sex: 0- Female 1- Male");

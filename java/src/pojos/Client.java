@@ -73,7 +73,7 @@ public class Client {
       } if
     sout("Height");
     int height= sc.nextInt();
-    sout("Weight");
+    sout("Weight ");
     double weight=sc.nextDouble;
     sout("Do you have any additional symptoms?"+\n+"1-Yes
      */

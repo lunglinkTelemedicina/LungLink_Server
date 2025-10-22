@@ -12,7 +12,7 @@ public class Client {
     private int age;
     //private Sex sex;
     private int clientId;
-    //private User user;
+    //  private User user;
     //private List<MedicalHistory> medicalHistory;
     //private List <Doctor> doctors;
 

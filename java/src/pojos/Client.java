@@ -18,7 +18,7 @@ public class Client {
 
 
     public Client(){
-        //constructor vacío
+        //constructor vacío.
     }
 
     public Client(String name, String surname, Sex sex, int clientId){

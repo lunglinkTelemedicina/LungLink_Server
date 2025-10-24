@@ -12,22 +12,22 @@ public class Client {
     private int age;
     private Sex sex;
     private int clientId;
-    // private User user;
-    //private List<MedicalHistory> medicalHistory;
-    //private List <Doctor> doctors;
+    private User user;
+    private List<MedicalHistory> medicalHistory;
+    private List <Doctor> doctors;
 
 
     public Client(){
-        //constructor vacío
+        //constructor vacío.
     }
 
-    /*public Client(String name, String surname, int clientId){
+    public Client(String name, String surname, Sex sex, int clientId){
         this.name=name;
         this.surname=surname;
         this.clientId=clientId;
-        //this.medicalHistory=new ArrayList<MedicalHistory>()
-        //this.doctors=new ArrayList<Doctor>();
-    }*/
+        this.medicalHistory=new ArrayList<MedicalHistory>();
+        this.doctors=new ArrayList<Doctor>();
+    }
 
     public String getName() {
         return name;
@@ -37,21 +37,54 @@ public class Client {
         this.name = name;
     }
 
-   /* public List<MedicalHistory> getMedicalHistory () {
+    public String getMail() {
+        return mail;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public Sex getSex() {
+        return sex;
+    }
+
+    public void setSex(Sex sex) {
+        this.sex = sex;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public List<MedicalHistory> getMedicalHistory () {
         return medicalHistory;
     }
 
-    public void List<MedicalHistory> setMedicalHistory(List<MedicalHistory> medicalHistory) {
+    public void setMedicalHistory(List<MedicalHistory> medicalHistory) {
         this.medicalHistory = medicalHistory;
-    }*/
+    }
 
-    /* public List<Doctor> getDoctors () {
+
+    public List<Doctor> getDoctors () {
         return doctors;
     }
 
-    public void List<Doctor> setDoctors(List<Doctor> doctors) {
+    public void setDoctors(List<Doctor> doctors) {
         this.doctors = doctors;
-    }*/
+    }
 
     public String getSurname() {
         return surname;

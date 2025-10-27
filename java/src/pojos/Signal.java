@@ -1,5 +1,5 @@
-package src.pojos;
+package pojos;
 
-public class Signal {
+public class Signal { //TODO class
     //here we have ecg and emg
 }

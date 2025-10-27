@@ -1,4 +1,4 @@
-package src.pojos;
+package pojos;
 
 
 import java.time.LocalDate;
@@ -6,25 +6,25 @@ import java.util.List;
 
 public class MedicalHistory {
 
-    private int id;
+    private int recordId;
     private LocalDate date;
     private int patientId;
     private int doctorId;
     private Signal signalEMG;
     private Signal signalECG;
     private String data;
-    private List<Symptoms> symptomList;
+    private List<Symptoms> symptomsList;
 
     public MedicalHistory() {
         //constructor vacio
     }
 
-    public int getId() {
-        return id;
+    public int getRecordId() {
+        return recordId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setRecordId(int recordId) {
+        this.recordId = recordId;
     }
 
     public LocalDate getDate() {
@@ -76,10 +76,10 @@ public class MedicalHistory {
     }
 
     public List<Symptoms> getSymptomList() {
-        return symptomList;
+        return symptomsList;
     }
 
     public void setSymptomList(List<Symptoms> symptomList) {
-        this.symptomList = symptomList;
+        this.symptomsList = symptomList;
     }
 }

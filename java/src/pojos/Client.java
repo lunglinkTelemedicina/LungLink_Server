@@ -1,32 +1,36 @@
-package src.pojos;
+package pojos;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class Client {
 
+    private int clientId;
     private String name;
     private String surname;
+    private LocalDate dob;
     private String mail;
-    private int age;
     private Sex sex;
-    private int clientId;
     private User user;
     private List<MedicalHistory> medicalHistory;
     private List <Doctor> doctors;
 
-
-    public Client(){
-        //constructor vacío.
-    }
-
-    public Client(String name, String surname, Sex sex, int clientId){
+    public Client(int clientId, String name, String surname, Sex sex){
+        this.clientId=clientId;
         this.name=name;
         this.surname=surname;
-        this.clientId=clientId;
         this.medicalHistory=new ArrayList<MedicalHistory>();
         this.doctors=new ArrayList<Doctor>();
+    }
+
+
+    public int getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(int clientId) {
+        this.clientId = clientId;
     }
 
     public String getName() {
@@ -37,20 +41,24 @@ public class Client {
         this.name = name;
     }
 
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public LocalDate getDob() { return dob; }
+
+    public void setDob(LocalDate dob) { this.dob = dob; }
+
     public String getMail() {
         return mail;
     }
 
     public void setMail(String mail) {
         this.mail = mail;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
     }
 
     public Sex getSex() {
@@ -77,26 +85,12 @@ public class Client {
         this.medicalHistory = medicalHistory;
     }
 
-
     public List<Doctor> getDoctors () {
         return doctors;
     }
 
     public void setDoctors(List<Doctor> doctors) {
         this.doctors = doctors;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-    public int getClientId() {
-        return clientId;
-    }
-    public void setClientId(int clientId) {
-        this.clientId = clientId;
     }
 
     @Override

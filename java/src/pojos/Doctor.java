@@ -1,4 +1,4 @@
-package src.pojos;
+package pojos;
 
-public class Doctor {
+public class Doctor { //TODO class
 }

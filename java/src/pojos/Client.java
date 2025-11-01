@@ -12,18 +12,24 @@ public class Client {
     private LocalDate dob;
     private String mail;
     private Sex sex;
-    private User user;
+    //private User user;
     private List<MedicalHistory> medicalHistory;
-    private List <Doctor> doctors;
+    private int doctorId;
 
-    public Client(int clientId, String name, String surname, Sex sex){
-        this.clientId=clientId;
-        this.name=name;
-        this.surname=surname;
-        this.medicalHistory=new ArrayList<MedicalHistory>();
-        this.doctors=new ArrayList<Doctor>();
+    public Client(){
+
     }
 
+    public Client(String name, String surname, Sex sex, LocalDate dob, String mail) {
+        this.clientId = clientId; //TODO funcion crear id
+        this.name = name;
+        this.surname = surname;
+        this.sex=sex;
+        this.dob = dob;
+        this.mail = mail;
+        this.medicalHistory = new ArrayList<MedicalHistory>();
+        this.doctorId= doctorId;//TODO funcion q asigne
+    }
 
     public int getClientId() {
         return clientId;
@@ -69,15 +75,15 @@ public class Client {
         this.sex = sex;
     }
 
-    public User getUser() {
+    /*public User getUser() {
         return user;
     }
 
     public void setUser(User user) {
         this.user = user;
-    }
+    }*/
 
-    public List<MedicalHistory> getMedicalHistory () {
+    public List<MedicalHistory> getMedicalHistory() {
         return medicalHistory;
     }
 
@@ -85,41 +91,46 @@ public class Client {
         this.medicalHistory = medicalHistory;
     }
 
-    public List<Doctor> getDoctors () {
-        return doctors;
+    public int getDoctorId() {
+        return doctorId;
     }
 
-    public void setDoctors(List<Doctor> doctors) {
-        this.doctors = doctors;
+    public void setDoctors(int doctorId) {
+        this.doctorId = doctorId;
     }
+
+
+    public int createClientId(){
+        //TODO elegir si random o no random
+        return ++clientId;
+    }
+    public void addExtraInfo(){
+        //TODO funcion
+    }
+
+    public List<String>viewResults(){
+        //TODO funcion
+        return null;//cambiar el null
+    }
+
+    public void registerSymptoms(){
+        //TODO funcion
+    }
+
+
+
+
 
     @Override
     public String toString() {
-        return "Name: " + name + " Surname: " + surname + ", ClientId: " + clientId;
+        return "Client{" +
+                "name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", clientId=" + clientId +
+                '}';
     }
-
-    /*private void createRecord(){
-        medicalHistory newRecord=extraInfo();
-        newRecord.setClientName(this.name);
-        newRecord.setClientSurname(this.surname);
-        this.getMedicalHistory().add(newRecord);
-
-    }*/
-
-    /*private MedicalHistory extraInfo(){
-    Scanner sc=new Scanner(System.in);
-    Sex sex;
-    sout("Sex: 0- Female 1- Male");
-    int numSex=sc.nextInt();
-    if (numSex=0){
-      Sex sex=Sex.FEMALE;
-      } if
-    sout("Height");
-    int height= sc.nextInt();
-    sout("Weight ");
-    double weight=sc.nextDouble;
-    sout("Do you have any additional symptoms?"+\n+"1-Yes
-     */
-
-
 }
+
+
+
+

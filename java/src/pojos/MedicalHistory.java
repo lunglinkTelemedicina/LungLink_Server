@@ -13,7 +13,7 @@ public class MedicalHistory {
     private Signal signalEMG;
     private Signal signalECG;
     private String data;
-    private List<Symptoms> symptomsList;
+    private List<String> symptomsList;
 
     public MedicalHistory() {
         //constructor vacio
@@ -75,11 +75,11 @@ public class MedicalHistory {
         this.data = data;
     }
 
-    public List<Symptoms> getSymptomList() {
+    public List<String> getSymptomList() {
         return symptomsList;
     }
 
-    public void setSymptomList(List<Symptoms> symptomList) {
+    public void setSymptomList(List<String> symptomList) {
         this.symptomsList = symptomList;
     }
 }

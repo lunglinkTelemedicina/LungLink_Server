@@ -12,7 +12,7 @@ public class MedicalHistory {
     private int doctorId;
     private Signal signalEMG;
     private Signal signalECG;
-    private String data;
+    private String observations;
     private List<String> symptomsList;
 
     public MedicalHistory() {
@@ -67,12 +67,12 @@ public class MedicalHistory {
         this.signalECG = signalECG;
     }
 
-    public String getData() {
-        return data;
+    public String getObservations() {
+        return observations;
     }
 
-    public void setData(String data) {
-        this.data = data;
+    public void setObservations(String observations) {
+        this.observations = observations;
     }
 
     public List<String> getSymptomList() {

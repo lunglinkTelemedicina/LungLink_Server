@@ -8,7 +8,7 @@ public class MedicalHistory {
 
     private int recordId;
     private LocalDate date;
-    private int patientId;
+    private int clientId;
     private int doctorId;
     private Signal signalEMG;
     private Signal signalECG;
@@ -35,12 +35,12 @@ public class MedicalHistory {
         this.date = date;
     }
 
-    public int getPatientId() {
-        return patientId;
+    public int getClientId() {
+        return clientId;
     }
 
-    public void setPatientId(int patientId) {
-        this.patientId = patientId;
+    public void setClientId(int clientId) {
+        this.clientId = clientId;
     }
 
     public int getDoctorId() {

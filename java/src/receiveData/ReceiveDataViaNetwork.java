@@ -1,4 +1,4 @@
-package receiveData;
+/*package receiveData;
 
 import pojos.Client;
 
@@ -62,4 +62,4 @@ public class ReceiveDataViaNetwork {
             Logger.getLogger(ReceiveDataViaNetwork.class.getName()).log(Level.SEVERE,null,e);
         }
     }
-}
+} */

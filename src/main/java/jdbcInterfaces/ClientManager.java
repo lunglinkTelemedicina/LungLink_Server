@@ -1,6 +1,6 @@
-package src.jdbcInterfaces;
+package jdbcInterfaces;
 
-import src.pojos.Client;
+import pojos.Client;
 import java.util.List;
 
 public interface ClientManager {

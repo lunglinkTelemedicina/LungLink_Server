@@ -1,6 +1,6 @@
-package src.jdbcInterfaces;
+package jdbcInterfaces;
 
-import src.pojos.User;
+import pojos.User;
 
 public interface UserManager {
 

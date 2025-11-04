@@ -1,10 +1,8 @@
-package src.pojos;
+package pojos;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import pojos.Sex;
-import pojos.MedicalHistory;
 
 public class Client {
 

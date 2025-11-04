@@ -1,4 +1,4 @@
-package src.main;
+package main;
 
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or

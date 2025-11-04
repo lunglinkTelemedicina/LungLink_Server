@@ -1,4 +1,4 @@
-package src.jdbc;
+package jdbc;
 
 public class jdbcClient {
 

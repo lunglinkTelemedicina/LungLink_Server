@@ -1,7 +1,8 @@
-/*package src.jdbcInterfaces;
+package jdbcInterfaces;
 
-import src.pojos.Doctor;
+import pojos.Doctor;
 import java.util.List;
+
 
 public interface DoctorManager {
 
@@ -11,4 +12,4 @@ public interface DoctorManager {
     public void updateDoctor(Doctor doctor);
     public void deleteDoctor(int id);
 
-}*/
+}

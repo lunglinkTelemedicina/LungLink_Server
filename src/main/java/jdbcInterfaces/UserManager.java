@@ -4,8 +4,8 @@ import pojos.User;
 
 public interface UserManager {
 
-    public void insert(User user);
-    public User findByUsername(String username);
-    public void delete(String username);
+    public void addUser(User user);
+    public User getUserByUsername(String username);
+    public void deleteUser(String username);
 
 }

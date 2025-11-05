@@ -15,6 +15,7 @@ public class Client {
     //private User user;
     private List<MedicalHistory> medicalHistory;
     private int doctorId;
+    //añadir user_id???
 
     public Client(){
 
@@ -95,7 +96,7 @@ public class Client {
         return doctorId;
     }
 
-    public void setDoctors(int doctorId) {
+    public void setDoctorId(int doctorId) {
         this.doctorId = doctorId;
     }
 

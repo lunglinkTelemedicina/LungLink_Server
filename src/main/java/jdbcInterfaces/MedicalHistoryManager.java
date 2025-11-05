@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface MedicalHistoryManager {
 
-    void addMedicalHistory(MedicalHistory history);
+    int addMedicalHistory(MedicalHistory history);
     MedicalHistory getMedicalHistoryById(int id);
     List<MedicalHistory> getMedicalHistoryByClientId(int clientId);
     List<MedicalHistory> getMedicalHistories();

@@ -5,11 +5,11 @@ import java.util.List;
 
 public interface ClientManager {
 
-    public void addClient(Client client);
-    public Client getClientById(int id);
+    public int addClient(Client client);
+    public Client getClientById(int ClientId);
     public List<Client> getClients();
     public void updateClient(Client client);
-    public void deleteClient(int id);
+    public void deleteClient(int ClientId);
 
     //habra que decidir cuales más poner o cuales más nos hacen falta
 

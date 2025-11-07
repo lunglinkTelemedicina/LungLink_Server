@@ -12,24 +12,24 @@ public class Client {
     private LocalDate dob;
     private String mail;
     private Sex sex;
-    //private User user;
     private List<MedicalHistory> medicalHistory;
     private int doctorId;
-    //añadir user_id???
+    private int  userId;
 
     public Client(){
 
     }
 
-    public Client(String name, String surname, Sex sex, LocalDate dob, String mail) {
-        this.clientId = clientId; //TODO funcion crear id
+    public Client(int clientId, String name, String surname, LocalDate dob, String mail, Sex sex, List<MedicalHistory> medicalHistory, int doctorId, int userId) {
+        this.clientId = clientId;
         this.name = name;
         this.surname = surname;
-        this.sex=sex;
         this.dob = dob;
         this.mail = mail;
-        this.medicalHistory = new ArrayList<MedicalHistory>();
-        this.doctorId= doctorId;//TODO funcion q asigne
+        this.sex = sex;
+        this.medicalHistory = medicalHistory;
+        this.doctorId = doctorId;
+        this.userId = userId;
     }
 
     public int getClientId() {
@@ -76,14 +76,6 @@ public class Client {
         this.sex = sex;
     }
 
-    /*public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }*/
-
     public List<MedicalHistory> getMedicalHistory() {
         return medicalHistory;
     }
@@ -100,6 +92,13 @@ public class Client {
         this.doctorId = doctorId;
     }
 
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 
     public int createClientId(){
         //TODO elegir si random o no random

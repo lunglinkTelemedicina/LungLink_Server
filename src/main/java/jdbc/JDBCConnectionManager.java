@@ -7,11 +7,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-public class jdbcConnectionManager {
+public class JDBCConnectionManager {
 
     private Connection c = null;
 
-    public jdbcConnectionManager() {
+    public JDBCConnectionManager() {
         try {
             // Cargar el driver JDBC de SQLite
             Class.forName("org.sqlite.JDBC");
@@ -34,9 +34,9 @@ public class jdbcConnectionManager {
         } catch (ClassNotFoundException e) {
             System.out.println("No se cargó el driver JDBC de SQLite.");
         } catch (SQLException ex) {
-            Logger.getLogger(jdbcConnectionManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(JDBCConnectionManager.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(jdbcConnectionManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(JDBCConnectionManager.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -44,40 +44,42 @@ public class jdbcConnectionManager {
         try (Statement stmt = c.createStatement()) {
 
             stmt.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS User (
+                CREATE TABLE user (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    username TEXT NOT NULL UNIQUE,
+                    username TEXT UNIQUE NOT NULL,
                     password BLOB NOT NULL
                 );
             """);
 
             stmt.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS Doctor (
+                CREATE TABLE doctor (
                     doctor_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL,
                     surname TEXT NOT NULL,
-                    mail TEXT,
-                    specialty TEXT,
-                    user_id INTEGER,
-                    FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE CASCADE
+                    email TEXT NOT NULL,
+                    specialty TEXT,                     
+                    user_id INTEGER NOT NULL,          
+                    FOREIGN KEY (user_id) REFERENCES user(id)  -- foreign key al usuario para el login
                 );
             """);
 
             stmt.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS Client (
+                CREATE TABLE client (
                     client_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL,
                     surname TEXT NOT NULL,
-                    dob TEXT,
+                    dob DATE,
                     mail TEXT,
-                    sex TEXT,
-                    doctor_id INTEGER,
-                    FOREIGN KEY (doctor_id) REFERENCES Doctor(doctor_id) ON DELETE SET NULL
+                    sex TEXT,                           
+                    doctor_id INTEGER,                  
+                    user_id INTEGER NOT NULL,           
+                    FOREIGN KEY (doctor_id) REFERENCES doctor(doctor_id),  -- foreign key para el doctor asignado
+                    FOREIGN KEY (user_id) REFERENCES user(id)  -- foreign key al usuario para el login
                 );
             """);
 
             stmt.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS MedicalHistory (
+                CREATE TABLE IF NOT EXISTS medicalhistory (
                     record_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     date TEXT NOT NULL,
                     client_id INTEGER,
@@ -86,8 +88,8 @@ public class jdbcConnectionManager {
                     signalECG TEXT,
                     observations TEXT,
                     symptomsList TEXT,
-                    FOREIGN KEY (client_id) REFERENCES Client(client_id) ON DELETE CASCADE,
-                    FOREIGN KEY (doctor_id) REFERENCES Doctor(doctor_id) ON DELETE SET NULL
+                    FOREIGN KEY (client_id) REFERENCES client(client_id) ON DELETE CASCADE,
+                    FOREIGN KEY (doctor_id) REFERENCES doctor(doctor_id) ON DELETE SET NULL
                 );
             """);
 

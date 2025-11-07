@@ -1,4 +1,4 @@
-package src.pojos;
+package pojos;
 
 
 import java.time.LocalDate;
@@ -6,25 +6,25 @@ import java.util.List;
 
 public class MedicalHistory {
 
-    private int id;
+    private int recordId;
     private LocalDate date;
-    private int patientId;
+    private int clientId;
     private int doctorId;
     private Signal signalEMG;
     private Signal signalECG;
-    private String data;
-    private List<Symptoms> symptomList;
+    private String observations;
+    private List<String> symptomsList;
 
     public MedicalHistory() {
         //constructor vacio
     }
 
-    public int getId() {
-        return id;
+    public int getRecordId() {
+        return recordId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setRecordId(int recordId) {
+        this.recordId = recordId;
     }
 
     public LocalDate getDate() {
@@ -35,12 +35,12 @@ public class MedicalHistory {
         this.date = date;
     }
 
-    public int getPatientId() {
-        return patientId;
+    public int getClientId() {
+        return clientId;
     }
 
-    public void setPatientId(int patientId) {
-        this.patientId = patientId;
+    public void setClientId(int clientId) {
+        this.clientId = clientId;
     }
 
     public int getDoctorId() {
@@ -67,19 +67,19 @@ public class MedicalHistory {
         this.signalECG = signalECG;
     }
 
-    public String getData() {
-        return data;
+    public String getObservations() {
+        return observations;
     }
 
-    public void setData(String data) {
-        this.data = data;
+    public void setObservations(String observations) {
+        this.observations = observations;
     }
 
-    public List<Symptoms> getSymptomList() {
-        return symptomList;
+    public List<String> getSymptomList() {
+        return symptomsList;
     }
 
-    public void setSymptomList(List<Symptoms> symptomList) {
-        this.symptomList = symptomList;
+    public void setSymptomList(List<String> symptomList) {
+        this.symptomsList = symptomList;
     }
 }

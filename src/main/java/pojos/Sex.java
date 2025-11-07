@@ -1,4 +1,4 @@
-package src.pojos;
+package pojos;
 
 public enum Sex {
     FEMALE, MALE

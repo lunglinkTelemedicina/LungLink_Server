@@ -6,20 +6,20 @@ import pojos.Sex;
 
 import java.sql.*;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-
-public class jdbcClient implements ClientManager {
+public class JDBCClient implements ClientManager {
 
     @Override
     public int addClient(Client client) {
         String sql = """
-            INSERT INTO Client (name, surname, dob, mail, sex, doctor_id)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO client (name, surname, dob, mail, sex, doctor_id, user_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         """;
 
         int generatedId = -1;
-        jdbcConnectionManager cm = new jdbcConnectionManager();
+        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -29,21 +29,16 @@ public class jdbcClient implements ClientManager {
             ps.setString(3, client.getDob() != null ? client.getDob().toString() : null);
             ps.setString(4, client.getMail());
             ps.setString(5, client.getSex() != null ? client.getSex().name() : null);
-            //ps.setInt(6, client.getDoctorId());
-
-            // ⚠️ Aquí está el cambio importante:
-            if (client.getDoctorId() > 0) {
-                ps.setInt(6, client.getDoctorId());
-            } else {
-                ps.setNull(6, Types.INTEGER); // ← Esto evita el error de clave foránea
-            }
+            ps.setInt(6, client.getDoctorId());
+            ps.setInt(7, client.getUserId());
 
             ps.executeUpdate();
 
-            ResultSet rs = ps.getGeneratedKeys();
-            if (rs.next()) {
-                generatedId = rs.getInt(1);
-                client.setClientId(generatedId);
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    generatedId = rs.getInt(1);
+                    client.setClientId(generatedId);
+                }
             }
 
             System.out.println("Cliente insertado correctamente con ID: " + generatedId);
@@ -51,8 +46,6 @@ public class jdbcClient implements ClientManager {
         } catch (SQLException e) {
             System.err.println("Error al insertar cliente:");
             e.printStackTrace();
-        } finally {
-            cm.disconnect();
         }
 
         return generatedId;
@@ -60,10 +53,10 @@ public class jdbcClient implements ClientManager {
 
     @Override
     public Client getClientById(int clientId) {
-        String sql = "SELECT * FROM Client WHERE client_id = ?";
+        String sql = "SELECT * FROM client WHERE client_id = ?";
         Client c = null;
 
-        jdbcConnectionManager cm = new jdbcConnectionManager();
+        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -78,25 +71,20 @@ public class jdbcClient implements ClientManager {
                 c.setSurname(rs.getString("surname"));
 
                 String dob = rs.getString("dob");
-                if (dob != null) {
-                    c.setDob(LocalDate.parse(dob));
-                }
+                if (dob != null) c.setDob(LocalDate.parse(dob));
 
                 c.setMail(rs.getString("mail"));
 
                 String sex = rs.getString("sex");
-                if (sex != null) {
-                    c.setSex(Sex.valueOf(sex));
-                }
+                if (sex != null) c.setSex(Sex.valueOf(sex));
 
                 c.setDoctorId(rs.getInt("doctor_id"));
+                c.setUserId(rs.getInt("user_id"));
             }
 
         } catch (SQLException e) {
             System.err.println("Error al obtener cliente por ID:");
             e.printStackTrace();
-        } finally {
-            cm.disconnect();
         }
 
         return c;
@@ -105,9 +93,9 @@ public class jdbcClient implements ClientManager {
     @Override
     public List<Client> getClients() {
         List<Client> list = new ArrayList<>();
-        String sql = "SELECT * FROM Client";
+        String sql = "SELECT * FROM client";
 
-        jdbcConnectionManager cm = new jdbcConnectionManager();
+        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              Statement st = conn.createStatement();
@@ -120,18 +108,15 @@ public class jdbcClient implements ClientManager {
                 c.setSurname(rs.getString("surname"));
 
                 String dob = rs.getString("dob");
-                if (dob != null) {
-                    c.setDob(LocalDate.parse(dob));
-                }
+                if (dob != null) c.setDob(LocalDate.parse(dob));
 
                 c.setMail(rs.getString("mail"));
 
                 String sex = rs.getString("sex");
-                if (sex != null) {
-                    c.setSex(Sex.valueOf(sex));
-                }
+                if (sex != null) c.setSex(Sex.valueOf(sex));
 
                 c.setDoctorId(rs.getInt("doctor_id"));
+                c.setUserId(rs.getInt("user_id"));
 
                 list.add(c);
             }
@@ -139,8 +124,6 @@ public class jdbcClient implements ClientManager {
         } catch (SQLException e) {
             System.err.println("Error al obtener lista de clientes:");
             e.printStackTrace();
-        } finally {
-            cm.disconnect();
         }
 
         return list;
@@ -149,12 +132,12 @@ public class jdbcClient implements ClientManager {
     @Override
     public void updateClient(Client client) {
         String sql = """
-            UPDATE Client
-            SET name=?, surname=?, dob=?, mail=?, sex=?, doctor_id=?
-            WHERE client_id=?
+            UPDATE client
+            SET name = ?, surname = ?, dob = ?, mail = ?, sex = ?, doctor_id = ?, user_id = ?
+            WHERE client_id = ?
         """;
 
-        jdbcConnectionManager cm = new jdbcConnectionManager();
+        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -164,44 +147,42 @@ public class jdbcClient implements ClientManager {
             ps.setString(3, client.getDob() != null ? client.getDob().toString() : null);
             ps.setString(4, client.getMail());
             ps.setString(5, client.getSex() != null ? client.getSex().name() : null);
-            //ps.setInt(6, client.getDoctorId());
-            if (client.getDoctorId() > 0) {
-                ps.setInt(6, client.getDoctorId());
-            } else {
-                ps.setNull(6, Types.INTEGER);  // 💡 aquí el cambio
-            }
-            ps.setInt(7, client.getClientId());
+            ps.setInt(6, client.getDoctorId());
+            ps.setInt(7, client.getUserId());
+            ps.setInt(8, client.getClientId());
 
-            ps.executeUpdate();
-            System.out.println("Cliente actualizado correctamente.");
+            int rows = ps.executeUpdate();
+            if (rows > 0) {
+                System.out.println("Cliente actualizado correctamente (ID " + client.getClientId() + ")");
+            } else {
+                System.out.println("No se encontró cliente con ese ID.");
+            }
 
         } catch (SQLException e) {
             System.err.println("Error al actualizar cliente:");
             e.printStackTrace();
-        } finally {
-            cm.disconnect();
         }
     }
 
     @Override
     public void deleteClient(int clientId) {
-        String sql = "DELETE FROM Client WHERE client_id = ?";
-
-        jdbcConnectionManager cm = new jdbcConnectionManager();
+        String sql = "DELETE FROM client WHERE client_id = ?";
+        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, clientId);
-            ps.executeUpdate();
-            System.out.println("Cliente eliminado correctamente.");
+            int rows = ps.executeUpdate();
+            if (rows > 0) {
+                System.out.println("Cliente eliminado correctamente (ID " + clientId + ")");
+            } else {
+                System.out.println("No se encontró cliente con ese ID.");
+            }
 
         } catch (SQLException e) {
             System.err.println("Error al eliminar cliente:");
             e.printStackTrace();
-        } finally {
-            cm.disconnect();
         }
     }
 }
-

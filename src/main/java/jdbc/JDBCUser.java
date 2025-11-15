@@ -5,47 +5,43 @@ import pojos.User;
 
 import java.sql.*;
 
-public class jdbcUser implements UserManager {
+public class JDBCUser implements UserManager {
+
 
     @Override
     public int addUser(User user) {
-        String sql = "INSERT INTO User (username, password) VALUES (?, ?)";
-        int generatedId = -1;
-
-        jdbcConnectionManager cm = new jdbcConnectionManager();
+        String sql = "INSERT INTO user (username, password) VALUES (?, ?)";
+        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            ps.setString(1, user.username);
-            ps.setBytes(2, user.password);
+            ps.setString(1, user.getUsername());
+            ps.setBytes(2, user.getPassword());
             ps.executeUpdate();
 
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
-                    generatedId = rs.getInt(1);
-                    user.id = generatedId;
+                    user.id = rs.getInt(1);
                 }
             }
 
-            System.out.println("Usuario insertado correctamente con ID: " + generatedId);
+            System.out.println("Usuario insertado con ID: " + user.getId());
 
         } catch (SQLException e) {
             System.err.println("Error al insertar usuario:");
             e.printStackTrace();
-        } finally {
-            cm.disconnect();
         }
 
-        return generatedId;
+        return user.id;
     }
+
 
     @Override
     public User getUserByUsername(String username) {
-        String sql = "SELECT * FROM User WHERE username = ?";
-        User u = null;
+        String sql = "SELECT * FROM user WHERE username = ?";
 
-        jdbcConnectionManager cm = new jdbcConnectionManager();
+        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -54,26 +50,26 @@ public class jdbcUser implements UserManager {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                u = new User();
-                u.id = rs.getInt("id");
-                u.username = rs.getString("username");
-                u.password = rs.getBytes("password");
+                User u = new User();
+                u.setId(rs.getInt("id"));
+                u.setUsername(rs.getString("username"));
+                u.setPassword(rs.getBytes("password"));
+                return u;
             }
 
         } catch (SQLException e) {
             System.err.println("Error al obtener usuario por nombre de usuario:");
             e.printStackTrace();
-        } finally {
-            cm.disconnect();
         }
-
-        return u;
+        return null;
     }
+
+
 
     @Override
     public void deleteUser(int id) {
-        String sql = "DELETE FROM User WHERE id = ?";
-        jdbcConnectionManager cm = new jdbcConnectionManager();
+        String sql = "DELETE FROM user WHERE id = ?";
+        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -85,15 +81,13 @@ public class jdbcUser implements UserManager {
         } catch (SQLException e) {
             System.err.println("Error al eliminar usuario por ID:");
             e.printStackTrace();
-        } finally {
-            cm.disconnect();
         }
     }
 
     @Override
     public void deleteUserByName(String username) {
-        String sql = "DELETE FROM User WHERE username = ?";
-        jdbcConnectionManager cm = new jdbcConnectionManager();
+        String sql = "DELETE FROM user WHERE username = ?";
+        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -105,8 +99,6 @@ public class jdbcUser implements UserManager {
         } catch (SQLException e) {
             System.err.println("Error al eliminar usuario por nombre:");
             e.printStackTrace();
-        } finally {
-            cm.disconnect();
         }
     }
 }

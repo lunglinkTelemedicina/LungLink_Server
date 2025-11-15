@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 
-public class jdbcMedicalHistory implements MedicalHistoryManager {
+public class JDBCMedicalHistory implements MedicalHistoryManager {
 
     @Override
     public int addMedicalHistory(MedicalHistory m) {
@@ -18,7 +18,7 @@ public class jdbcMedicalHistory implements MedicalHistoryManager {
         """;
 
         int generatedId = -1;
-        jdbcConnectionManager cm = new jdbcConnectionManager();
+        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -65,7 +65,7 @@ public class jdbcMedicalHistory implements MedicalHistoryManager {
     public MedicalHistory getMedicalHistoryById(int recordId) {
         String sql = "SELECT * FROM MedicalHistory WHERE record_id = ?";
         MedicalHistory mh = null;
-        jdbcConnectionManager cm = new jdbcConnectionManager();
+        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -99,7 +99,7 @@ public class jdbcMedicalHistory implements MedicalHistoryManager {
     public List<MedicalHistory> getMedicalHistoryByClientId(int clientId) {
         List<MedicalHistory> list = new ArrayList<>();
         String sql = "SELECT * FROM MedicalHistory WHERE client_id = ?";
-        jdbcConnectionManager cm = new jdbcConnectionManager();
+        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -135,7 +135,7 @@ public class jdbcMedicalHistory implements MedicalHistoryManager {
     public List<MedicalHistory> getMedicalHistories() {
         List<MedicalHistory> list = new ArrayList<>();
         String sql = "SELECT * FROM MedicalHistory";
-        jdbcConnectionManager cm = new jdbcConnectionManager();
+        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              Statement st = conn.createStatement();
@@ -168,7 +168,7 @@ public class jdbcMedicalHistory implements MedicalHistoryManager {
     @Override
     public void deleteMedicalHistory(int recordId) {
         String sql = "DELETE FROM MedicalHistory WHERE record_id = ?";
-        jdbcConnectionManager cm = new jdbcConnectionManager();
+        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

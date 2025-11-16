@@ -16,7 +16,7 @@ public class ClientHandler implements Runnable {
 
     @Override
     public void run(){
-        System.out.println("Client connected");
+        System.out.println("Client connected" /*+ socket.getRemoteSocketAddress()*/);
 
         try{
             BufferedReader bf=new BufferedReader(new InputStreamReader(socket.getInputStream()));

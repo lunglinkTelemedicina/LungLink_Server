@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.net.SocketException;
 
 public class ClientHandler implements Runnable {
-    private final Socket socket;
+    private Socket socket;
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
@@ -17,8 +17,10 @@ public class ClientHandler implements Runnable {
     @Override
     public void run(){
         System.out.println("Client connected");
+
         try{
             BufferedReader bf=new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
             String line;
             while((line=bf.readLine())!=null){
                 if(line.equals("x")||line.equalsIgnoreCase("DISCONNECT")){

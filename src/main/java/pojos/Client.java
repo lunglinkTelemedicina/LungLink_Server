@@ -32,6 +32,10 @@ public class Client {
         this.userId = userId;
     }
 
+    public Client(int clientId, String name, String surname, LocalDate dob, String mail, Sex sex, Object o) {
+
+    }
+
     public int getClientId() {
         return clientId;
     }

@@ -17,6 +17,48 @@ public class Signal {
         this.clientId = clientId;
     }
 
+    public List<Integer> getValues() {
+        return values;
+    }
+
+    public void setValues(List<Integer> values) {
+        this.values = values;
+    }
+
+    public String getSignalFile() {
+        return signalFile;
+    }
+
+    public void setSignalFile(String signalFile) {
+        this.signalFile = signalFile;
+    }
+
+    public TypeSignal getType() {
+        return type;
+    }
+
+    public void setType(TypeSignal type) {
+        this.type = type;
+    }
+
+    public int getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(int clientId) {
+        this.clientId = clientId;
+    }
+
+    @Override
+    public String toString() {
+        return "Signal{" +
+                "values=" + values +
+                ", signalFile='" + signalFile + '\'' +
+                ", type=" + type +
+                ", clientId=" + clientId +
+                '}';
+    }
+
     public void valuesToList(String values) {
         List<Integer> newValues = new LinkedList<>();
         String[] element = values.split(" ");

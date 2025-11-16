@@ -93,15 +93,17 @@ public class JDBCConnectionManager {
                 );
             """);
 
-//            stmt.executeUpdate("""
-//                CREATE TABLE IF NOT EXISTS Signal (
-//                    signal_id INTEGER PRIMARY KEY AUTOINCREMENT,
-//                    type TEXT NOT NULL, -- EMG o ECG
-//                    data BLOB,
-//                    record_id INTEGER,
-//                    FOREIGN KEY (record_id) REFERENCES MedicalHistory(record_id) ON DELETE CASCADE
-//                );
-//            """);
+            stmt.executeUpdate("""
+                CREATE TABLE IF NOT EXISTS signal (
+                     signal_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                     type TEXT NOT NULL,
+                     values TEXT NOT NULL,
+                     signal_file TEXT,             
+                     sampling_rate INTEGER DEFAULT 100,
+                     client_id INTEGER NOT NULL,
+                     FOREIGN KEY (client_id) REFERENCES client(client_id)
+                );
+            """);
 
             System.out.println("Tablas creadas o verificadas correctamente.");
 

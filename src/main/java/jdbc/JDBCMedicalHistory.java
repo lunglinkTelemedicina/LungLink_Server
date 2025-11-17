@@ -63,7 +63,7 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
 
     @Override
     public MedicalHistory getMedicalHistoryById(int recordId) {
-        String sql = "SELECT * FROM MedicalHistory WHERE record_id = ?";
+        String sql = "SELECT * FROM medicalhisstory WHERE record_id = ?";
         MedicalHistory mh = null;
         JDBCConnectionManager cm = new JDBCConnectionManager();
 
@@ -83,6 +83,11 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
                 mh.setClientId(rs.getInt("client_id"));
                 mh.setDoctorId(rs.getInt("doctor_id"));
                 mh.setObservations(rs.getString("observations"));
+
+                String symptomsStr = rs.getString("symptomsList");
+                if (symptomsStr != null && !symptomsStr.isEmpty()) {
+                    mh.setSymptomsList(Arrays.asList(symptomsStr.split(",")));
+                }
             }
 
         } catch (SQLException e) {
@@ -98,7 +103,7 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
     @Override
     public List<MedicalHistory> getMedicalHistoryByClientId(int clientId) {
         List<MedicalHistory> list = new ArrayList<>();
-        String sql = "SELECT * FROM MedicalHistory WHERE client_id = ?";
+        String sql = "SELECT * FROM medicalhistory WHERE client_id = ?";
         JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
@@ -117,6 +122,11 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
                 mh.setClientId(rs.getInt("client_id"));
                 mh.setDoctorId(rs.getInt("doctor_id"));
                 mh.setObservations(rs.getString("observations"));
+
+                String symptomsStr = rs.getString("symptomsList");
+                if (symptomsStr != null && !symptomsStr.isEmpty()) {
+                    mh.setSymptomsList(Arrays.asList(symptomsStr.split(",")));
+                }
 
                 list.add(mh);
             }
@@ -164,6 +174,37 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
 
         return list;
     }
+
+    public void addSymptoms(int recordId, List<String> symptoms) {
+        if (symptoms == null || symptoms.isEmpty()) {
+            System.out.println("No hay síntomas para añadir.");
+            return;
+        }
+
+        // Convertimos la lista en una sola cadena separada por comas
+        String symptomsStr = String.join(",", symptoms);
+
+        String sql = "UPDATE medicalhistory SET symptomsList = ? WHERE record_id = ?";
+        JDBCConnectionManager cm = new JDBCConnectionManager();
+
+        try (Connection conn = cm.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, symptomsStr);
+            ps.setInt(2, recordId);
+
+            ps.executeUpdate();
+
+            System.out.println("Síntomas añadidos correctamente al historial " + recordId);
+
+        } catch (SQLException e) {
+            System.err.println("Error al añadir síntomas:");
+            e.printStackTrace();
+        } finally {
+            cm.disconnect();
+        }
+    }
+
 
     @Override
     public void deleteMedicalHistory(int recordId) {

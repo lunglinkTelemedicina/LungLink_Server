@@ -75,11 +75,11 @@ public class MedicalHistory {
         this.observations = observations;
     }
 
-    public List<String> getSymptomList() {
+    public List<String> getSymptomsList() {
         return symptomsList;
     }
 
-    public void setSymptomList(List<String> symptomList) {
+    public void setSymptomsList(List<String> symptomList) {
         this.symptomsList = symptomList;
     }
 }

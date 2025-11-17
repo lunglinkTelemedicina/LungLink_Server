@@ -14,8 +14,8 @@ public class JDBCClient implements ClientManager {
     @Override
     public int addClient(Client client) {
         String sql = """
-            INSERT INTO client (name, surname, dob, mail, sex, doctor_id, user_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO client (name, surname, dob, mail, sex, weight, height, doctor_id, user_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """;
 
         int generatedId = -1;
@@ -29,8 +29,10 @@ public class JDBCClient implements ClientManager {
             ps.setString(3, client.getDob() != null ? client.getDob().toString() : null);
             ps.setString(4, client.getMail());
             ps.setString(5, client.getSex() != null ? client.getSex().name() : null);
-            ps.setInt(6, client.getDoctorId());
-            ps.setInt(7, client.getUserId());
+            ps.setDouble(6, client.getWeight());
+            ps.setDouble(7, client.getHeight());
+            ps.setInt(8, client.getDoctorId());
+            ps.setInt(9, client.getUserId());
 
             ps.executeUpdate();
 
@@ -78,6 +80,9 @@ public class JDBCClient implements ClientManager {
                 String sex = rs.getString("sex");
                 if (sex != null) c.setSex(Sex.valueOf(sex));
 
+                c.setWeight(rs.getDouble("weight"));
+                c.setHeight(rs.getDouble("height"));
+
                 c.setDoctorId(rs.getInt("doctor_id"));
                 c.setUserId(rs.getInt("user_id"));
             }
@@ -115,6 +120,9 @@ public class JDBCClient implements ClientManager {
                 String sex = rs.getString("sex");
                 if (sex != null) c.setSex(Sex.valueOf(sex));
 
+                c.setWeight(rs.getDouble("weight"));
+                c.setHeight(rs.getDouble("height"));
+
                 c.setDoctorId(rs.getInt("doctor_id"));
                 c.setUserId(rs.getInt("user_id"));
 
@@ -130,10 +138,10 @@ public class JDBCClient implements ClientManager {
     }
 
     @Override
-    public void updateClient(Client client) {
+    public void updateClient(Client client) { //TODO meter weight y height
         String sql = """
             UPDATE client
-            SET name = ?, surname = ?, dob = ?, mail = ?, sex = ?, doctor_id = ?, user_id = ?
+            SET name = ?, surname = ?, dob = ?, mail = ?, sex = ?, weight = ?, height = ?, doctor_id = ?, user_id = ?
             WHERE client_id = ?
         """;
 
@@ -147,9 +155,11 @@ public class JDBCClient implements ClientManager {
             ps.setString(3, client.getDob() != null ? client.getDob().toString() : null);
             ps.setString(4, client.getMail());
             ps.setString(5, client.getSex() != null ? client.getSex().name() : null);
-            ps.setInt(6, client.getDoctorId());
-            ps.setInt(7, client.getUserId());
-            ps.setInt(8, client.getClientId());
+            ps.setDouble(6, client.getWeight());
+            ps.setDouble(7, client.getHeight());
+            ps.setInt(8, client.getDoctorId());
+            ps.setInt(9, client.getUserId());
+            ps.setInt(10, client.getClientId());
 
             int rows = ps.executeUpdate();
             if (rows > 0) {

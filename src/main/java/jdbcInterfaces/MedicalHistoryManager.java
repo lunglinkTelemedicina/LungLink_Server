@@ -9,6 +9,7 @@ public interface MedicalHistoryManager {
     MedicalHistory getMedicalHistoryById(int id);
     List<MedicalHistory> getMedicalHistoryByClientId(int clientId);
     List<MedicalHistory> getMedicalHistories();
+    void addSymptoms(int recordId, List<String> symptoms);
     void deleteMedicalHistory(int id);
 
 }

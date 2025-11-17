@@ -13,6 +13,8 @@ public class Client {
     private String mail;
     private Sex sex;
     private List<MedicalHistory> medicalHistory;
+    private double weight;
+    private double height;
     private int doctorId;
     private int  userId;
 
@@ -20,7 +22,7 @@ public class Client {
 
     }
 
-    public Client(int clientId, String name, String surname, LocalDate dob, String mail, Sex sex, List<MedicalHistory> medicalHistory, int doctorId, int userId) {
+    public Client(int clientId, String name, String surname, LocalDate dob, String mail, Sex sex, List<MedicalHistory> medicalHistory, double weight, double height, int doctorId, int userId) {
         this.clientId = clientId;
         this.name = name;
         this.surname = surname;
@@ -28,6 +30,8 @@ public class Client {
         this.mail = mail;
         this.sex = sex;
         this.medicalHistory = medicalHistory;
+        this.weight = weight;
+        this.height = height;
         this.doctorId = doctorId;
         this.userId = userId;
     }
@@ -88,6 +92,22 @@ public class Client {
         this.medicalHistory = medicalHistory;
     }
 
+    public double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public void setHeight(double height) {
+        this.height = height;
+    }
+
     public int getDoctorId() {
         return doctorId;
     }
@@ -104,31 +124,20 @@ public class Client {
         this.userId = userId;
     }
 
-    public int createClientId(){
-        //TODO elegir si random o no random
-        return ++clientId;
-    }
-    public void addExtraInfo(){
-        //TODO funcion
-    }
-
-    public List<String>viewResults(){
-        //TODO funcion
-        return null;//cambiar el null
-    }
-
-    public void registerSymptoms(){
-        //TODO funcion
-    }
-
-
-
     @Override
     public String toString() {
         return "Client{" +
-                "name='" + name + '\'' +
+                "clientId=" + clientId +
+                ", name='" + name + '\'' +
                 ", surname='" + surname + '\'' +
-                ", clientId=" + clientId +
+                ", dob=" + dob +
+                ", mail='" + mail + '\'' +
+                ", sex=" + sex +
+                ", medicalHistory=" + medicalHistory +
+                ", weight=" + weight +
+                ", height=" + height +
+                ", doctorId=" + doctorId +
+                ", userId=" + userId +
                 '}';
     }
 }

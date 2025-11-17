@@ -5,7 +5,6 @@ import jdbc.JDBCClient;
 import jdbc.JDBCMedicalHistory;
 import jdbc.JDBCSignal;
 import pojos.MedicalHistory;
-import pojos.Signal;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -15,14 +14,14 @@ import java.util.List;
 public class CommandProcessor {
 
     //Estas clases acceden a la base de datos
-    private final JDBCClient clientDAO;
-    private final JDBCMedicalHistory historyDAO;
-    private final JDBCSignal signalDAO;
+    private final JDBCClient jdbcClient;
+    private final JDBCMedicalHistory jdbcMedicalHistory;
+    private final JDBCSignal jdbcSignal;
 
     public CommandProcessor() {
-        this.clientDAO = new JDBCClient();
-        this.historyDAO = new JDBCMedicalHistory();
-        this.signalDAO = new JDBCSignal();
+        this.jdbcClient = new JDBCClient();
+        this.jdbcMedicalHistory = new JDBCMedicalHistory();
+        this.jdbcSignal = new JDBCSignal();
     }
 
     //Este metodo recibe un mensaje y según como empiece llama a un metodo o a otro para manejar la peticion
@@ -48,10 +47,6 @@ public class CommandProcessor {
 
                 case GET_HISTORY:
                     return handleGetHistory(parts);
-
-                    //TODO queremos que el paciente vea sus señales?
-//                case GET_SIGNALS:
-//                    return handleGetSignals(parts);
 
                 case DISCONNECT:
                     return "OK|Disconnected";
@@ -100,7 +95,7 @@ public class CommandProcessor {
     //Por cada GetHistory: DATE, SYMPTOMS, OBS
     private String handleGetHistory(String[] parts) {
         int clientId = Integer.parseInt(parts[1]);
-        List<MedicalHistory> list = historyDAO.getMedicalHistoryByClientId(clientId);
+        List<MedicalHistory> list = jdbcMedicalHistory.getMedicalHistoryByClientId(clientId);
 
         if (list.isEmpty()) {
             return "ERROR|No history";

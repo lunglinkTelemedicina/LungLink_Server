@@ -73,7 +73,7 @@ public class CommandProcessor {
         MedicalHistory mh = new MedicalHistory();
         mh.setClientId(clientId);
         mh.setDate(LocalDate.now());
-        mh.setSymptomList(symptoms);
+        mh.setSymptomsList(symptoms);
 
         // Guardamos en la BD usando el DAO
         //historyDAO.addSymptoms(mh); //TODO habria que crear addSymptons en la base de datos
@@ -107,8 +107,8 @@ public class CommandProcessor {
 
             response += "DATE: " + mh.getDate() + "\n";
 
-            if (mh.getSymptomList() != null)
-                response += "SYMPTOMS: " + mh.getSymptomList() + "\n";
+            if (mh.getSymptomsList() != null)
+                response += "SYMPTOMS: " + mh.getSymptomsList() + "\n";
 
             if (mh.getObservations() != null)
                 response += "OBS: " + mh.getObservations() + "\n";

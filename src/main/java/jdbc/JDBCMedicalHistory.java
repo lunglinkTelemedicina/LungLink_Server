@@ -2,6 +2,8 @@ package jdbc;
 
 import jdbcInterfaces.MedicalHistoryManager;
 import pojos.MedicalHistory;
+import pojos.Signal;
+import pojos.TypeSignal;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -88,6 +90,8 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
                 if (symptomsStr != null && !symptomsStr.isEmpty()) {
                     mh.setSymptomsList(Arrays.asList(symptomsStr.split(",")));
                 }
+
+                loadSignalsForHistory(mh, conn);
             }
 
         } catch (SQLException e) {
@@ -128,6 +132,8 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
                     mh.setSymptomsList(Arrays.asList(symptomsStr.split(",")));
                 }
 
+                loadSignalsForHistory(mh, conn);
+
                 list.add(mh);
             }
 
@@ -162,6 +168,7 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
                 mh.setDoctorId(rs.getInt("doctor_id"));
                 mh.setObservations(rs.getString("observations"));
 
+                loadSignalsForHistory(mh, conn);
                 list.add(mh);
             }
 
@@ -175,14 +182,14 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
         return list;
     }
 
-    public void addSymptoms(int recordId, List<String> symptoms) {
-        if (symptoms == null || symptoms.isEmpty()) {
+    public void addSymptoms(int recordId, List<String> symptomsList) {
+        if (symptomsList == null || symptomsList.isEmpty()) {
             System.out.println("No hay síntomas para añadir.");
             return;
         }
 
         // Convertimos la lista en una sola cadena separada por comas
-        String symptomsStr = String.join(",", symptoms);
+        String symptomsStr = String.join(",", symptomsList);
 
         String sql = "UPDATE medicalhistory SET symptomsList = ? WHERE record_id = ?";
         JDBCConnectionManager cm = new JDBCConnectionManager();
@@ -226,4 +233,88 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
             cm.disconnect();
         }
     }
+
+    public void addSignalToMedicalHistory(int recordId, Signal signal) {
+        if (signal == null) {
+            System.out.println("Null singal, it cannot be added.");
+            return;
+        }
+
+        String sql = """
+        INSERT INTO signal (type, values, signal_file, sampling_rate, client_id, record_id)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """;
+
+        JDBCConnectionManager cm = new JDBCConnectionManager();
+
+        try (Connection conn = cm.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+
+            if (signal.getType() != null) {
+                ps.setString(1, signal.getType().name());
+            } else {
+                ps.setNull(1, Types.VARCHAR);
+            }
+            ps.setString(2, signal.valuesToDB());
+            ps.setString(3, signal.getSignalFile());
+            ps.setInt(4, 100);
+            ps.setInt(5, signal.getClientId());
+            ps.setInt(6, recordId);
+
+            ps.executeUpdate();
+            System.out.println("Signal added to the record " + recordId);
+
+        } catch (SQLException e) {
+            System.err.println("Error while adding the signal:");
+            e.printStackTrace();
+        } finally {
+            cm.disconnect();
+        }
+    }
+
+    public void loadSignalsForHistory(MedicalHistory mh, Connection conn) {
+        if (mh == null) return;
+
+        String sql = "SELECT * FROM signal WHERE record_id = ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, mh.getRecordId());
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Signal signal = new Signal();
+
+                String typeStr = rs.getString("type");
+                if (typeStr != null) {
+                    signal.setType(TypeSignal.valueOf(typeStr.toUpperCase()));
+                }
+
+                // values (usando el metodo valuesToList de la clase Signal)
+                String valuesString = rs.getString("values");
+                if (valuesString != null) {
+                    signal.valuesToList(valuesString);
+                }
+
+                signal.setSignalFile(rs.getString("signal_file"));
+                signal.setClientId(rs.getInt("client_id"));
+
+                // Ahora asignamos la señal al MedicalHistory
+                if (signal.getType() == TypeSignal.EMG) {
+                    mh.setSignalEMG(signal);
+                } else if (signal.getType() == TypeSignal.ECG) {
+                    mh.setSignalECG(signal);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error al cargar señales del historial médico:");
+            e.printStackTrace();
+        }
+    }
+
+
+
 }

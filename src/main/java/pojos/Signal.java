@@ -10,11 +10,17 @@ public class Signal {
     private TypeSignal type;
     private static final int samplingRate = 100; //en hercios
     private int clientId;
+    private int recordId;
 
-    public Signal(TypeSignal type, int clientId) {
+    public Signal(TypeSignal type, int clientId, int recordId) {
         this.values = new LinkedList<>();
         this.type = type;
         this.clientId = clientId;
+        this.recordId = recordId;
+    }
+
+    public Signal() {
+
     }
 
     public List<Integer> getValues() {
@@ -49,14 +55,20 @@ public class Signal {
         this.clientId = clientId;
     }
 
-    @Override
-    public String toString() {
-        return "Signal{" +
-                "values=" + values +
-                ", signalFile='" + signalFile + '\'' +
-                ", type=" + type +
-                ", clientId=" + clientId +
-                '}';
+    public int getRecordId() {
+        return recordId;
+    }
+
+    public void setRecordId(int recordId) {
+        this.recordId = recordId;
+    }
+
+    public Signal(List<Integer> values, String signalFile, TypeSignal type, int clientId, int recordId) {
+        this.values = values;
+        this.signalFile = signalFile;
+        this.type = type;
+        this.clientId = clientId;
+        this.recordId = recordId;
     }
 
     public void valuesToList(String values) {

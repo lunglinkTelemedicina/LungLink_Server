@@ -44,7 +44,7 @@ public class JDBCConnectionManager {
         try (Statement stmt = c.createStatement()) {
 
             stmt.executeUpdate("""
-                CREATE TABLE user (
+                CREATE TABLE IF NOT EXISTS user (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     username TEXT UNIQUE NOT NULL,
                     password BLOB NOT NULL
@@ -52,7 +52,7 @@ public class JDBCConnectionManager {
             """);
 
             stmt.executeUpdate("""
-                CREATE TABLE doctor (
+                CREATE TABLE IF NOT EXISTS doctor (
                     doctor_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL,
                     surname TEXT NOT NULL,
@@ -64,7 +64,7 @@ public class JDBCConnectionManager {
             """);
 
             stmt.executeUpdate("""
-                CREATE TABLE client (
+                CREATE TABLE IF NOT EXISTS client (
                     client_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL,
                     surname TEXT NOT NULL,
@@ -86,8 +86,8 @@ public class JDBCConnectionManager {
                     date TEXT NOT NULL,
                     client_id INTEGER,
                     doctor_id INTEGER,
-                    signalEMG TEXT,
-                    signalECG TEXT,
+//                    signalEMG TEXT,
+//                    signalECG TEXT,
                     observations TEXT,
                     symptomsList TEXT,
                     FOREIGN KEY (client_id) REFERENCES client(client_id) ON DELETE CASCADE,
@@ -103,7 +103,9 @@ public class JDBCConnectionManager {
                      signal_file TEXT,             
                      sampling_rate INTEGER DEFAULT 100,
                      client_id INTEGER NOT NULL,
+                     record_id INTEGER NOT NULL,
                      FOREIGN KEY (client_id) REFERENCES client(client_id)
+                     FOREIGN KEY (record_id) REFERENCES medicalhistory(record_id)
                 );
             """);
 

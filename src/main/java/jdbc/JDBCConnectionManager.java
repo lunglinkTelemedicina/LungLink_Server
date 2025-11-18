@@ -29,6 +29,7 @@ public class JDBCConnectionManager {
             c.createStatement().execute("PRAGMA foreign_keys=ON");
 
             System.out.println("Conexión establecida con la base de datos LungLink.");
+
             createTables();
 
         } catch (ClassNotFoundException e) {
@@ -86,8 +87,8 @@ public class JDBCConnectionManager {
                     date TEXT NOT NULL,
                     client_id INTEGER,
                     doctor_id INTEGER,
-//                    signalEMG TEXT,
-//                    signalECG TEXT,
+                    signalEMG TEXT,
+                    signalECG TEXT,
                     observations TEXT,
                     symptomsList TEXT,
                     FOREIGN KEY (client_id) REFERENCES client(client_id) ON DELETE CASCADE,
@@ -104,18 +105,18 @@ public class JDBCConnectionManager {
                      sampling_rate INTEGER DEFAULT 100,
                      client_id INTEGER NOT NULL,
                      record_id INTEGER NOT NULL,
-                     FOREIGN KEY (client_id) REFERENCES client(client_id)
+                     FOREIGN KEY (client_id) REFERENCES client(client_id),
                      FOREIGN KEY (record_id) REFERENCES medicalhistory(record_id)
                 );
             """);
 
-            System.out.println("Tablas creadas o verificadas correctamente.");
+            System.out.println("Tables created or correctly verified");
 
         } catch (SQLException e) {
             if (e.getMessage().contains("already exist")) {
-                System.out.println("Las tablas ya existen.");
+                System.out.println("Tables already exist");
             } else {
-                System.out.println("Error al crear las tablas:");
+                System.out.println("Error while creating tables:");
                 e.printStackTrace();
             }
         }

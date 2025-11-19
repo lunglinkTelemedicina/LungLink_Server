@@ -93,7 +93,4 @@ public class ReceiveDataViaNetwork {
     }
     //TODO receive medicalHistory cuando las signals este claro como se recogen y se guardan
 
-
-
-
 }

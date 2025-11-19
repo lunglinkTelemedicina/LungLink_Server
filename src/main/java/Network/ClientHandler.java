@@ -1,9 +1,6 @@
 package Network;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 
@@ -15,34 +12,48 @@ public class ClientHandler implements Runnable {
     }
 
     @Override
-    public void run(){
-        System.out.println("Client connected" /*+ socket.getRemoteSocketAddress()*/);
+    public void run() {
 
-        try{
-            BufferedReader bf=new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        try (DataInputStream dataIn = new DataInputStream(socket.getInputStream());
+             DataOutputStream dataOut = new DataOutputStream(socket.getOutputStream())) {
 
-            String line;
-            while((line=bf.readLine())!=null){
-                if(line.equals("x")||line.equalsIgnoreCase("DISCONNECT")){
-                    System.out.println("Client ended communication.");
-                    break;
+            boolean running = true;
+
+            while (running) {
+                String message = dataIn.readUTF();
+
+                if (message.startsWith(String.valueOf(CommandType.SEND_SYMPTOMS))) {
+
+                    String[] parts = message.split("\\|");
+                    int clientId = Integer.parseInt(parts[1]);
+                    String[] symptoms = parts[2].split(",");
+
+                    System.out.println("Symptoms received " + clientId);
+                    dataOut.flush();
+                } else if (message.startsWith(String.valueOf(CommandType.SEND_ECG))) { // falta añadir EMG
+
+                    String[] parts = message.split("\\|");
+                    int clientId = Integer.parseInt(parts[1]);
+                    String type = parts[2];
+                    int numSamples = Integer.parseInt(parts[3]);
+
+
+                    // Read Bytes form the signal
+                    int length = dataIn.readInt();
+                    byte[] buffer = new byte[length];
+                    dataIn.readFully(buffer);
+
+                    System.out.println("Signal " + type + " received (" + numSamples + " samples)");
+                    dataOut.flush();
+
+                } else if (message.equals("DISCONNECT")) {
+                    dataOut.flush();
+                    running = false;
                 }
-                System.out.println("Message received: "+line);
             }
 
-        } catch (SocketException se) {
-            System.out.println("Client disconnected abruptly.");
-
-        } catch (IOException eCliente) {
-            System.out.println(" Error with client.");
-            eCliente.printStackTrace();
-
-        } finally {
-            System.out.println("Closing sockets of this client.");
-
-            try {
-                socket.close();
-            } catch (IOException ignored) {}
+        } catch (IOException e) {
+            System.out.println("ClientDisconnected: " + e.getMessage());
         }
     }
 }

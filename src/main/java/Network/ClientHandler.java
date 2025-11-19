@@ -3,6 +3,7 @@ package Network;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
+import java.sql.SQLOutput;
 
 public class ClientHandler implements Runnable {
     private Socket socket;
@@ -28,7 +29,8 @@ public class ClientHandler implements Runnable {
                     int clientId = Integer.parseInt(parts[1]);
                     String[] symptoms = parts[2].split(",");
 
-                    System.out.println("Symptoms received " + clientId);
+                    System.out.println("Symptoms received from client: " + clientId);
+                    dataOut.writeUTF("Received");
                     dataOut.flush();
                 } else if (message.startsWith(String.valueOf(CommandType.SEND_ECG))) { // falta añadir EMG
 
@@ -44,9 +46,11 @@ public class ClientHandler implements Runnable {
                     dataIn.readFully(buffer);
 
                     System.out.println("Signal " + type + " received (" + numSamples + " samples)");
+                    dataOut.writeUTF("Received");
                     dataOut.flush();
 
                 } else if (message.equals("DISCONNECT")) {
+                    dataOut.writeUTF("Closing");
                     dataOut.flush();
                     running = false;
                 }

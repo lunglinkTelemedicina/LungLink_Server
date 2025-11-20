@@ -81,7 +81,7 @@ public class ClientHandler implements Runnable {
 
 
                 } else if (message.equals("DISCONNECT")) {
-                    send.sendString("OK|Disconnected");
+                    send.sendString("Disconnected");
                     running = false;
                 }
             }

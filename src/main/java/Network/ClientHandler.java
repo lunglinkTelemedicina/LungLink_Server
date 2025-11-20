@@ -69,8 +69,7 @@ public class ClientHandler implements Runnable {
                     send.sendString("Extra Info saved");
 
                 } else if (message.equals("DISCONNECT")) {
-                    dataOut.writeUTF("Closing");
-                    dataOut.flush();
+                    send.sendString("OK|Disconnected");
                     running = false;
                 }
             }

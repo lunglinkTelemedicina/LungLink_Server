@@ -30,6 +30,12 @@ public class ReceiveDataViaNetwork {
     public String receiveString() throws IOException {
         return dataInputStream.readUTF();
     }
+    public byte[] receiveBytes() throws IOException {
+        int length = dataInputStream.readInt();
+        byte[] buffer = new byte[length];
+        dataInputStream.readFully(buffer); // block till all bytes arrive
+        return buffer;
+    }
 
     public Client receiveClient() {
         Client client = null;

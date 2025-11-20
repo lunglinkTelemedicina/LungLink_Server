@@ -42,27 +42,31 @@ public class ClientHandler implements Runnable {
                     medicalHistory.setDate(LocalDate.now());
                     medicalHistory.setSymptomsList(symptoms);
 
-                    //FALTA IMPLEMENTRA JDBC 
+                    //FALTA IMPLEMENTRA JDBC jdbMedicalHistory.addSymptoms(medicalHistory)
 
                     System.out.println("Symptoms received from client: " + clientId);
-                    dataOut.writeUTF("Received");
-                    dataOut.flush();
-                } else if (message.startsWith(String.valueOf(CommandType.SEND_ECG))) { // falta añadir EMG
+
+                } else if (message.startsWith("SEND_ECG") || message.startsWith("SEND_EMG")) {
 
                     String[] parts = message.split("\\|");
                     int clientId = Integer.parseInt(parts[1]);
-                    String type = parts[2];
-                    int numSamples = Integer.parseInt(parts[3]);
+                    int numSamples = Integer.parseInt(parts[2]);
+                    String signalType = message.startsWith("SEND_ECG") ? "ECG" : "EMG";
 
+                    send.sendString("Client can send the data");
+                    byte[] signalBytes = receive.receiveBytes();
+                    //jdbcSignal.saveSignal(clientId, signalType, signalBytes)
+                    send.sendString("Signal saved");
 
-                    // Read Bytes form the signal
-                    int length = dataIn.readInt();
-                    byte[] buffer = new byte[length];
-                    dataIn.readFully(buffer);
+                }else if (message.startsWith(String.valueOf(CommandType.ADD_EXTRA_INFO))) {
 
-                    System.out.println("Signal " + type + " received (" + numSamples + " samples)");
-                    dataOut.writeUTF("Received");
-                    dataOut.flush();
+                    String[] parts = message.split("\\|");
+                    int clientId = Integer.parseInt(parts[1]);
+                    double height = Double.parseDouble(parts[2]);
+                    double weight = Double.parseDouble(parts[3]);
+
+                    // jdbcClient.updateHeightWeight(clientId, height, weight);
+                    send.sendString("Extra Info saved");
 
                 } else if (message.equals("DISCONNECT")) {
                     dataOut.writeUTF("Closing");

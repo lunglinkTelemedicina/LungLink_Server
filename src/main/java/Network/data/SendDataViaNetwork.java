@@ -30,6 +30,14 @@ public class SendDataViaNetwork {
             System.err.println("Error sending string: " + e.getMessage());
         }
     }
+    public void sendBytes(byte[] data) throws IOException {
+        dataOutputStream.writeInt(data.length);
+        dataOutputStream.write(data);
+        dataOutputStream.flush();
+
+    }
+
+
 
     public void sendClient(Client client)  {
         try {

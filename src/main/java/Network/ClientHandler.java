@@ -1,33 +1,48 @@
 package Network;
 
+import Network.data.ReceiveDataViaNetwork;
+import Network.data.SendDataViaNetwork;
+import pojos.MedicalHistory;
+
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.sql.SQLOutput;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ClientHandler implements Runnable {
     private Socket socket;
+    private final ReceiveDataViaNetwork receive;
+    private final SendDataViaNetwork send;
+
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
+        this.receive = new ReceiveDataViaNetwork(socket);
+        this.send = new SendDataViaNetwork(socket);
     }
 
     @Override
     public void run() {
-
-        try (DataInputStream dataIn = new DataInputStream(socket.getInputStream());
-             DataOutputStream dataOut = new DataOutputStream(socket.getOutputStream())) {
-
+        try{
             boolean running = true;
-
             while (running) {
-                String message = dataIn.readUTF();
-
+                String message = receive.receiveString();
                 if (message.startsWith(String.valueOf(CommandType.SEND_SYMPTOMS))) {
 
                     String[] parts = message.split("\\|");
                     int clientId = Integer.parseInt(parts[1]);
-                    String[] symptoms = parts[2].split(",");
+                    List<String> symptoms = Arrays.asList(parts[2].split(","));
+
+                    MedicalHistory medicalHistory = new MedicalHistory();
+                    medicalHistory.setClientId(clientId);
+                    medicalHistory.setDate(LocalDate.now());
+                    medicalHistory.setSymptomsList(symptoms);
+
+                    //FALTA IMPLEMENTRA JDBC 
 
                     System.out.println("Symptoms received from client: " + clientId);
                     dataOut.writeUTF("Received");

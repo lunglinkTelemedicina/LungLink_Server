@@ -62,17 +62,22 @@ public class ClientHandler implements Runnable {
 
                     send.sendString("Client can send the data");
 
+                    byte[] raw = receive.receiveBytes();
+
                     // Convertir bytes a enteros (raw BITalino)
                     Signal signal = new Signal();
                     signal.setClientId(clientId);
                     signal.setType(type);
-                    signal.setValuesFromBytes(signalBytes);
+                    signal.fromByteArray(raw);
 
                     // Guardar en un historial nuevo
                     MedicalHistory mh = new MedicalHistory();
                     mh.setClientId(clientId);
                     mh.setDate(LocalDate.now());
                     jdbcMedicalHistory.addMedicalHistory(mh);
+
+                    int recordId = jdbcMedicalHistory.addMedicalHistory(mh);
+                    signal.setRecordId(recordId);
 
                     jdbcMedicalHistory.addSignalToMedicalHistory(mh.getRecordId(), signal);
 

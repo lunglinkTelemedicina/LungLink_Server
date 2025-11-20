@@ -37,6 +37,8 @@ public class ReceiveDataViaNetwork {
         return buffer;
     }
 
+
+
     public Client receiveClient() {
         Client client = null;
 

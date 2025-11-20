@@ -1,43 +1,25 @@
 package pojos;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Signal {
 
-    private List<Integer> values;
-    private String signalFile;
-    private TypeSignal type;
-    private static final int samplingRate = 100; //en hercios
-    private int clientId;
-    private int recordId;
-
-    public Signal(TypeSignal type, int clientId, int recordId) {
-        this.values = new LinkedList<>();
-        this.type = type;
-        this.clientId = clientId;
-        this.recordId = recordId;
-    }
+    private TypeSignal type;         // ECG o EMG
+    private int clientId;            // Paciente
+    private int recordId;            // (solo servidor lo usa)
+    private List<Integer> values;    // Muestras de la señal
 
     public Signal() {
-
+        this.values = new ArrayList<>();
     }
 
-    public List<Integer> getValues() {
-        return values;
+    public Signal(TypeSignal type, int clientId) {
+        this.type = type;
+        this.clientId = clientId;
+        this.values = new ArrayList<>();
     }
 
-    public void setValues(List<Integer> values) {
-        this.values = values;
-    }
-
-    public String getSignalFile() {
-        return signalFile;
-    }
-
-    public void setSignalFile(String signalFile) {
-        this.signalFile = signalFile;
-    }
 
     public TypeSignal getType() {
         return type;
@@ -63,37 +45,52 @@ public class Signal {
         this.recordId = recordId;
     }
 
-    public Signal(List<Integer> values, String signalFile, TypeSignal type, int clientId, int recordId) {
+    public List<Integer> getValues() {
+        return values;
+    }
+
+    public void setValues(List<Integer> values) {
         this.values = values;
-        this.signalFile = signalFile;
-        this.type = type;
-        this.clientId = clientId;
-        this.recordId = recordId;
+    }
+
+    public void addSample(int sample) {
+        values.add(sample);
     }
 
 
-    public void valuesToList(String values) {
-        List<Integer> newValues = new LinkedList<>();
-        String[] element = values.split(" ");
-        for (String e : element) {
-            newValues.add(Integer.parseInt(e));
+    // Reconstruir señal desde BYTES (servidor)
+
+
+    public void fromByteArray(byte[] raw) {
+        values.clear();
+        for (int i = 0; i < raw.length; i += 2) {
+            int val = ((raw[i] & 0xFF) << 8) | (raw[i + 1] & 0xFF);
+            values.add(val);
         }
-        this.values = newValues;
     }
 
-    //es para que al guardarlo en la db se giarde en forma de cadena de texto en la columan correpsondiente
-    public String valuesToDB() {
+
+    // Guardar señal como CSV en BD
+
+
+    public String toCSV() {
+        if (values.isEmpty()) return "";
         StringBuilder sb = new StringBuilder();
-        String sep = " ";
+        for (int v : values) sb.append(v).append(",");
+        return sb.substring(0, sb.length() - 1);
+    }
 
-        for (int i = 0; i < values.size(); i++) {
-            sb.append(values.get(i));
-            if (i < values.size() - 1) {
-                sb.append(sep);
-            }
+
+    // Cargar señal desde CSV de BD
+
+
+    public void fromCSV(String csv) {
+        values.clear();
+        if (csv == null || csv.isBlank()) return;
+
+        String[] parts = csv.split(",");
+        for (String p : parts) {
+            values.add(Integer.parseInt(p.trim()));
         }
-        return sb.toString();
     }
 }
-
-

@@ -31,7 +31,7 @@ public class SendDataViaNetwork {
         }
     }
 
-    public void sendClient(Client client) {
+    public void sendClient(Client client)  {
         try {
             dataOutputStream.writeInt(client.getClientId());
             dataOutputStream.writeUTF(client.getName());

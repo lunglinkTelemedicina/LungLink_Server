@@ -84,7 +84,7 @@ public class Signal {
     // Cargar señal desde CSV de BD
 
 
-    public void fromCSV(String csv) {
+    public void fromCSV(String csv) { // FILE
         values.clear();
         if (csv == null || csv.isBlank()) return;
 

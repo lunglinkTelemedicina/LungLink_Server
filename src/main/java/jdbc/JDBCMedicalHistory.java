@@ -65,7 +65,7 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
 
     @Override
     public MedicalHistory getMedicalHistoryById(int recordId) {
-        String sql = "SELECT * FROM medicalhisstory WHERE record_id = ?";
+        String sql = "SELECT * FROM medicalhistory WHERE record_id = ?";
         MedicalHistory mh = null;
         JDBCConnectionManager cm = new JDBCConnectionManager();
 

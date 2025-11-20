@@ -2,6 +2,7 @@ package Network;
 
 import Network.data.ReceiveDataViaNetwork;
 import Network.data.SendDataViaNetwork;
+import jdbc.JDBCMedicalHistory;
 import pojos.MedicalHistory;
 
 import java.io.*;
@@ -67,6 +68,17 @@ public class ClientHandler implements Runnable {
 
                     // jdbcClient.updateHeightWeight(clientId, height, weight);
                     send.sendString("Extra Info saved");
+
+                }else if (message.startsWith(String.valueOf(CommandType.GET_HISTORY))){
+                    String[] parts = message.split("\\|");
+                    int clientId = Integer.parseInt(parts[1]);
+                    List <MedicalHistory> medicalHistoryList= JDBCMedicalHistory.getMedicalHistoryByClientId(clientId);
+                    try{
+
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+
 
                 } else if (message.equals("DISCONNECT")) {
                     send.sendString("OK|Disconnected");

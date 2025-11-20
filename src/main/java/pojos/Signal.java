@@ -71,6 +71,7 @@ public class Signal {
         this.recordId = recordId;
     }
 
+
     public void valuesToList(String values) {
         List<Integer> newValues = new LinkedList<>();
         String[] element = values.split(" ");

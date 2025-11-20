@@ -195,4 +195,35 @@ public class JDBCClient implements ClientManager {
             e.printStackTrace();
         }
     }
+
+    public void updateHeightWeight(int clientId, double weight, double height) {
+        String sql = """
+        UPDATE client
+        SET weight = ?, height = ?
+        WHERE client_id = ?
+    """;
+
+        JDBCConnectionManager cm = new JDBCConnectionManager();
+
+        try (Connection conn = cm.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setDouble(1, weight);
+            ps.setDouble(2, height);
+            ps.setInt(3, clientId);
+
+            int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+                System.out.println("Weight and height correctly updated for client with id: ( " + clientId + ")");
+            } else {
+                System.out.println("Client not found");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error while updating height and weight");
+            e.printStackTrace();
+        }
+    }
+
 }

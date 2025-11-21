@@ -1,8 +1,5 @@
 package Network.data;
 
-import pojos.Client;
-import pojos.Doctor;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
@@ -22,6 +19,11 @@ public class SendDataViaNetwork {
         }
     }
 
+    public void sendInt(int value) throws IOException {
+        dataOutputStream.writeInt(value);
+        dataOutputStream.flush();
+    }
+
     public void sendString(String message) {
         try {
             dataOutputStream.writeUTF(message);
@@ -30,6 +32,7 @@ public class SendDataViaNetwork {
             System.err.println("Error sending string: " + e.getMessage());
         }
     }
+
     public void sendBytes(byte[] data) throws IOException {
         dataOutputStream.writeInt(data.length);
         dataOutputStream.write(data);

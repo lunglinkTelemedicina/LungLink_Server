@@ -1,15 +1,14 @@
 package Network;
-//TODO falta conectar bien con la base de datos cada metodo
 
-import jdbc.JDBCClient;
-import jdbc.JDBCMedicalHistory;
-import jdbc.JDBCSignal;
-import pojos.MedicalHistory;
+import Network.data.ReceiveDataViaNetwork;
+import Network.data.SendDataViaNetwork;
+import jdbc.*;
+import pojos.*;
 
+import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+
 
 public class CommandProcessor {
 
@@ -25,7 +24,7 @@ public class CommandProcessor {
     }
 
     //Este metodo recibe un mensaje y según como empiece llama a un metodo o a otro para manejar la peticion
-    public String handleClientRequest(String message) {
+    public String handleClientRequest(String message, ReceiveDataViaNetwork receive, SendDataViaNetwork send) {
 
         //Mensaje vacio
         if (message == null || message.isEmpty())
@@ -37,7 +36,7 @@ public class CommandProcessor {
 
         try {
 
-            switch (cmd) {//TODO receive signals
+            switch (cmd) {
 
                 case SEND_SYMPTOMS:
                     return handleSendSymptoms(parts);
@@ -48,16 +47,19 @@ public class CommandProcessor {
                 case GET_HISTORY:
                     return handleGetHistory(parts);
 
+                case SEND_ECG:
+                case SEND_EMG:
+                    return handleSignals(parts, cmd, receive, send);
                 case DISCONNECT:
-                    return "OK|Disconnected";
+                    return "OK|Client disconnected";
 
                 default:
-                    return "ERROR|Unknown command " + cmd;
+                    return "ERROR| Unknown command" + cmd;
             }
 
         } catch (Exception ex) {
             // Si algo falla en cualquier comando → devolvemos error al cliente
-            return "ERROR|" + ex.getMessage();
+            return "ERROR" + ex.getMessage();
         }
     }
 
@@ -69,16 +71,15 @@ public class CommandProcessor {
         // Pasamos de string de sintomas con ',' a una lista de sintomas
         List<String> symptoms = new ArrayList<>(Arrays.asList(symptomsCSV.split(",")));
 
-        // Creamos un objeto MedicalHistory SOLO para síntomas
+        // Creamos un objeto MedicalHistory solo para síntomas
         MedicalHistory medicalHistory = new MedicalHistory();
         medicalHistory.setClientId(clientId);
         medicalHistory.setDate(LocalDate.now());
-        medicalHistory.setSymptomsList(symptoms);
 
-        // Guardamos en la BD usando el DAO
-        //jdbcMedicalHistory.addSymptoms(medicalHistory); //TODO conexion base de datos
+        int recordId = jdbcMedicalHistory.addMedicalHistory(medicalHistory);
+        jdbcMedicalHistory.addSymptoms(recordId, symptoms);
 
-        return "OK|Symptoms saved";
+        return "OK|Symptoms are saved";
     }
 
     private String handleAddExtraInfo(String[] parts) {
@@ -87,23 +88,24 @@ public class CommandProcessor {
         double height = Double.parseDouble(parts[2]);
         double weight = Double.parseDouble(parts[3]);
 
-        //jdbcClient.updateHeightWeight(clientId, height, weight);//TODO conexion base de datos
-
+        jdbcClient.updateHeightWeight(clientId, height, weight);
         return "OK|Extra info saved";
     }
 
-    //Por cada GetHistory: DATE, SYMPTOMS, OBS
+
     private String handleGetHistory(String[] parts) {
         int clientId = Integer.parseInt(parts[1]);
         List<MedicalHistory> list = jdbcMedicalHistory.getMedicalHistoryByClientId(clientId);
 
         if (list.isEmpty()) {
-            return "ERROR|No history";
+            return "ERROR| No history found";
         }
 
-        String response = "HISTORY|";
+        String response = "History:";
 
         for (MedicalHistory mh : list) {
+
+            response += "ID: " + mh.getRecordId() + "\n";
 
             response += "DATE: " + mh.getDate() + "\n";
 
@@ -113,12 +115,56 @@ public class CommandProcessor {
             if (mh.getObservations() != null)
                 response += "OBS: " + mh.getObservations() + "\n";
 
-            response += "---------------------\n";
         }
 
         return response;
 
     }
+
+    private String handleSignals(String[] parts,
+                                 CommandType cmd,
+                                 ReceiveDataViaNetwork receive,
+                                 SendDataViaNetwork send) throws Exception {
+
+        int clientId = Integer.parseInt(parts[1]);
+        int numSamples = Integer.parseInt(parts[2]);
+
+        TypeSignal type = (cmd == CommandType.SEND_ECG)
+                ? TypeSignal.ECG
+                : TypeSignal.EMG;
+
+        // tell client to send bytes
+        send.sendString("OK|Send bytes");
+
+        // receive raw bytes
+        byte[] raw = receive.receiveBytes();
+
+        Signal signal = new Signal(type, clientId);
+        signal.fromByteArray(raw);
+
+        MedicalHistory medicalHistory = new MedicalHistory();
+        medicalHistory.setClientId(clientId);
+        medicalHistory.setDate(LocalDate.now());
+
+        int recordId = jdbcMedicalHistory.addMedicalHistory(medicalHistory);
+        signal.setRecordId(recordId);
+
+        try {
+            String fileName = signal.saveAsFile();
+            signal.setSignalFile(fileName);
+
+            jdbcSignal.addSignal(signal);
+
+            return "OK|Signal saved";
+        } catch (IOException e) {
+            System.err.println("Error saving signal file: " + e.getMessage());
+            send.sendString("Error saving signal");
+        }
+
+        return "ERROR|Signal could not be saved";
+    }
 }
+
+
 
 

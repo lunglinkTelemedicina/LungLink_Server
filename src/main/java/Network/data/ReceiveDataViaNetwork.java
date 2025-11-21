@@ -1,18 +1,11 @@
 package Network.data;
 
-import pojos.Client;
-import pojos.Doctor;
-import pojos.DoctorSpecialty;
-import pojos.Sex;
-
 import java.io.DataInputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
-import java.time.LocalDate;
 
 public class ReceiveDataViaNetwork {
-//TODO : no tengo claro como se conecta esto con clienthandler o server connection
+
     private DataInputStream dataInputStream;
     private Socket socket;
 
@@ -26,9 +19,14 @@ public class ReceiveDataViaNetwork {
         }
     }
 
+    public int receiveInt() throws IOException{
+        return dataInputStream.readInt();
+    }
+
     public String receiveString() throws IOException {
         return dataInputStream.readUTF();
     }
+
     public byte[] receiveBytes() throws IOException {
         int length = dataInputStream.readInt();
         byte[] buffer = new byte[length];

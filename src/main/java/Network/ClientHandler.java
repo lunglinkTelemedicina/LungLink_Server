@@ -7,20 +7,16 @@ import jdbc.JDBCMedicalHistory;
 import jdbc.JDBCSignal;
 import pojos.*;
 import pojos.TypeSignal;
-import Network.ServerConnection;
 
 
 import java.io.*;
 import java.net.Socket;
-import java.net.SocketException;
-import java.sql.SQLOutput;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class ClientHandler implements Runnable {
-    private Socket socket;
+    private final Socket socket;
     private final ReceiveDataViaNetwork receive;
     private final SendDataViaNetwork send;
 
@@ -29,6 +25,8 @@ public class ClientHandler implements Runnable {
     private final JDBCClient jdbcClient = new JDBCClient();
 
     private final ServerConnection serverConnection;
+    private final CommandProcessor processor;
+
     private boolean running = true;
 
     public ClientHandler(Socket socket, ServerConnection serverConnection) {
@@ -36,102 +34,33 @@ public class ClientHandler implements Runnable {
         this.serverConnection = serverConnection;
         this.receive = new ReceiveDataViaNetwork(socket);
         this.send = new SendDataViaNetwork(socket);
+        this.processor = new CommandProcessor();
     }
 
     @Override
     public void run() {
-        try{
-
+        try {
             while (running) {
+
                 String message = receive.receiveString();
-                if (message.startsWith(String.valueOf(CommandType.SEND_SYMPTOMS))) {
 
-                    String[] parts = message.split("\\|");
-                    int clientId = Integer.parseInt(parts[1]);
-                    List<String> symptoms = Arrays.asList(parts[2].split(","));
+                // PROCESS COMMAND WITH THE BRAIN
+                String response = processor.handleClientRequest(message, receive, send);
 
-                    MedicalHistory medicalHistory = new MedicalHistory();
-                    medicalHistory.setClientId(clientId);
-                    medicalHistory.setDate(LocalDate.now());
-                    jdbcMedicalHistory.addMedicalHistory(medicalHistory);
-                    jdbcMedicalHistory.addSymptoms(medicalHistory.getRecordId(), symptoms);
-                    send.sendString("Symptoms saved correctly");
+                // SEND RESPONSE BACK
+                send.sendString(response);
 
-
-                }  else if (message.startsWith("SEND_ECG") || message.startsWith("SEND_EMG")) {
-
-                String[] parts = message.split("\\|");
-                int clientId = Integer.parseInt(parts[1]);
-                int numSamples = Integer.parseInt(parts[2]);
-                TypeSignal type = message.startsWith("SEND_ECG") ? TypeSignal.ECG : TypeSignal.EMG;
-
-                // Avisar al cliente
-                send.sendString("Client can send the data");
-
-                // Recibir bytes de la señal
-                byte[] raw = receive.receiveBytes();
-
-                // Reconstruir señal
-                Signal signal = new Signal(type, clientId);
-                signal.fromByteArray(raw);
-
-                // Crear historial médico
-                MedicalHistory mh = new MedicalHistory();
-                mh.setClientId(clientId);
-                mh.setDate(LocalDate.now());
-
-                int recordId = jdbcMedicalHistory.addMedicalHistory(mh);
-                signal.setRecordId(recordId);
-
-                try {
-                    // Guardar archivo CSV en signals
-                    String fileName = signal.saveAsFile();
-                    signal.setSignalFile(fileName);
-
-                    // Guardar la señal en la BD (nombre)
-                    jdbcSignal.addSignal(signal);
-                    send.sendString("Signal saved");
-
-                } catch (IOException e) {
-                    System.err.println("Error saving signal file: " + e.getMessage());
-                    send.sendString("Error saving signal");
-                }
-
-        }else if (message.startsWith(String.valueOf(CommandType.ADD_EXTRA_INFO))) {
-
-                    String[] parts = message.split("\\|");
-                    int clientId = Integer.parseInt(parts[1]);
-                    double height = Double.parseDouble(parts[2]);
-                    double weight = Double.parseDouble(parts[3]);
-
-                    jdbcClient.updateHeightWeight(clientId, height, weight);
-                    send.sendString("Extra Info saved");
-
-                }else if (message.startsWith(String.valueOf(CommandType.GET_HISTORY))){
-                    String[] parts = message.split("\\|");
-                    int clientId = Integer.parseInt(parts[1]);
-                    List <MedicalHistory> medicalHistoryList= jdbcMedicalHistory.getMedicalHistoryByClientId(clientId);
-                    StringBuilder sb = new StringBuilder();
-                    for (MedicalHistory mh : medicalHistoryList) {
-                        sb.append("RecordID=").append(mh.getRecordId())
-                                .append(";Date=").append(mh.getDate())
-                                .append(";Obs=").append(mh.getObservations())
-                                .append("\n");
-                    }
-                    send.sendString(sb.toString());
-
-                } else if (message.equals("DISCONNECT")) {
-                    send.sendString("Disconnected");
+                if (response.startsWith("OK|Disconnected")) {
                     running = false;
                 }
             }
 
         } catch (IOException e) {
-            System.out.println("ClientDisconnected: " + e.getMessage());
-        }finally{
+            System.out.println("Client disconnected: " + e.getMessage());
+        } finally {
             serverConnection.unregisterClient(this);
             closeConnection();
-            System.out.println("Client handler closed for: " + socket.getRemoteSocketAddress());
+            System.out.println("Closed handler for: " + socket.getRemoteSocketAddress());
         }
     }
 
@@ -153,4 +82,8 @@ public class ClientHandler implements Runnable {
         }
     }
 }
+
+
+
+
 

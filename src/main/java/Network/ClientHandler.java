@@ -20,10 +20,6 @@ public class ClientHandler implements Runnable {
     private final ReceiveDataViaNetwork receive;
     private final SendDataViaNetwork send;
 
-    private final JDBCMedicalHistory jdbcMedicalHistory = new JDBCMedicalHistory();
-    private final JDBCSignal jdbcSignal = new JDBCSignal();
-    private final JDBCClient jdbcClient = new JDBCClient();
-
     private final ServerConnection serverConnection;
     private final CommandProcessor processor;
 

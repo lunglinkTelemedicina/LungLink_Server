@@ -37,53 +37,6 @@ public class ReceiveDataViaNetwork {
     }
 
 
-    public Client receiveClient() {
-        Client client = null;
-
-        try {
-            int clientId = dataInputStream.readInt();
-            String name = dataInputStream.readUTF();
-            String surname = dataInputStream.readUTF();
-            LocalDate dob = LocalDate.parse(dataInputStream.readUTF());
-            String mail = dataInputStream.readUTF();
-            String sexStr = dataInputStream.readUTF();
-            Sex sex = Sex.valueOf(sexStr);
-
-            client = new Client(clientId, name, surname, dob, mail, sex, null);
-
-        } catch (EOFException ex) {
-            System.out.println("Client data not correctly read.");
-        } catch (IOException ex) {
-            System.err.println("Error receiving Client data: " + ex.getMessage());
-            ex.printStackTrace();
-        }
-
-        return client;
-    }
-
-    public Doctor receiveDoctor() {
-        Doctor doctor = null;
-
-        try {
-            int id = dataInputStream.readInt();
-            String name = dataInputStream.readUTF();
-            String surname = dataInputStream.readUTF();
-            String email = dataInputStream.readUTF();
-            String specialtyStr = dataInputStream.readUTF();
-            DoctorSpecialty specialty =  DoctorSpecialty.valueOf(specialtyStr);
-
-            doctor = new Doctor(id, name, surname, email, specialty);
-
-        } catch (EOFException ex) {
-            System.out.println("Doctor data not fully received.");
-        } catch (IOException ex) {
-            System.err.println("Error receiving Doctor data: " + ex.getMessage());
-            ex.printStackTrace();
-        }
-
-        return doctor;
-    }
-
     public void releaseResources() {
         try {
             if (dataInputStream != null) {

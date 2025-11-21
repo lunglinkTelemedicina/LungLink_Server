@@ -37,37 +37,6 @@ public class SendDataViaNetwork {
 
     }
 
-    public void sendClient(Client client)  {
-        try {
-            dataOutputStream.writeInt(client.getClientId());
-            dataOutputStream.writeUTF(client.getName());
-            dataOutputStream.writeUTF(client.getSurname());
-            dataOutputStream.writeUTF(client.getDob().toString());
-            dataOutputStream.writeUTF(client.getMail());
-            dataOutputStream.writeUTF(client.getSex().toString());
-
-            dataOutputStream.flush();
-
-        } catch (IOException e) {
-            System.err.println("Error sending client data: " + e.getMessage());
-        }
-    }
-
-    public void sendDoctor(Doctor doctor) {
-        try {
-            dataOutputStream.writeInt(doctor.getDoctorId());
-            dataOutputStream.writeUTF(doctor.getName());
-            dataOutputStream.writeUTF(doctor.getSurname());
-            dataOutputStream.writeUTF(doctor.getEmail());
-            dataOutputStream.writeUTF(doctor.getSpecialty().toString());
-
-            dataOutputStream.flush();
-
-        } catch (IOException e) {
-            System.err.println("Error sending doctor data: " + e.getMessage());
-        }
-    }
-
     public void releaseResources() {
         try {
             if (dataOutputStream != null) {

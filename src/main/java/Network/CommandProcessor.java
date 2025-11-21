@@ -54,12 +54,12 @@ public class CommandProcessor {
                     return "OK|Client disconnected";
 
                 default:
-                    return "ERROR| Unknown command" + cmd;
+                    return "ERROR|Unknown command" + cmd;
             }
 
         } catch (Exception ex) {
             // Si algo falla en cualquier comando → devolvemos error al cliente
-            return "ERROR" + ex.getMessage();
+            return "ERROR|" + ex.getMessage();
         }
     }
 
@@ -98,7 +98,7 @@ public class CommandProcessor {
         List<MedicalHistory> list = jdbcMedicalHistory.getMedicalHistoryByClientId(clientId);
 
         if (list.isEmpty()) {
-            return "ERROR| No history found";
+            return "ERROR|No history found";
         }
 
         String response = "History:";

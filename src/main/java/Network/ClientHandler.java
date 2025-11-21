@@ -58,37 +58,46 @@ public class ClientHandler implements Runnable {
                     send.sendString("Symptoms saved correctly");
 
 
-                } else if (message.startsWith("SEND_ECG") || message.startsWith("SEND_EMG")) {
+                }  else if (message.startsWith("SEND_ECG") || message.startsWith("SEND_EMG")) {
 
-                    String[] parts = message.split("\\|");
-                    int clientId = Integer.parseInt(parts[1]);
-                    int numSamples = Integer.parseInt(parts[2]);
-                    TypeSignal type = message.startsWith("SEND_ECG") ? TypeSignal.ECG : TypeSignal.EMG;
+                String[] parts = message.split("\\|");
+                int clientId = Integer.parseInt(parts[1]);
+                int numSamples = Integer.parseInt(parts[2]);
+                TypeSignal type = message.startsWith("SEND_ECG") ? TypeSignal.ECG : TypeSignal.EMG;
 
-                    send.sendString("Client can send the data");
+                // Avisar al cliente
+                send.sendString("Client can send the data");
 
-                    byte[] raw = receive.receiveBytes();
+                // Recibir bytes de la señal
+                byte[] raw = receive.receiveBytes();
 
-                    // Convertir bytes a enteros (raw BITalino)
-                    Signal signal = new Signal();
-                    signal.setClientId(clientId);
-                    signal.setType(type);
-                    signal.fromByteArray(raw);
+                // Reconstruir señal
+                Signal signal = new Signal(type, clientId);
+                signal.fromByteArray(raw);
 
-                    // Guardar en un historial nuevo
-                    MedicalHistory mh = new MedicalHistory();
-                    mh.setClientId(clientId);
-                    mh.setDate(LocalDate.now());
-                    jdbcMedicalHistory.addMedicalHistory(mh);
+                // Crear historial médico
+                MedicalHistory mh = new MedicalHistory();
+                mh.setClientId(clientId);
+                mh.setDate(LocalDate.now());
 
-                    int recordId = jdbcMedicalHistory.addMedicalHistory(mh);
-                    signal.setRecordId(recordId);
+                int recordId = jdbcMedicalHistory.addMedicalHistory(mh);
+                signal.setRecordId(recordId);
 
-                    jdbcMedicalHistory.addSignalToMedicalHistory(mh.getRecordId(), signal);
+                try {
+                    // Guardar archivo CSV en signals
+                    String fileName = signal.saveAsFile();
+                    signal.setSignalFile(fileName);
 
+                    // Guardar la señal en la BD (nombre)
+                    jdbcSignal.addSignal(signal);
                     send.sendString("Signal saved");
 
-                }else if (message.startsWith(String.valueOf(CommandType.ADD_EXTRA_INFO))) {
+                } catch (IOException e) {
+                    System.err.println("Error saving signal file: " + e.getMessage());
+                    send.sendString("Error saving signal");
+                }
+
+        }else if (message.startsWith(String.valueOf(CommandType.ADD_EXTRA_INFO))) {
 
                     String[] parts = message.split("\\|");
                     int clientId = Integer.parseInt(parts[1]);

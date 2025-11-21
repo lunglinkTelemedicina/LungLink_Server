@@ -12,8 +12,8 @@ public class JDBCSignal implements SignalManager {
     @Override
     public void addSignal(Signal signal) {
         String sql = """
-            INSERT INTO signal (type, values, signal_file, client_id)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO signal (type, signal_file, client_id)
+            VALUES (?, ?, ?)
         """;
 
         int generatedId = -1;
@@ -23,21 +23,20 @@ public class JDBCSignal implements SignalManager {
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, signal.getType() != null ? signal.getType().name() : null);
-            ps.setString(2, signal.valuesToDB());
-            ps.setString(3, signal.getSignalFile());
-            ps.setInt(4, signal.getClientId());
+            ps.setString(2, signal.getSignalFile());
+            ps.setInt(3, signal.getClientId());
 
             ps.executeUpdate();
 
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
                     generatedId = rs.getInt(1);
-                    System.out.println("Señal insertada correctamente con ID: " + generatedId);
+                    System.out.println("Signal correctly inserted with ID: " + generatedId);
                 }
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al insertar señal:");
+            System.err.println("Error inserting señal:");
             e.printStackTrace();
         }
 
@@ -65,18 +64,11 @@ public class JDBCSignal implements SignalManager {
 
                 int clientId = rs.getInt("client_id");
                 s = new Signal(type, clientId);
-
-                // reconstruir lista de valores
-                String valuesString = rs.getString("values");
-                if (valuesString != null) {
-                    s.valuesToList(valuesString);
-                }
-
                 s.setSignalFile(rs.getString("signal_file"));
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al obtener señal por ID:");
+            System.err.println("Error getting signal by ID:");
             e.printStackTrace();
         }
 
@@ -105,19 +97,13 @@ public class JDBCSignal implements SignalManager {
                 }
 
                 Signal s = new Signal(type, clientId);
-
-                String valuesString = rs.getString("values");
-                if (valuesString != null) {
-                    s.valuesToList(valuesString);
-                }
-
                 s.setSignalFile(rs.getString("signal_file"));
 
                 list.add(s);
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al obtener señales por cliente:");
+            System.err.println("Error getting signals by client:");
             e.printStackTrace();
         }
 
@@ -137,13 +123,13 @@ public class JDBCSignal implements SignalManager {
             int rows = ps.executeUpdate();
 
             if (rows > 0) {
-                System.out.println("Señal eliminada correctamente (ID " + signalId + ")");
+                System.out.println("Signal correctly deleted (ID " + signalId + ")");
             } else {
-                System.out.println("No se encontró señal con ese ID.");
+                System.out.println("Signal not found");
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al eliminar señal:");
+            System.err.println("Error deleting signal:");
             e.printStackTrace();
         }
     }

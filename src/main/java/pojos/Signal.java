@@ -1,5 +1,7 @@
 package pojos;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +11,7 @@ public class Signal {
     private int clientId;            // Paciente
     private int recordId;            // (solo servidor lo usa)
     private List<Integer> values;    // Muestras de la señal
+    private String signalFile;
 
     public Signal() {
         this.values = new ArrayList<>();
@@ -57,40 +60,35 @@ public class Signal {
         values.add(sample);
     }
 
+    public String getSignalFile() {return signalFile;}
+
+    public void setSignalFile(String signalFile) {this.signalFile = signalFile;}
 
     // Reconstruir señal desde BYTES (servidor)
 
 
     public void fromByteArray(byte[] raw) {
         values.clear();
+        if(raw==null||raw.length==0) return;
         for (int i = 0; i < raw.length; i += 2) {
             int val = ((raw[i] & 0xFF) << 8) | (raw[i + 1] & 0xFF);
             values.add(val);
         }
     }
+    public String saveAsFile() throws IOException {
 
+        String folder = "signals/";
+        String fileName = type.name() + "_record" + recordId + ".csv";
 
-    // Guardar señal como CSV en BD
+        java.io.File dir = new java.io.File(folder);
+        if (!dir.exists()) dir.mkdirs();
 
+        FileWriter fw = new FileWriter(folder + fileName);
 
-    public String toCSV() {
-        if (values.isEmpty()) return "";
-        StringBuilder sb = new StringBuilder();
-        for (int v : values) sb.append(v).append(",");
-        return sb.substring(0, sb.length() - 1);
+        for (int v : values) fw.write(v + ",");
+        fw.close();
+
+        return fileName; // This goes into SQL in column signal_file
     }
 
-
-    // Cargar señal desde CSV de BD
-
-
-    public void fromCSV(String csv) { // FILE
-        values.clear();
-        if (csv == null || csv.isBlank()) return;
-
-        String[] parts = csv.split(",");
-        for (String p : parts) {
-            values.add(Integer.parseInt(p.trim()));
-        }
-    }
 }

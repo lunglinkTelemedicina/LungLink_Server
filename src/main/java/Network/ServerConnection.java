@@ -86,4 +86,8 @@ public class ServerConnection{
         connectedClients.remove(handler);
     }
 
+    public int getConnectedClientCount() {
+        return connectedClients.size();
+    }
+
 }

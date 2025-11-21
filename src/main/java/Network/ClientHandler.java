@@ -7,6 +7,8 @@ import jdbc.JDBCMedicalHistory;
 import jdbc.JDBCSignal;
 import pojos.*;
 import pojos.TypeSignal;
+import Network.ServerConnection;
+
 
 import java.io.*;
 import java.net.Socket;
@@ -26,9 +28,12 @@ public class ClientHandler implements Runnable {
     private final JDBCSignal jdbcSignal = new JDBCSignal();
     private final JDBCClient jdbcClient = new JDBCClient();
 
+    private final ServerConnection serverConnection;
+    private boolean running = true;
 
-    public ClientHandler(Socket socket) {
+    public ClientHandler(Socket socket, ServerConnection serverConnection) {
         this.socket = socket;
+        this.serverConnection = serverConnection;
         this.receive = new ReceiveDataViaNetwork(socket);
         this.send = new SendDataViaNetwork(socket);
     }
@@ -36,7 +41,7 @@ public class ClientHandler implements Runnable {
     @Override
     public void run() {
         try{
-            boolean running = true;
+
             while (running) {
                 String message = receive.receiveString();
                 if (message.startsWith(String.valueOf(CommandType.SEND_SYMPTOMS))) {
@@ -114,6 +119,28 @@ public class ClientHandler implements Runnable {
 
         } catch (IOException e) {
             System.out.println("ClientDisconnected: " + e.getMessage());
+        }finally{
+            serverConnection.unregisterClient(this);
+            closeConnection();
+            System.out.println("Client handler closed for: " + socket.getRemoteSocketAddress());
+        }
+    }
+
+    public void closeConnection(){
+        running = false;
+        try{
+            receive.close();
+        }catch(Exception ignored) {}
+
+        try {
+            send.close();
+        } catch (Exception ignored) {}
+
+        try {
+            socket.close();
+        } catch (IOException e) {
+            System.err.println("Error closing socket: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

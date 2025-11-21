@@ -23,7 +23,6 @@ public class ReceiveDataViaNetwork {
         }catch (IOException e){
             System.err.println("Error initializing ReceiveDataViaNetwork: " + e.getMessage());
             e.printStackTrace();
-
         }
     }
 
@@ -36,7 +35,6 @@ public class ReceiveDataViaNetwork {
         dataInputStream.readFully(buffer); // block till all bytes arrive
         return buffer;
     }
-
 
 
     public Client receiveClient() {
@@ -98,6 +96,10 @@ public class ReceiveDataViaNetwork {
             System.err.println("Error with resources: " + ex.getMessage());
             ex.printStackTrace();
         }
+    }
+    public void close() throws IOException {
+        if (dataInputStream != null) dataInputStream.close();
+        if (socket != null) socket.close();
     }
     //TODO receive medicalHistory cuando las signals este claro como se recogen y se guardan
 

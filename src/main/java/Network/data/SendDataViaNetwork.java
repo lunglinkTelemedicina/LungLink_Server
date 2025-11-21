@@ -37,8 +37,6 @@ public class SendDataViaNetwork {
 
     }
 
-
-
     public void sendClient(Client client)  {
         try {
             dataOutputStream.writeInt(client.getClientId());
@@ -54,7 +52,6 @@ public class SendDataViaNetwork {
             System.err.println("Error sending client data: " + e.getMessage());
         }
     }
-
 
     public void sendDoctor(Doctor doctor) {
         try {
@@ -84,7 +81,10 @@ public class SendDataViaNetwork {
             ex.printStackTrace();
         }
     }
-
+    public void close() throws IOException {
+        if (dataOutputStream != null) dataOutputStream.close();
+        if (socket != null) socket.close();
+    }
 
     // TODO: SEND MedicalHistory cuando este claro como se guardan las signals
 

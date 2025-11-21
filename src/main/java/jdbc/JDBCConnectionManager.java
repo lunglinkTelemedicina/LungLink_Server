@@ -73,9 +73,9 @@ public class JDBCConnectionManager {
                     mail TEXT,
                     sex TEXT,
                     weight DOUBLE,
-                    height DOUBLE,                            
-                    doctor_id INTEGER,                  
-                    user_id INTEGER NOT NULL,           
+                    height DOUBLE,
+                    doctor_id INTEGER NOT NULL,
+                    user_id INTEGER NOT NULL,
                     FOREIGN KEY (doctor_id) REFERENCES doctor(doctor_id),  -- foreign key para el doctor asignado
                     FOREIGN KEY (user_id) REFERENCES user(id)  -- foreign key al usuario para el login
                 );
@@ -85,10 +85,8 @@ public class JDBCConnectionManager {
                 CREATE TABLE IF NOT EXISTS medicalhistory (
                     record_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     date TEXT NOT NULL,
-                    client_id INTEGER,
+                    client_id INTEGER NOT NULL,
                     doctor_id INTEGER,
-                    signalEMG TEXT,
-                    signalECG TEXT,
                     observations TEXT,
                     symptomsList TEXT,
                     FOREIGN KEY (client_id) REFERENCES client(client_id) ON DELETE CASCADE,
@@ -103,9 +101,7 @@ public class JDBCConnectionManager {
                      values TEXT NOT NULL,
                      signal_file TEXT,             
                      sampling_rate INTEGER DEFAULT 100,
-                     client_id INTEGER NOT NULL,
                      record_id INTEGER NOT NULL,
-                     FOREIGN KEY (client_id) REFERENCES client(client_id),
                      FOREIGN KEY (record_id) REFERENCES medicalhistory(record_id)
                 );
             """);

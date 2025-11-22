@@ -6,8 +6,8 @@ import java.util.*;
 public interface SignalManager {
 
     void addSignal(Signal signal) throws Exception;
-    Signal getSignalById(int signalId) throws Exception;
-    List<Signal> getSignalsByClient(int clientId) throws Exception;
-    void deleteSignal(int signalId) throws Exception;
+    Signal getSignalById(int signalId);
+    List<Signal> getSignalsByRecordId(int recordId);
+    void deleteSignal(int signalId);
 
 }

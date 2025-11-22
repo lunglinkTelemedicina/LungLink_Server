@@ -3,6 +3,7 @@ package jdbc;
 import jdbcInterfaces.SignalManager;
 import pojos.Signal;
 import pojos.TypeSignal;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,34 +13,29 @@ public class JDBCSignal implements SignalManager {
     @Override
     public void addSignal(Signal signal) {
         String sql = """
-            INSERT INTO signal (type, signal_file, client_id)
-            VALUES (?, ?, ?)
+            INSERT INTO signal (type, signal_values, signal_file, sampling_rate, record_id)
+            VALUES (?, ?, ?, ?, ?)
         """;
 
-        int generatedId = -1;
         JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, signal.getType() != null ? signal.getType().name() : null);
-            ps.setString(2, signal.getSignalFile());
-            ps.setInt(3, signal.getClientId());
+            ps.setString(2, signal.valuesToDB());
+            ps.setString(3, signal.getSignalFile());
+            ps.setInt(4, signal.getSamplingRate());
+            ps.setInt(5, signal.getRecordId());
 
             ps.executeUpdate();
 
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next()) {
-                    generatedId = rs.getInt(1);
-                    System.out.println("Signal correctly inserted with ID: " + generatedId);
-                }
-            }
+            System.out.println("Signal correctly inserted.");
 
         } catch (SQLException e) {
-            System.err.println("Error inserting señal:");
+            System.err.println("Error inserting signal:");
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -56,15 +52,19 @@ public class JDBCSignal implements SignalManager {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                TypeSignal type = null;
-                String typeString = rs.getString("type");
-                if (typeString != null) {
-                    type = TypeSignal.valueOf(typeString);
-                }
+                s = new Signal();
 
-                int clientId = rs.getInt("client_id");
-                s = new Signal(type, clientId);
+                String typeString = rs.getString("type");
+                if (typeString != null)
+                    s.setType(TypeSignal.valueOf(typeString.toUpperCase()));
+
+                String valuesString = rs.getString("signal_values");
+                if (valuesString != null)
+                    s.valuesToDB();
+
                 s.setSignalFile(rs.getString("signal_file"));
+
+                s.setRecordId(rs.getInt("record_id"));
             }
 
         } catch (SQLException e) {
@@ -76,34 +76,37 @@ public class JDBCSignal implements SignalManager {
     }
 
     @Override
-    public List<Signal> getSignalsByClient(int clientId) {
+    public List<Signal> getSignalsByRecordId(int recordId) {
         List<Signal> list = new ArrayList<>();
-        String sql = "SELECT * FROM signal WHERE client_id = ?";
+        String sql = "SELECT * FROM signal WHERE record_id = ?";
 
         JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, clientId);
+            ps.setInt(1, recordId);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
+                Signal s = new Signal();
 
-                TypeSignal type = null;
                 String typeString = rs.getString("type");
-                if (typeString != null) {
-                    type = TypeSignal.valueOf(typeString);
-                }
+                if (typeString != null)
+                    s.setType(TypeSignal.valueOf(typeString.toUpperCase()));
 
-                Signal s = new Signal(type, clientId);
+                String valuesString = rs.getString("signal_values");
+                if (valuesString != null)
+                    s.valuesToList(valuesString);
+
                 s.setSignalFile(rs.getString("signal_file"));
+                s.setRecordId(recordId);
 
                 list.add(s);
             }
 
         } catch (SQLException e) {
-            System.err.println("Error getting signals by client:");
+            System.err.println("Error getting signals by record:");
             e.printStackTrace();
         }
 
@@ -120,13 +123,9 @@ public class JDBCSignal implements SignalManager {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, signalId);
-            int rows = ps.executeUpdate();
+            ps.executeUpdate();
 
-            if (rows > 0) {
-                System.out.println("Signal correctly deleted (ID " + signalId + ")");
-            } else {
-                System.out.println("Signal not found");
-            }
+            System.out.println("Signal deleted.");
 
         } catch (SQLException e) {
             System.err.println("Error deleting signal:");
@@ -134,4 +133,5 @@ public class JDBCSignal implements SignalManager {
         }
     }
 }
+
 

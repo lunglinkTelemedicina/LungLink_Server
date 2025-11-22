@@ -7,22 +7,30 @@ import java.util.List;
 
 public class Signal {
 
-    private TypeSignal type;         // ECG o EMG
-    private int clientId;            // Paciente
-    private int recordId;            // (solo servidor lo usa)
-    private List<Integer> values;    // Muestras de la señal
+    private int signalId;
+    private TypeSignal type;          // Paciente
+    private List<Integer> signal_values;    // Muestras de la señal
     private String signalFile;
+    private int samplingRate = 100;
+    private int recordId;  // (solo servidor lo usa)
 
     public Signal() {
-        this.values = new ArrayList<>();
+        this.signal_values = new ArrayList<>();
     }
 
-    public Signal(TypeSignal type, int clientId) {
+    public Signal(TypeSignal type) {
         this.type = type;
-        this.clientId = clientId;
-        this.values = new ArrayList<>();
+        this.signal_values = new ArrayList<>();
     }
 
+    public Signal(int signalId, TypeSignal type, List<Integer> signal_values, String signalFile, int samplingRate, int recordId) {
+        this.signalId = signalId;
+        this.type = type;
+        this.signal_values = signal_values;
+        this.signalFile = signalFile;
+        this.samplingRate = samplingRate;
+        this.recordId = recordId;
+    }
 
     public TypeSignal getType() {
         return type;
@@ -30,14 +38,6 @@ public class Signal {
 
     public void setType(TypeSignal type) {
         this.type = type;
-    }
-
-    public int getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(int clientId) {
-        this.clientId = clientId;
     }
 
     public int getRecordId() {
@@ -49,30 +49,38 @@ public class Signal {
     }
 
     public List<Integer> getValues() {
-        return values;
+        return signal_values;
     }
 
     public void setValues(List<Integer> values) {
-        this.values = values;
+        this.signal_values = values;
     }
 
     public void addSample(int sample) {
-        values.add(sample);
+        signal_values.add(sample);
     }
 
     public String getSignalFile() {return signalFile;}
 
     public void setSignalFile(String signalFile) {this.signalFile = signalFile;}
 
+    public int getSignalId() {return signalId;}
+
+    public void setSignalId(int signalId) {this.signalId = signalId;}
+
+    public int getSamplingRate() {return samplingRate;}
+
+    public void setSamplingRate(int samplingRate) {this.samplingRate = samplingRate;}
+
     // Reconstruir señal desde BYTES (servidor)
 
 
     public void fromByteArray(byte[] raw) {
-        values.clear();
+        signal_values.clear();
         if(raw==null||raw.length==0) return;
         for (int i = 0; i < raw.length; i += 2) {
             int val = ((raw[i] & 0xFF) << 8) | (raw[i + 1] & 0xFF);
-            values.add(val);
+            signal_values.add(val);
         }
     }
     public String saveAsFile() throws IOException {
@@ -85,10 +93,36 @@ public class Signal {
 
         FileWriter fw = new FileWriter(folder + fileName);
 
-        for (int v : values) fw.write(v + ",");
+        for (int v : signal_values) fw.write(v + ",");
         fw.close();
 
         return fileName; // This goes into SQL in column signal_file
     }
+
+    public String valuesToDB() {
+        if (signal_values == null || signal_values.isEmpty()) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < signal_values.size(); i++) {
+            sb.append(signal_values.get(i));
+            if (i < signal_values.size() - 1) {
+                sb.append(" ");
+            }
+        }
+        return sb.toString();
+    }
+
+    public void valuesToList(String valuesString) {
+        signal_values.clear();
+        if (valuesString == null || valuesString.isEmpty()) return;
+
+        String[] parts = valuesString.split(" ");
+        for (String p : parts) {
+            signal_values.add(Integer.parseInt(p));
+        }
+    }
+
 
 }

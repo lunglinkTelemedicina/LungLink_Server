@@ -8,15 +8,22 @@ public class MedicalHistory {
 
     private int recordId;
     private LocalDate date;
-    private int clientId;
-    private int doctorId;
-    private Signal signalEMG;
-    private Signal signalECG;
     private String observations;
     private List<String> symptomsList;
+    private int clientId;
+    private int doctorId;
 
     public MedicalHistory() {
         //constructor vacio
+    }
+
+    public MedicalHistory(int recordId, LocalDate date, String observations, List<String> symptomsList, int clientId,  int doctorId) {
+        this.recordId = recordId;
+        this.date = date;
+        this.observations = observations;
+        this.symptomsList = symptomsList;
+        this.clientId = clientId;
+        this.doctorId = doctorId;
     }
 
     public int getRecordId() {
@@ -43,30 +50,6 @@ public class MedicalHistory {
         this.clientId = clientId;
     }
 
-    public int getDoctorId() {
-        return doctorId;
-    }
-
-    public void setDoctorId(int doctorId) {
-        this.doctorId = doctorId;
-    }
-
-    public Signal getSignalEMG() {
-        return signalEMG;
-    }
-
-    public void setSignalEMG(Signal signalEMG) {
-        this.signalEMG = signalEMG;
-    }
-
-    public Signal getSignalECG() {
-        return signalECG;
-    }
-
-    public void setSignalECG(Signal signalECG) {
-        this.signalECG = signalECG;
-    }
-
     public String getObservations() {
         return observations;
     }
@@ -81,5 +64,21 @@ public class MedicalHistory {
 
     public void setSymptomsList(List<String> symptomList) {
         this.symptomsList = symptomList;
+    }
+
+    public int getDoctorId() {return doctorId;}
+
+    public void setDoctorId(int doctorId) {this.doctorId = doctorId;}
+
+    @Override
+    public String toString() {
+        return "MedicalHistory{" +
+                "recordId=" + recordId +
+                ", date=" + date +
+                ", observations='" + observations + '\'' +
+                ", symptomsList=" + symptomsList +
+                ", clientId=" + clientId +
+                ", doctorId=" + doctorId +
+                '}';
     }
 }

@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 public class JDBCConnectionManager {
 
+    //private static JDBCConnectionManager instance = null;
     private Connection c = null;
 
     public JDBCConnectionManager() {
@@ -41,6 +42,14 @@ public class JDBCConnectionManager {
         }
     }
 
+//    public static JDBCConnectionManager getInstance() {
+//        if (instance == null) {
+//            instance = new JDBCConnectionManager();
+//        }
+//        return instance;
+//    }
+
+
     public void createTables() {
         try (Statement stmt = c.createStatement()) {
 
@@ -48,7 +57,7 @@ public class JDBCConnectionManager {
                 CREATE TABLE IF NOT EXISTS user (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     username TEXT UNIQUE NOT NULL,
-                    password BLOB NOT NULL
+                    password TEXT NOT NULL
                 );
             """);
 
@@ -74,7 +83,7 @@ public class JDBCConnectionManager {
                     sex TEXT,
                     weight DOUBLE,
                     height DOUBLE,
-                    doctor_id INTEGER NOT NULL,
+                    doctor_id INTEGER,
                     user_id INTEGER NOT NULL,
                     FOREIGN KEY (doctor_id) REFERENCES doctor(doctor_id),  -- foreign key para el doctor asignado
                     FOREIGN KEY (user_id) REFERENCES user(id)  -- foreign key al usuario para el login

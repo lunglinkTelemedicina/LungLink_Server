@@ -3,9 +3,9 @@ package pojos;
 public class User {
     public int id;
     public String username;
-    public byte[] password;
+    public String password;
 
-    public User(int id, String username, byte[] password) {
+    public User(int id, String username, String password) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -15,8 +15,18 @@ public class User {
 
     }
 
-    public User(int i, byte[] bytes) {
+    public User(int id, String password) {
+        this.id = id;
+        this.password = password;
     }
+
+
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
+
 
     public int  getId() {
         return id;
@@ -32,10 +42,10 @@ public class User {
         this.username = username;
     }
 
-    public byte[] getPassword() {
+    public String getPassword() {
         return password;
     }
-    public void setPassword(byte[] password) {
+    public void setPassword(String password) {
         this.password = password;
     }
 

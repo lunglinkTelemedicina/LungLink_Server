@@ -10,14 +10,14 @@ public class JDBCUser implements UserManager {
 
     @Override
     public int addUser(User user) {
+        JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = "INSERT INTO user (username, password) VALUES (?, ?)";
-        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, user.getUsername());
-            ps.setBytes(2, user.getPassword());
+            ps.setString(2, new String(user.getPassword()));
             ps.executeUpdate();
 
             try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -39,9 +39,9 @@ public class JDBCUser implements UserManager {
 
     @Override
     public User getUserByUsername(String username) {
+        JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = "SELECT * FROM user WHERE username = ?";
 
-        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -53,7 +53,7 @@ public class JDBCUser implements UserManager {
                 User u = new User();
                 u.setId(rs.getInt("id"));
                 u.setUsername(rs.getString("username"));
-                u.setPassword(rs.getBytes("password"));
+                u.setPassword(rs.getString("password"));
                 return u;
             }
 
@@ -68,8 +68,8 @@ public class JDBCUser implements UserManager {
 
     @Override
     public void deleteUser(int id) {
+        JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = "DELETE FROM user WHERE id = ?";
-        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -86,8 +86,8 @@ public class JDBCUser implements UserManager {
 
     @Override
     public void deleteUserByName(String username) {
+        JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = "DELETE FROM user WHERE username = ?";
-        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -104,10 +104,10 @@ public class JDBCUser implements UserManager {
 
     @Override
     public User validateLogin(String username, String password) {
-        JDBCConnectionManager cm = new JDBCConnectionManager();
+        JDBCConnectionManager cm = new  JDBCConnectionManager();
 
         String sql = """
-            SELECT user_id, username, password
+            SELECT id, username, password
             FROM user
             WHERE username = ? AND password = ?
         """;
@@ -121,11 +121,11 @@ public class JDBCUser implements UserManager {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                int id = rs.getInt("user_id");
+                int id = rs.getInt("id");
                 String uname = rs.getString("username");
                 String pw = rs.getString("password");
 
-                User u = new User(id, pw.getBytes());
+                User u = new User(id, pw);
                 u.setUsername(uname);
                 return u;
             }

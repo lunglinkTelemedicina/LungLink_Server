@@ -10,14 +10,16 @@ import java.util.List;
 
 public class JDBCSignal implements SignalManager {
 
+
+
     @Override
     public void addSignal(Signal signal) {
+        JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = """
             INSERT INTO signal (type, signal_values, signal_file, sampling_rate, record_id)
             VALUES (?, ?, ?, ?, ?)
         """;
 
-        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -40,10 +42,10 @@ public class JDBCSignal implements SignalManager {
 
     @Override
     public Signal getSignalById(int signalId) {
+        JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = "SELECT * FROM signal WHERE signal_id = ?";
         Signal s = null;
 
-        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -77,10 +79,10 @@ public class JDBCSignal implements SignalManager {
 
     @Override
     public List<Signal> getSignalsByRecordId(int recordId) {
+        JDBCConnectionManager cm = new  JDBCConnectionManager();
         List<Signal> list = new ArrayList<>();
         String sql = "SELECT * FROM signal WHERE record_id = ?";
 
-        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -115,9 +117,8 @@ public class JDBCSignal implements SignalManager {
 
     @Override
     public void deleteSignal(int signalId) {
+        JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = "DELETE FROM signal WHERE signal_id = ?";
-
-        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

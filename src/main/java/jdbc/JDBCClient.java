@@ -11,15 +11,14 @@ import java.util.List;
 
 public class JDBCClient implements ClientManager {
 
-    JDBCConnectionManager cm = new JDBCConnectionManager();
 
     @Override
     public int addClient(Client client) {
         String sql = """
-            INSERT INTO client (name, surname, dob, mail, sex, weight, height, doctor_id, user_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO client (name, surname, dob, mail, sex, weight, height, user_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """;
-
+        JDBCConnectionManager cm = new  JDBCConnectionManager();
         int generatedId = -1;
 
         try (Connection conn = cm.getConnection();
@@ -32,8 +31,7 @@ public class JDBCClient implements ClientManager {
             ps.setString(5, client.getSex() != null ? client.getSex().name() : null);
             ps.setDouble(6, client.getWeight());
             ps.setDouble(7, client.getHeight());
-            ps.setInt(8, client.getDoctorId());
-            ps.setInt(9, client.getUserId());
+            ps.setInt(8, client.getUserId());
 
             ps.executeUpdate();
 
@@ -56,6 +54,7 @@ public class JDBCClient implements ClientManager {
 
     @Override
     public Client getClientById(int clientId) {
+        JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = "SELECT * FROM client WHERE client_id = ?";
         Client c = null;
 
@@ -96,6 +95,7 @@ public class JDBCClient implements ClientManager {
 
     @Override
     public List<Client> getClients() {
+        JDBCConnectionManager cm = new  JDBCConnectionManager();
         List<Client> list = new ArrayList<>();
         String sql = "SELECT * FROM client";
 
@@ -136,7 +136,8 @@ public class JDBCClient implements ClientManager {
     }
 
     @Override
-    public void updateClient(Client client) { //TODO meter weight y height
+    public void updateClient(Client client) {
+        JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = """
             UPDATE client
             SET name = ?, surname = ?, dob = ?, mail = ?, sex = ?, weight = ?, height = ?, doctor_id = ?, user_id = ?
@@ -173,6 +174,7 @@ public class JDBCClient implements ClientManager {
 
     @Override
     public void deleteClient(int clientId) {
+        JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = "DELETE FROM client WHERE client_id = ?";
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -192,6 +194,7 @@ public class JDBCClient implements ClientManager {
     }
 
     public void updateHeightWeight(int clientId, double weight, double height) {
+        JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = """
         UPDATE client
         SET weight = ?, height = ?
@@ -222,6 +225,7 @@ public class JDBCClient implements ClientManager {
 
     public Client getClientByUserId(int userId) {
 
+        JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = """
             SELECT client_id, name, surname, dob, sex, mail, height, weight
             FROM client

@@ -181,7 +181,7 @@ public class CommandProcessor {
         String username = parts[1];
         String password = parts[2];
 
-        User user = new User(0, password.getBytes());
+        User user = new User(username, password);
         user.setUsername(username);
 
         JDBCUser jdbcUser = new JDBCUser();

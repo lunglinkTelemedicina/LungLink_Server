@@ -12,8 +12,9 @@ public class JDBCDoctor implements DoctorManager {
 
     @Override
     public void addDoctor(Doctor doctor) {
+
+        JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = "INSERT INTO doctor (name, surname, email, specialty, user_id) VALUES (?, ?, ?, ?, ?)";
-        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -42,8 +43,9 @@ public class JDBCDoctor implements DoctorManager {
 
     @Override
     public Doctor getDoctorById(int id) {
+        JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = "SELECT * FROM doctor WHERE doctor_id = ?";
-        JDBCConnectionManager cm = new JDBCConnectionManager();
+
         Doctor doctor = null;
 
         try (Connection conn = cm.getConnection();
@@ -75,9 +77,9 @@ public class JDBCDoctor implements DoctorManager {
 
     @Override
     public List<Doctor> getDoctors() {
+        JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = "SELECT * FROM doctor";
         List<Doctor> doctors = new ArrayList<>();
-        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -107,8 +109,8 @@ public class JDBCDoctor implements DoctorManager {
 
     @Override
     public void updateDoctor(Doctor doctor) {
+        JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = "UPDATE doctor SET name = ?, surname = ?, email = ?, specialty = ?, user_id = ? WHERE doctor_id = ?";
-        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -135,8 +137,8 @@ public class JDBCDoctor implements DoctorManager {
 
     @Override
     public void deleteDoctor(int id) {
+        JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = "DELETE FROM doctor WHERE doctor_id = ?";
-        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

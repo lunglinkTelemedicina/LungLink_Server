@@ -10,7 +10,11 @@ public enum CommandType {
     SEND_ECG,
     SEND_EMG,
     DISCONNECT,
-    UNKNOWN;
+    UNKNOWN,
+    LOGIN_USER,
+    REGISTER_USER,
+    CHECK_CLIENT,
+    CREATE_CLIENT;
 
     //Convierte el string en enum
     public static CommandType fromString(String s) {

@@ -15,6 +15,9 @@ public class User {
 
     }
 
+    public User(int i, byte[] bytes) {
+    }
+
     public int  getId() {
         return id;
     }

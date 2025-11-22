@@ -101,4 +101,40 @@ public class JDBCUser implements UserManager {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public User validateLogin(String username, String password) {
+        JDBCConnectionManager cm = new JDBCConnectionManager();
+
+        String sql = """
+            SELECT user_id, username, password
+            FROM user
+            WHERE username = ? AND password = ?
+        """;
+
+        try (Connection conn = cm.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+            ps.setString(2, password);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                int id = rs.getInt("user_id");
+                String uname = rs.getString("username");
+                String pw = rs.getString("password");
+
+                User u = new User(id, pw.getBytes());
+                u.setUsername(uname);
+                return u;
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error validating login: " + e.getMessage());
+        }
+
+        return null;
+    }
 }
+

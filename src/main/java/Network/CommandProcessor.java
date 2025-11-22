@@ -38,6 +38,18 @@ public class CommandProcessor {
 
             switch (cmd) {
 
+                case LOGIN_USER:
+                    return handleLoginUser(parts);
+
+                case REGISTER_USER:
+                    return handleRegisterUser(parts);
+
+                case CHECK_CLIENT:
+                    return handleCheckClient(parts);
+
+                case CREATE_CLIENT:
+                    return handleCreateClient(parts);
+
                 case SEND_SYMPTOMS:
                     return handleSendSymptoms(parts);
 
@@ -163,6 +175,98 @@ public class CommandProcessor {
 
         return "ERROR|Signal could not be saved";
     }
+
+    private String handleRegisterUser(String[] parts) {
+
+        String username = parts[1];
+        String password = parts[2];
+
+        User user = new User(0, password.getBytes());
+        user.setUsername(username);
+
+        JDBCUser jdbcUser = new JDBCUser();
+        int newId = jdbcUser.addUser(user);
+
+        if (newId > 0) {
+            return "OK|" + newId;
+        }
+
+        return "ERROR|User registration failed";
+    }
+
+    private String handleLoginUser(String[] parts) {
+
+        String username = parts[1];
+        String password = parts[2];
+
+        JDBCUser jdbcUser = new JDBCUser();
+        User user = jdbcUser.validateLogin(username, password);
+
+        if (user == null) {
+            return "ERROR|Invalid credentials";
+        }
+
+        return "OK|" + user.getId() + "|" + user.getUsername();
+    }
+
+    private String handleCheckClient(String[] parts) {
+
+        int userId = Integer.parseInt(parts[1]);
+
+        JDBCClient jdbcClient = new JDBCClient();
+        Client c = jdbcClient.getClientByUserId(userId);
+
+        if (c == null) {
+            return "OK|" + userId + "|NO_CLIENT";
+        }
+
+        String dob = c.getDob().getDayOfMonth() + "-" +
+                c.getDob().getMonthValue() + "-" +
+                c.getDob().getYear();
+
+        return "OK|" +
+                c.getUserId() + "|" +
+                c.getClientId() + "|" +
+                c.getName() + "|" +
+                c.getSurname() + "|" +
+                dob + "|" +
+                c.getSex().name() + "|" +
+                c.getMail();
+    }
+
+    private String handleCreateClient(String[] parts) {
+
+        int userId = Integer.parseInt(parts[1]);
+        String name = parts[2];
+        String surname = parts[3];
+        String dobStr = parts[4];
+        String sex = parts[5];
+        String mail = parts[6];
+
+        String[] dobParts = dobStr.split("-");
+        int day = Integer.parseInt(dobParts[0]);
+        int month = Integer.parseInt(dobParts[1]);
+        int year = Integer.parseInt(dobParts[2]);
+
+        Client c = new Client();
+        c.setUserId(userId);
+        c.setName(name);
+        c.setSurname(surname);
+        c.setDob(LocalDate.of(year, month, day));
+        c.setSex(Sex.valueOf(sex));
+        c.setMail(mail);
+
+        JDBCClient jdbcClient = new JDBCClient();
+        int newId = jdbcClient.addClient(c);
+
+        if (newId > 0) {
+            return "OK|" + newId;
+        }
+
+        return "ERROR|Client creation failed";
+    }
+
+
 }
 
 

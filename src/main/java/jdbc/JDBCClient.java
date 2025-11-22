@@ -11,6 +11,8 @@ import java.util.List;
 
 public class JDBCClient implements ClientManager {
 
+    JDBCConnectionManager cm = new JDBCConnectionManager();
+
     @Override
     public int addClient(Client client) {
         String sql = """
@@ -19,7 +21,6 @@ public class JDBCClient implements ClientManager {
         """;
 
         int generatedId = -1;
-        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -57,8 +58,6 @@ public class JDBCClient implements ClientManager {
     public Client getClientById(int clientId) {
         String sql = "SELECT * FROM client WHERE client_id = ?";
         Client c = null;
-
-        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -100,7 +99,6 @@ public class JDBCClient implements ClientManager {
         List<Client> list = new ArrayList<>();
         String sql = "SELECT * FROM client";
 
-        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              Statement st = conn.createStatement();
@@ -145,7 +143,6 @@ public class JDBCClient implements ClientManager {
             WHERE client_id = ?
         """;
 
-        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -177,8 +174,6 @@ public class JDBCClient implements ClientManager {
     @Override
     public void deleteClient(int clientId) {
         String sql = "DELETE FROM client WHERE client_id = ?";
-        JDBCConnectionManager cm = new JDBCConnectionManager();
-
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -203,7 +198,6 @@ public class JDBCClient implements ClientManager {
         WHERE client_id = ?
     """;
 
-        JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -225,5 +219,51 @@ public class JDBCClient implements ClientManager {
             e.printStackTrace();
         }
     }
+
+    public Client getClientByUserId(int userId) {
+
+        String sql = """
+            SELECT client_id, name, surname, dob, sex, mail, height, weight
+            FROM client
+            WHERE user_id = ?
+        """;
+
+        try (Connection conn = cm.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                Client c = new Client();
+                c.setClientId(rs.getInt("client_id"));
+                c.setUserId(userId);
+                c.setName(rs.getString("name"));
+                c.setSurname(rs.getString("surname"));
+                c.setMail(rs.getString("mail"));
+
+                // DOB → LocalDate
+                String dob = rs.getString("dob");
+                LocalDate date = LocalDate.parse(dob);
+                c.setDob(date);
+
+                c.setSex(Sex.valueOf(rs.getString("sex")));
+
+                // Optional fields
+                c.setHeight(rs.getDouble("height"));
+                c.setWeight(rs.getDouble("weight"));
+
+                return c;
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error loading client: " + e.getMessage());
+        }
+
+        return null;
+    }
+
 
 }

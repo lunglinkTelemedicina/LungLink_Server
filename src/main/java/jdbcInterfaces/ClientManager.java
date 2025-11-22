@@ -10,7 +10,6 @@ public interface ClientManager {
     public List<Client> getClients();
     public void updateClient(Client client);
     public void deleteClient(int ClientId);
-
-    //habra que decidir cuales más poner o cuales más nos hacen falta
+    Client getClientByUserId(int userId);
 
 }

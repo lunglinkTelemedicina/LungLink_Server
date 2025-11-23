@@ -211,7 +211,7 @@ public class JDBCClient implements ClientManager {
             int rows = ps.executeUpdate();
 
             if (rows > 0) {
-                System.out.println("Weight and height correctly updated for client with id " + clientId);
+                System.out.println("Weight and height correctly updated for client with id \n" + clientId);
             } else {
                 System.out.println("Client not found");
             }

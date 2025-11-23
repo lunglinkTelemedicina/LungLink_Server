@@ -4,6 +4,7 @@ import Network.data.ReceiveDataViaNetwork;
 import Network.data.SendDataViaNetwork;
 import jdbc.*;
 import pojos.*;
+import utils.SecurityUtils;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -177,9 +178,12 @@ public class CommandProcessor {
     private String handleRegisterUser(String[] parts) {
 
         String username = parts[1];
-        String password = parts[2];
+        String passwordPlain = parts[2];
 
-        User user = new User(username, password);
+        String passwordHash = SecurityUtils.hashPassword(passwordPlain);
+
+
+        User user = new User(username, passwordHash);
         user.setUsername(username);
 
         JDBCUser jdbcUser = new JDBCUser();
@@ -195,10 +199,12 @@ public class CommandProcessor {
     private String handleLoginUser(String[] parts) {
 
         String username = parts[1];
-        String password = parts[2];
+        String passwordPlain = parts[2];
+
+        String passwordHash = SecurityUtils.hashPassword(passwordPlain);
 
         JDBCUser jdbcUser = new JDBCUser();
-        User user = jdbcUser.validateLogin(username, password);
+        User user = jdbcUser.validateLogin(username, passwordHash);
 
         if (user == null) {
             return "ERROR|Invalid credentials";

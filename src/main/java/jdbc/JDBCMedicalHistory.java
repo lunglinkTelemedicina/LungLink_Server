@@ -45,7 +45,7 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
                 }
             }
 
-            System.out.println("Medical History inserted with ID: " + generatedId);
+            System.out.println("Medical History inserted with ID: \n" + generatedId);
 
         } catch (SQLException e) {
             System.err.println("Error when inserting medical history: ");

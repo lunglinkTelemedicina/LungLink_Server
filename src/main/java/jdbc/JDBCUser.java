@@ -15,8 +15,10 @@ public class JDBCUser implements UserManager {
         try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
+            String hashedPassword = utils.SecurityUtils.hashPassword(user.getPassword());
+
             ps.setString(1, user.getUsername());
-            ps.setString(2, new String(user.getPassword()));
+            ps.setString(2, hashedPassword);
             ps.executeUpdate();
 
             try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -25,7 +27,7 @@ public class JDBCUser implements UserManager {
                 }
             }
 
-            System.out.println("User correctly added with ID: " + user.getId());
+            System.out.println("User correctly added with ID: \n" + user.getId());
 
         } catch (SQLException e) {
             System.err.println("Error when adding a user");
@@ -99,7 +101,10 @@ public class JDBCUser implements UserManager {
     }
 
     @Override
-    public User validateLogin(String username, String password) {
+    public User validateLogin(String username, String passwordPlain) {
+
+
+        String passwordHash = utils.SecurityUtils.hashPassword(passwordPlain);
 
         String sql = """
             SELECT id, username, password
@@ -111,16 +116,16 @@ public class JDBCUser implements UserManager {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, username);
-            ps.setString(2, password);
+            ps.setString(2, passwordHash);
 
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
                 int id = rs.getInt("id");
                 String uname = rs.getString("username");
-                String pw = rs.getString("password");
+                String pwHash = rs.getString("password");
 
-                User u = new User(id, pw);
+                User u = new User(id, pwHash);
                 u.setUsername(uname);
                 return u;
             }

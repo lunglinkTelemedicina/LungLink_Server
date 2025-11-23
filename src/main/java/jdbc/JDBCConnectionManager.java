@@ -23,7 +23,7 @@ public class JDBCConnectionManager {
                 createTables(conn);
             }
 
-            System.out.println("LungLink database correctly initialized");
+            System.out.println("LungLink database correctly initialized\n");
 
         } catch (Exception e) {
             throw new RuntimeException("Error initializing DB", e);

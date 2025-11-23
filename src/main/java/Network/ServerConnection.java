@@ -27,7 +27,7 @@ public class ServerConnection{
             while (running) {
                 try {
                     Socket socket = serverSocket.accept();
-                    System.out.println("New client connected: \n" + socket.getRemoteSocketAddress());
+                    System.out.println("New client connected: " + socket.getRemoteSocketAddress()+"\n");
 
                     // Create handler
                     ClientHandler handler = new ClientHandler(socket,  this);

@@ -113,11 +113,9 @@ public class CommandProcessor {
             return "ERROR|No history found";
         }
 
-        String response = "History:";
+        String response = "";
 
         for (MedicalHistory mh : list) {
-
-            response += "ID: " + mh.getRecordId() + "\n";
 
             response += "DATE: " + mh.getDate() + "\n";
 

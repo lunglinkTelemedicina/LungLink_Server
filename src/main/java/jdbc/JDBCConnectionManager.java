@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 public class JDBCConnectionManager {
 
-    //private static JDBCConnectionManager instance = null;
+    //private static JDBCConnectionManager instance;
     private Connection c = null;
 
     public JDBCConnectionManager() {

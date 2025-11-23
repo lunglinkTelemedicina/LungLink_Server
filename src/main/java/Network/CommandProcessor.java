@@ -149,7 +149,7 @@ public class CommandProcessor {
         // receive raw bytes
         byte[] raw = receive.receiveBytes();
 
-        Signal signal = new Signal(type,clientId);
+        Signal signal = new Signal(type);
         signal.fromByteArray(raw);
 
         MedicalHistory medicalHistory = new MedicalHistory();

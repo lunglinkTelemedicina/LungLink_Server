@@ -8,7 +8,8 @@ import java.util.List;
 public class Signal {
 
     private int signalId;
-    private TypeSignal type;          // Paciente
+    private TypeSignal type;
+    private int clientId; // Paciente
     private List<Integer> signal_values;    // Muestras de la señal
     private String signalFile;
     private int samplingRate = 100;
@@ -18,8 +19,9 @@ public class Signal {
         this.signal_values = new ArrayList<>();
     }
 
-    public Signal(TypeSignal type) {
+    public Signal(TypeSignal type,int clientId) {
         this.type = type;
+        this.clientId=clientId;
         this.signal_values = new ArrayList<>();
     }
 
@@ -72,7 +74,14 @@ public class Signal {
 
     public void setSamplingRate(int samplingRate) {this.samplingRate = samplingRate;}
 
-    // Reconstruir señal desde BYTES (servidor)
+    public int getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(int clientId) {
+        this.clientId = clientId;
+    }
+// Reconstruir señal desde BYTES (servidor)
 
 
     public void fromByteArray(byte[] raw) {

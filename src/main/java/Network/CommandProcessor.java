@@ -144,12 +144,12 @@ public class CommandProcessor {
                 : TypeSignal.EMG;
 
         // tell client to send bytes
-        send.sendString("OK|Send bytes");
+        send.sendString("Client can send data");
 
         // receive raw bytes
         byte[] raw = receive.receiveBytes();
 
-        Signal signal = new Signal(type);
+        Signal signal = new Signal(type,clientId);
         signal.fromByteArray(raw);
 
         MedicalHistory medicalHistory = new MedicalHistory();

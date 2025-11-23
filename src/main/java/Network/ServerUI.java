@@ -77,11 +77,17 @@ public class ServerUI {
                 }
             }
 
+
+            serverConnection.broadcastShutdownMessage();
+            Thread.sleep(200);
             serverConnection.stopServer();
             System.exit(0);
 
+
         } catch (IOException e) {
             System.out.println("Error reading password.");
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 }

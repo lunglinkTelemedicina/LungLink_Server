@@ -90,4 +90,13 @@ public class ServerConnection{
         return connectedClients.size();
     }
 
+    public void broadcastShutdownMessage() {
+        synchronized (connectedClients) {
+            for (ClientHandler handler : connectedClients) {
+                handler.sendShutdownMessage();
+            }
+        }
+    }
+
+
 }

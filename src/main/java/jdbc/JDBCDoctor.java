@@ -13,10 +13,9 @@ public class JDBCDoctor implements DoctorManager {
     @Override
     public void addDoctor(Doctor doctor) {
 
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = "INSERT INTO doctor (name, surname, email, specialty, user_id) VALUES (?, ?, ?, ?, ?)";
 
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, doctor.getName());
@@ -33,22 +32,22 @@ public class JDBCDoctor implements DoctorManager {
                 }
             }
 
-            System.out.println("Doctor insertado con ID: " + doctor.getDoctorId());
+            System.out.println("Doctor inserted with ID: " + doctor.getDoctorId());
 
         } catch (SQLException e) {
-            System.err.println("Error al insertar doctor:");
+            System.err.println("Error when inserting doctor:");
             e.printStackTrace();
         }
     }
 
     @Override
     public Doctor getDoctorById(int id) {
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
+
         String sql = "SELECT * FROM doctor WHERE doctor_id = ?";
 
         Doctor doctor = null;
 
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
@@ -68,7 +67,7 @@ public class JDBCDoctor implements DoctorManager {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al obtener doctor por ID:");
+            System.err.println("Error when obtaining the doctor by ID:");
             e.printStackTrace();
         }
 
@@ -77,11 +76,11 @@ public class JDBCDoctor implements DoctorManager {
 
     @Override
     public List<Doctor> getDoctors() {
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
+
         String sql = "SELECT * FROM doctor";
         List<Doctor> doctors = new ArrayList<>();
 
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
@@ -100,7 +99,7 @@ public class JDBCDoctor implements DoctorManager {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al obtener la lista de doctores:");
+            System.err.println("Error when obtaining the list of doctors:");
             e.printStackTrace();
         }
 
@@ -109,10 +108,10 @@ public class JDBCDoctor implements DoctorManager {
 
     @Override
     public void updateDoctor(Doctor doctor) {
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
+
         String sql = "UPDATE doctor SET name = ?, surname = ?, email = ?, specialty = ?, user_id = ? WHERE doctor_id = ?";
 
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, doctor.getName());
@@ -124,35 +123,35 @@ public class JDBCDoctor implements DoctorManager {
 
             int rowsUpdated = ps.executeUpdate();
             if (rowsUpdated > 0) {
-                System.out.println("Doctor actualizado correctamente (ID " + doctor.getDoctorId() + ")");
+                System.out.println("Doctor with id " + doctor.getDoctorId() + " correctly updated");
             } else {
-                System.out.println("No se encontró ningún doctor con ese ID.");
+                System.out.println("Doctor not found");
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al actualizar doctor:");
+            System.err.println("Error when updating the doctor");
             e.printStackTrace();
         }
     }
 
     @Override
     public void deleteDoctor(int id) {
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
+
         String sql = "DELETE FROM doctor WHERE doctor_id = ?";
 
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
             int rowsDeleted = ps.executeUpdate();
             if (rowsDeleted > 0) {
-                System.out.println("Doctor eliminado correctamente (ID " + id + ")");
+                System.out.println("Doctor with id " + id + " correctly deleted");
             } else {
-                System.out.println("No se encontró ningún doctor con ese ID.");
+                System.out.println("Doctor not found");
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al eliminar doctor:");
+            System.err.println("Error when deleting a doctor");
             e.printStackTrace();
         }
     }

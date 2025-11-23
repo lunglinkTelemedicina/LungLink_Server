@@ -10,10 +10,9 @@ public class JDBCUser implements UserManager {
 
     @Override
     public int addUser(User user) {
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = "INSERT INTO user (username, password) VALUES (?, ?)";
 
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, user.getUsername());
@@ -26,10 +25,10 @@ public class JDBCUser implements UserManager {
                 }
             }
 
-            System.out.println("Usuario insertado con ID: " + user.getId());
+            System.out.println("User correctly added with ID: " + user.getId());
 
         } catch (SQLException e) {
-            System.err.println("Error al insertar usuario:");
+            System.err.println("Error when adding a user");
             e.printStackTrace();
         }
 
@@ -39,11 +38,10 @@ public class JDBCUser implements UserManager {
 
     @Override
     public User getUserByUsername(String username) {
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = "SELECT * FROM user WHERE username = ?";
 
 
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, username);
@@ -58,7 +56,7 @@ public class JDBCUser implements UserManager {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al obtener usuario por nombre de usuario:");
+            System.err.println("Error when obtaining the user by its username");
             e.printStackTrace();
         }
         return null;
@@ -68,43 +66,40 @@ public class JDBCUser implements UserManager {
 
     @Override
     public void deleteUser(int id) {
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = "DELETE FROM user WHERE id = ?";
 
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
             ps.executeUpdate();
-            System.out.println("Usuario eliminado correctamente por ID.");
+            System.out.println("User " + id + "correctly deleted");
 
         } catch (SQLException e) {
-            System.err.println("Error al eliminar usuario por ID:");
+            System.err.println("Error when deleting user by id: ");
             e.printStackTrace();
         }
     }
 
     @Override
     public void deleteUserByName(String username) {
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = "DELETE FROM user WHERE username = ?";
 
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, username);
             ps.executeUpdate();
-            System.out.println("Usuario eliminado correctamente por nombre.");
+            System.out.println("User " + username + " correctly deleted ");
 
         } catch (SQLException e) {
-            System.err.println("Error al eliminar usuario por nombre:");
+            System.err.println("Error when deleting user by name: ");
             e.printStackTrace();
         }
     }
 
     @Override
     public User validateLogin(String username, String password) {
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
 
         String sql = """
             SELECT id, username, password
@@ -112,7 +107,7 @@ public class JDBCUser implements UserManager {
             WHERE username = ? AND password = ?
         """;
 
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, username);

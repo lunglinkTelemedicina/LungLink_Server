@@ -18,10 +18,10 @@ public class JDBCClient implements ClientManager {
             INSERT INTO client (name, surname, dob, mail, sex, weight, height, user_id)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """;
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
+
         int generatedId = -1;
 
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, client.getName());
@@ -42,10 +42,10 @@ public class JDBCClient implements ClientManager {
                 }
             }
 
-            System.out.println("Cliente insertado correctamente con ID: " + generatedId);
+            System.out.println("Client correctly inserted with ID: " + generatedId);
 
         } catch (SQLException e) {
-            System.err.println("Error al insertar cliente:");
+            System.err.println("Error when inserting a client:");
             e.printStackTrace();
         }
 
@@ -54,11 +54,11 @@ public class JDBCClient implements ClientManager {
 
     @Override
     public Client getClientById(int clientId) {
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
+
         String sql = "SELECT * FROM client WHERE client_id = ?";
         Client c = null;
 
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, clientId);
@@ -86,7 +86,7 @@ public class JDBCClient implements ClientManager {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al obtener cliente por ID:");
+            System.err.println("Error when obtaining a client with its id:");
             e.printStackTrace();
         }
 
@@ -95,12 +95,12 @@ public class JDBCClient implements ClientManager {
 
     @Override
     public List<Client> getClients() {
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
+
         List<Client> list = new ArrayList<>();
         String sql = "SELECT * FROM client";
 
 
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
 
@@ -128,7 +128,7 @@ public class JDBCClient implements ClientManager {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al obtener lista de clientes:");
+            System.err.println("Error when obtaining the list of clients: ");
             e.printStackTrace();
         }
 
@@ -137,7 +137,7 @@ public class JDBCClient implements ClientManager {
 
     @Override
     public void updateClient(Client client) {
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
+
         String sql = """
             UPDATE client
             SET name = ?, surname = ?, dob = ?, mail = ?, sex = ?, weight = ?, height = ?, doctor_id = ?, user_id = ?
@@ -145,7 +145,7 @@ public class JDBCClient implements ClientManager {
         """;
 
 
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, client.getName());
@@ -161,40 +161,39 @@ public class JDBCClient implements ClientManager {
 
             int rows = ps.executeUpdate();
             if (rows > 0) {
-                System.out.println("Cliente actualizado correctamente (ID " + client.getClientId() + ")");
+                System.out.println("Client with ID  " + client.getClientId() + " correctly updated");
             } else {
-                System.out.println("No se encontró cliente con ese ID.");
+                System.out.println("Client not found");
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al actualizar cliente:");
+            System.err.println("Error when updating client");
             e.printStackTrace();
         }
     }
 
     @Override
     public void deleteClient(int clientId) {
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = "DELETE FROM client WHERE client_id = ?";
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, clientId);
             int rows = ps.executeUpdate();
             if (rows > 0) {
-                System.out.println("Cliente eliminado correctamente (ID " + clientId + ")");
+                System.out.println("Client with ID " + clientId + " correctly deleted ");
             } else {
-                System.out.println("No se encontró cliente con ese ID.");
+                System.out.println("Client not found");
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al eliminar cliente:");
+            System.err.println("Error when eliminating the client");
             e.printStackTrace();
         }
     }
 
     public void updateHeightWeight(int clientId, double weight, double height) {
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
+
         String sql = """
         UPDATE client
         SET weight = ?, height = ?
@@ -202,7 +201,7 @@ public class JDBCClient implements ClientManager {
     """;
 
 
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setDouble(1, weight);
@@ -212,7 +211,7 @@ public class JDBCClient implements ClientManager {
             int rows = ps.executeUpdate();
 
             if (rows > 0) {
-                System.out.println("Weight and height correctly updated for client with id: ( " + clientId + ")");
+                System.out.println("Weight and height correctly updated for client with id " + clientId);
             } else {
                 System.out.println("Client not found");
             }
@@ -225,14 +224,14 @@ public class JDBCClient implements ClientManager {
 
     public Client getClientByUserId(int userId) {
 
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
+        //JDBCConnectionManager cm = new  JDBCConnectionManager();
         String sql = """
             SELECT client_id, name, surname, dob, sex, mail, height, weight
             FROM client
             WHERE user_id = ?
         """;
 
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, userId);

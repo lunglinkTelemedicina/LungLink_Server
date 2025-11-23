@@ -12,7 +12,7 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
 
     @Override
     public int addMedicalHistory(MedicalHistory m) {
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
+
         String sql = """
             INSERT INTO medicalhistory (date, client_id, doctor_id, observations)
             VALUES (?, ?, ?, ?)
@@ -20,16 +20,13 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
 
         int generatedId = -1;
 
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            // date
             ps.setString(1, m.getDate() != null ? m.getDate().toString() : null);
 
-            // client_id (NOT NULL en la tabla)
             ps.setInt(2, m.getClientId());
 
-            // doctor_id (puede ser NULL)
             if (m.getDoctorId() > 0) {
                 ps.setInt(3, m.getDoctorId());
             } else {
@@ -48,13 +45,11 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
                 }
             }
 
-            System.out.println("Historial médico insertado con ID: " + generatedId);
+            System.out.println("Medical History inserted with ID: " + generatedId);
 
         } catch (SQLException e) {
-            System.err.println("Error al insertar historial médico:");
+            System.err.println("Error when inserting medical history: ");
             e.printStackTrace();
-        }finally{
-            cm.disconnect();
         }
 
         return generatedId;
@@ -62,11 +57,11 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
 
     @Override
     public MedicalHistory getMedicalHistoryById(int recordId) {
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
+
         String sql = "SELECT * FROM medicalhistory WHERE record_id = ?";
         MedicalHistory mh = null;
 
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, recordId);
@@ -95,22 +90,20 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al obtener historial médico por ID:");
+            System.err.println("Error when obtaining medical history by id:");
             e.printStackTrace();
-        }finally{
-            cm.disconnect();
-        }
+       }
 
         return mh;
     }
 
     @Override
     public List<MedicalHistory> getMedicalHistoryByClientId(int clientId) {
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
+
         List<MedicalHistory> list = new ArrayList<>();
         String sql = "SELECT * FROM medicalhistory WHERE client_id = ?";
 
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, clientId);
@@ -138,10 +131,8 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al obtener historiales médicos por cliente:");
+            System.err.println("Error when obtaining medical histories by client");
             e.printStackTrace();
-        }finally{
-            cm.disconnect();
         }
 
         return list;
@@ -149,11 +140,11 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
 
     @Override
     public List<MedicalHistory> getMedicalHistories() {
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
+
         List<MedicalHistory> list = new ArrayList<>();
         String sql = "SELECT * FROM medicalhistory";
 
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
 
@@ -174,17 +165,15 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al obtener todos los historiales médicos:");
+            System.err.println("Error when obtaining medical histories ");
             e.printStackTrace();
-        }finally{
-            cm.disconnect();
         }
 
         return list;
     }
 
     public void addSymptoms(int recordId, List<String> symptomsList) {
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
+
         if (symptomsList == null || symptomsList.isEmpty()) {
             System.out.println("No hay síntomas para añadir.");
             return;
@@ -194,7 +183,7 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
 
         String sql = "UPDATE medicalhistory SET symptomsList = ? WHERE record_id = ?";
 
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, symptomsStr);
@@ -202,34 +191,30 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
 
             ps.executeUpdate();
 
-            System.out.println("Síntomas añadidos correctamente al historial " + recordId);
+            System.out.println("Symptoms correctly added to medical history " + recordId);
 
         } catch (SQLException e) {
-            System.err.println("Error al añadir síntomas:");
+            System.err.println("Error when adding symptoms ");
             e.printStackTrace();
-        }finally{
-            cm.disconnect();
         }
     }
 
     @Override
     public void deleteMedicalHistory(int recordId) {
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
+
         String sql = "DELETE FROM medicalhistory WHERE record_id = ?";
 
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, recordId);
             ps.executeUpdate();
 
-            System.out.println("Historial médico eliminado correctamente.");
+            System.out.println("Medical History " + recordId + "correctly deleted ");
 
         } catch (SQLException e) {
-            System.err.println("Error al eliminar historial médico:");
+            System.err.println("Error when deleting medical history");
             e.printStackTrace();
-        }finally{
-            cm.disconnect();
         }
     }
 
@@ -238,7 +223,7 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
      * Usa la tabla signal: (signal_id, type, values, signal_file, sampling_rate, record_id)
      */
     public void addSignalToMedicalHistory(int recordId, Signal signal) {
-        JDBCConnectionManager cm = new  JDBCConnectionManager();
+
         if (signal == null) {
             System.out.println("Null signal, it cannot be added.");
             return;
@@ -249,7 +234,7 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
             VALUES (?, ?, ?, ?, ?)
         """;
 
-        try (Connection conn = cm.getConnection();
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             if (signal.getType() != null) {
                 ps.setString(1, signal.getType().name());
@@ -267,8 +252,6 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
         } catch (SQLException e) {
             System.err.println("Error while adding the signal:");
             e.printStackTrace();
-        }finally{
-            cm.disconnect();
         }
     }
 
@@ -310,7 +293,7 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al cargar señales del historial médico:");
+            System.err.println("Error when uploading signals into the medical history: ");
             e.printStackTrace();
         }
 

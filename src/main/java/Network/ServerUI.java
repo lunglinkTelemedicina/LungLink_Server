@@ -16,14 +16,13 @@ public class ServerUI {
 
     public void start() {
 
-        System.out.println("------ SERVER ADMIN PANEL ------");
+        System.out.println("SERVER ADMIN PANEL");
 
         while (true) {
 
             System.out.println("\nChoose an option:");
             System.out.println("1) View connected clients");
             System.out.println("2) Stop server");
-            System.out.println("3) Exit admin panel");
             System.out.print(">> ");
 
             String option;
@@ -42,10 +41,6 @@ public class ServerUI {
                 case "2":
                     attemptShutdown();
                     break;
-
-                case "3":
-                    System.out.println("Exiting admin panel...");
-                    return;
 
                 default:
                     System.out.println("Invalid option.");
@@ -72,14 +67,17 @@ public class ServerUI {
             int clients = serverConnection.getConnectedClientCount();
 
             if (clients > 0) {
-                System.out.println("WARNING: There are " + clients +
-                        " connected clients. Shutdown aborted.");
-                return;
+                System.out.println("WARNING: There are " + clients + " connected clients");
+                System.out.println("Are you sure you want to stop the server? (yes/no): ");
+                String answer = reader.readLine();
+
+                if(!answer.equalsIgnoreCase("yes")) {
+                    System.out.println("Shutdown cancelled");
+                    return;
+                }
             }
 
-            System.out.println("Stopping server...");
             serverConnection.stopServer();
-            System.out.println("Server stopped.");
             System.exit(0);
 
         } catch (IOException e) {

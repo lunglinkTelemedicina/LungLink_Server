@@ -1,57 +1,54 @@
 package jdbc;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 
 public class JDBCConnectionManager {
 
-    //private static JDBCConnectionManager instance;
-    private Connection c = null;
+    private static JDBCConnectionManager instance;
 
     public JDBCConnectionManager() {
         try {
-            // Cargar el driver JDBC de SQLite
             Class.forName("org.sqlite.JDBC");
 
-            // Crear el directorio "database" si no existe
+            // Crear carpeta database si no existe
             File dbDirectory = new File("./database");
-            if (!dbDirectory.exists() && !dbDirectory.mkdirs()) {
-                throw new IOException("No se pudo crear el directorio ./database");
+            if (!dbDirectory.exists()) {
+                dbDirectory.mkdirs();
             }
 
-            // Establecer conexión con la base de datos
-            c = DriverManager.getConnection("jdbc:sqlite:./database/lunglink.db");
+            // Crear base solo UNA VEZ, NO en cada conexión
+            try (Connection conn = DriverManager.getConnection("jdbc:sqlite:./database/lunglink.db")) {
+                conn.createStatement().execute("PRAGMA foreign_keys = ON");
+                createTables(conn);
+            }
 
-            // Activar claves foráneas
-            c.createStatement().execute("PRAGMA foreign_keys=ON");
+            System.out.println("LungLink database correctly initialized");
 
-            System.out.println("Conexión establecida con la base de datos LungLink.");
-
-            createTables();
-
-        } catch (ClassNotFoundException e) {
-            System.out.println("No se cargó el driver JDBC de SQLite.");
-        } catch (SQLException ex) {
-            Logger.getLogger(JDBCConnectionManager.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(JDBCConnectionManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception e) {
+            throw new RuntimeException("Error initializing DB", e);
         }
     }
 
-//    public static JDBCConnectionManager getInstance() {
-//        if (instance == null) {
-//            instance = new JDBCConnectionManager();
-//        }
-//        return instance;
-//    }
+    public static synchronized JDBCConnectionManager getInstance() {
+        if (instance == null) {
+            instance = new JDBCConnectionManager();
+        }
+        return instance;
+    }
+
+    public Connection getConnection(){
+        try{
+            return DriverManager.getConnection("jdbc:sqlite:./database/lunglink.db");
+        }catch(SQLException e){
+            throw new RuntimeException("Can't get connection", e);
+        }
+    }
 
 
-    public void createTables() {
-        try (Statement stmt = c.createStatement()) {
+
+    public void createTables(Connection conn) {
+        try (Statement stmt = conn.createStatement()) {
 
             stmt.executeUpdate("""
                 CREATE TABLE IF NOT EXISTS user (
@@ -128,20 +125,4 @@ public class JDBCConnectionManager {
     }
 
 
-    public Connection getConnection() {
-        return c;
-    }
-
-
-    public void disconnect() {
-        try {
-            if (c != null && !c.isClosed()) {
-                c.close();
-                System.out.println("Conexión cerrada correctamente.");
-            }
-        } catch (SQLException e) {
-            System.out.println("Error al cerrar la conexión:");
-            e.printStackTrace();
-        }
-    }
 }

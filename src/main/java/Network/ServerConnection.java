@@ -9,12 +9,16 @@ import java.util.List;
 public class ServerConnection{
 
     private int port;
+
+    private DoctorAssignmentService doctorAssignmentService;
+
     private boolean running = true;
     private ServerSocket serverSocket;
     private List<ClientHandler> connectedClients = new ArrayList<ClientHandler>();
 
-    public ServerConnection(int port) {
+    public ServerConnection(int port, DoctorAssignmentService doctorAssignmentService) {
         this.port = port;
+        this.doctorAssignmentService = doctorAssignmentService;
     }
 
     //Starts server and accepts clients until stopped
@@ -30,7 +34,7 @@ public class ServerConnection{
                     System.out.println("New client connected: " + socket.getRemoteSocketAddress()+"\n");
 
                     // Create handler
-                    ClientHandler handler = new ClientHandler(socket,  this);
+                    ClientHandler handler = new ClientHandler(socket,  this, doctorAssignmentService);
                     registerClient(handler);
 
                     // Start handler thread

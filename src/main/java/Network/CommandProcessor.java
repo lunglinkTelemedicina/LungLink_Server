@@ -411,7 +411,7 @@ public class CommandProcessor {
 
         Doctor existing = jdbcDoctor.getDoctorByUserId(userId);
         if (existing != null) {
-            return "OK|Doctor Already Exists";
+            return "OK|"+ existing.getDoctorId();
         }
 
         Doctor d = new Doctor();
@@ -419,13 +419,16 @@ public class CommandProcessor {
         d.setName(name);
         d.setSurname(surname);
         d.setEmail(email);
-
-
         d.setSpecialty(DoctorSpecialty.valueOf(specialty));
 
         jdbcDoctor.addDoctor(d);
 
-        return "OK|DoctorCreated";
+        Doctor created = jdbcDoctor.getDoctorByUserId(userId);
+        if (created == null) {
+            return "ERROR|DoctorNotCreated";
+        }
+
+        return "OK|" + created.getDoctorId();
     }
 
 

@@ -18,8 +18,8 @@ public class ServerUI {
         while (true) {
 
             System.out.println("\nChoose an option:\n");
-            System.out.println("1) View connected clients\n");
-            System.out.println("2) Stop server\n");
+            System.out.println("1) View connected clients");
+            System.out.println("2) Stop server");
 
             int option = UIUtils.readInt("Option: ");
 

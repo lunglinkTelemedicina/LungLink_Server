@@ -182,6 +182,10 @@ public class CommandProcessor {
 
         System.out.println("Doctor assigned: " + assigned.getName() + "(" + assigned.getSpecialty() + ")");
 
+        // Store the doctor assignment in the DB
+        jdbcClient.updateDoctorForClient(clientId, assigned.getDoctorId());
+
+
 
         MedicalHistory medicalHistory = new MedicalHistory();
         medicalHistory.setClientId(clientId);

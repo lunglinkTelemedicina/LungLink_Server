@@ -28,6 +28,7 @@ public class JDBCConnectionManager {
         } catch (Exception e) {
             throw new RuntimeException("Error initializing DB", e);
         }
+
     }
 
     public static synchronized JDBCConnectionManager getInstance() {

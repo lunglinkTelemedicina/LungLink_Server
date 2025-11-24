@@ -1,10 +1,10 @@
 package jdbc;
 
 import jdbcInterfaces.*;
-import pojos.Doctor;
-import pojos.DoctorSpecialty;
+import pojos.*;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,6 +72,37 @@ public class JDBCDoctor implements DoctorManager {
         }
 
         return doctor;
+    }
+
+    public Doctor getDoctorByUserId(int userId) {
+
+        String sql = "SELECT * FROM doctor WHERE user_id = ?";
+        Doctor d = null;
+
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                d = new Doctor();
+                d.setDoctorId(rs.getInt("doctor_id"));
+                d.setName(rs.getString("name"));
+                d.setSurname(rs.getString("surname"));
+                String specStr = rs.getString("specialty");
+                if (specStr != null) {
+                    d.setSpecialty(DoctorSpecialty.valueOf(specStr));
+                }
+                d.setUserId(rs.getInt("user_id"));
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error when obtaining doctor by user_id");
+            e.printStackTrace();
+        }
+
+        return d;
     }
 
     @Override
@@ -155,4 +186,47 @@ public class JDBCDoctor implements DoctorManager {
             e.printStackTrace();
         }
     }
+
+    public List<Client> getClientsByDoctorId(int doctorId) {
+
+        List<Client> list = new ArrayList<>();
+        String sql = "SELECT * FROM client WHERE doctor_id = ?";
+
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, doctorId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Client c = new Client();
+                c.setClientId(rs.getInt("client_id"));
+                c.setName(rs.getString("name"));
+                c.setSurname(rs.getString("surname"));
+
+                String dob = rs.getString("dob");
+                if (dob != null) c.setDob(LocalDate.parse(dob));
+
+                c.setMail(rs.getString("mail"));
+
+                String sexStr = rs.getString("sex");
+                if (sexStr != null) c.setSex(Sex.valueOf(sexStr));
+
+                c.setWeight(rs.getDouble("weight"));
+                c.setHeight(rs.getDouble("height"));
+                c.setDoctorId(rs.getInt("doctor_id"));
+                c.setUserId(rs.getInt("user_id"));
+
+                list.add(c);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error when obtaining clients of doctor " + doctorId);
+            e.printStackTrace();
+        }
+
+        return list;
+    }
 }
+

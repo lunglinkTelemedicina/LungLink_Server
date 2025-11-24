@@ -119,6 +119,46 @@ public class JDBCSignal implements SignalManager {
             e.printStackTrace();
         }
     }
+
+    public List<Signal> getSignalsByClientId(int clientId) {
+
+        List<Signal> list = new ArrayList<>();
+
+        String sql = """
+        SELECT s.signal_id, s.type, s.signal_file, s.record_id
+        FROM signal s
+        JOIN medicalhistory m ON s.record_id = m.record_id
+        WHERE m.client_id = ?
+    """;
+
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, clientId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Signal s = new Signal();
+                s.setSignalId(rs.getInt("signal_id"));
+                s.setRecordId(rs.getInt("record_id"));
+                s.setSignalFile(rs.getString("signal_file"));
+
+                String typeStr = rs.getString("type");
+                if (typeStr != null) {
+                    s.setType(TypeSignal.valueOf(typeStr));
+                }
+
+                list.add(s);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error when obtaining signals by client id");
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
 }
 
 

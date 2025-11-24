@@ -17,11 +17,13 @@ public class CommandProcessor {
     private final JDBCClient jdbcClient;
     private final JDBCMedicalHistory jdbcMedicalHistory;
     private final JDBCSignal jdbcSignal;
+    private final JDBCDoctor jdbcDoctor;
 
     public CommandProcessor() {
         this.jdbcClient = new JDBCClient();
         this.jdbcMedicalHistory = new JDBCMedicalHistory();
         this.jdbcSignal = new JDBCSignal();
+        this.jdbcDoctor = new JDBCDoctor();
     }
 
     //This method gets a message and, depending on how it starts, calls one method or another to handle the request.
@@ -65,6 +67,19 @@ public class CommandProcessor {
                     return handleSignals(parts, cmd, receive, send);
                 case DISCONNECT:
                     return "OK|Client disconnected";
+                case CREATE_DOCTOR:
+                    return handleCreateDoctor(parts);
+                case CHECK_DOCTOR:
+                    return handleCheckDoctor(parts);
+                case GET_DOCTOR_PATIENTS:
+                    return handleGetDoctorPatients(parts);
+                case GET_PATIENT_HISTORY_DOCTOR:
+                    return handleGetPatientHistoryDoctor(parts);
+                case GET_PATIENT_SIGNALS:
+                    return handleGetPatientsSignals(parts);
+                case ADD_OBSERVATIONS:
+                    return handleAddObservations(parts);
+
 
                 default:
                     return "ERROR|Unknown command" + cmd;
@@ -269,6 +284,153 @@ public class CommandProcessor {
 
         return "ERROR|Client creation failed";
     }
+
+    private String handleCheckDoctor(String[] parts) {
+
+        int userId = Integer.parseInt(parts[1]);
+
+        Doctor d = jdbcDoctor.getDoctorByUserId(userId);
+
+        if (d == null) {
+            return "OK|" + userId + "|NO_DOCTOR";
+        }
+
+        return "OK|" + userId + "|DOCTOR|" +
+                d.getDoctorId() + "|" +
+                d.getName() + "|" +
+                d.getSurname();
+    }
+
+    private String handleGetDoctorPatients(String[] parts) {
+
+        int doctorId = Integer.parseInt(parts[1]);
+
+        List<Client> list = jdbcDoctor.getClientsByDoctorId(doctorId);
+
+        if (list.isEmpty()) {
+            return "ERROR|No patients found";
+        }
+
+        StringBuilder sb = new StringBuilder("OK|");
+
+        for (int i = 0; i < list.size(); i++) {
+            Client c = list.get(i);
+
+            String dobStr = c.getDob() != null ?
+                    c.getDob().getDayOfMonth() + "-" +
+                            c.getDob().getMonthValue() + "-" +
+                            c.getDob().getYear() :
+                    "";
+
+            sb.append(c.getClientId()).append(";")
+                    .append(c.getName()).append(";")
+                    .append(c.getSurname()).append(";")
+                    .append(dobStr).append(";")
+                    .append(c.getSex() != null ? c.getSex().name() : "").append(";")
+                    .append(c.getMail() != null ? c.getMail() : "");
+
+            if (i < list.size() - 1) sb.append("#");
+        }
+
+        return sb.toString();
+    }
+
+    private String handleGetPatientHistoryDoctor(String[] parts) {
+
+        int clientId = Integer.parseInt(parts[1]);
+        List<MedicalHistory> list = jdbcMedicalHistory.getMedicalHistoryByClientId(clientId);
+
+        if (list.isEmpty()) {
+            return "ERROR|No history found";
+        }
+
+        StringBuilder response = new StringBuilder();
+
+        for (MedicalHistory mh : list) {
+
+            response.append("RECORD_ID: ").append(mh.getRecordId()).append("\n");
+            response.append("DATE: ").append(mh.getDate()).append("\n");
+
+            if (mh.getSymptomsList() != null) {
+                response.append("SYMPTOMS: ")
+                        .append(String.join(",", mh.getSymptomsList()))
+                        .append("\n");
+            }
+
+            if (mh.getObservations() != null) {
+                response.append("OBS: ").append(mh.getObservations()).append("\n");
+            }
+
+            response.append("\n");
+        }
+
+        return response.toString();
+    }
+
+    private String handleGetPatientsSignals(String[] parts) {
+
+        int clientId = Integer.parseInt(parts[1]);
+
+        List<Signal> signals = jdbcSignal.getSignalsByClientId(clientId);
+
+        if (signals.isEmpty()) {
+            return "ERROR|No signals found";
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        for (Signal s : signals) {
+            sb.append("SIGNAL_ID: ").append(s.getSignalId()).append("\n");
+            sb.append("TYPE: ").append(s.getType() != null ? s.getType().name() : "").append("\n");
+            sb.append("RECORD_ID: ").append(s.getRecordId()).append("\n");
+            sb.append("FILE: ").append(s.getSignalFile() != null ? s.getSignalFile() : "").append("\n");
+            sb.append("\n");
+        }
+
+        return sb.toString();
+    }
+
+
+    private String handleAddObservations(String[] parts) {
+
+        int recordId = Integer.parseInt(parts[1]);
+        String note = parts[2];
+
+        jdbcMedicalHistory.updateObservations(recordId, note);
+
+        return "OK|Observation added";
+    }
+
+    private String handleCreateDoctor(String[] parts) {
+
+        int userId = Integer.parseInt(parts[1]);
+        String name = parts[2];
+        String surname = parts[3];
+        String specialty = parts[4];
+        String email = parts[5];
+
+        Doctor existing = jdbcDoctor.getDoctorByUserId(userId);
+        if (existing != null) {
+            return "OK|Doctor Already Exists";
+        }
+
+        Doctor d = new Doctor();
+        d.setUserId(userId);
+        d.setName(name);
+        d.setSurname(surname);
+        d.setEmail(email);
+
+
+        d.setSpecialty(DoctorSpecialty.valueOf(specialty));
+
+        jdbcDoctor.addDoctor(d);
+
+        return "OK|DoctorCreated";
+    }
+
+
+
+
 
 
 }

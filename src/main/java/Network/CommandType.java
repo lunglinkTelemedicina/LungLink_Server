@@ -14,7 +14,13 @@ public enum CommandType {
     LOGIN_USER,
     REGISTER_USER,
     CHECK_CLIENT,
-    CREATE_CLIENT;
+    CREATE_CLIENT,
+    CREATE_DOCTOR,
+    CHECK_DOCTOR,
+    GET_DOCTOR_PATIENTS,
+    GET_PATIENT_HISTORY_DOCTOR,
+    GET_PATIENT_SIGNALS,
+    ADD_OBSERVATIONS;
 
     //Converts the string into an enum
     public static CommandType fromString(String s) {

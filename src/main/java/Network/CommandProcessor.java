@@ -8,6 +8,7 @@ import utils.SecurityUtils;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 
@@ -93,7 +94,16 @@ public class CommandProcessor {
 
     private String handleSendSymptoms(String[] parts) {
 
-        int clientId = Integer.parseInt(parts[1]);
+        int clientId;
+        if (parts.length < 3) {
+            throw new IllegalArgumentException("Missing arguments for SEND_SYMPTOMS (expected: CLIENT_ID|SYMPTOMS_CSV).");
+        }
+
+        try {
+            clientId = Integer.parseInt(parts[1]);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid Client ID format.", e);
+        }
         String symptomsCSV = parts[2];
 
         //We change the symptoms string with ',' into a list of symptoms
@@ -105,16 +115,30 @@ public class CommandProcessor {
         medicalHistory.setDate(LocalDate.now());
 
         int recordId = jdbcMedicalHistory.addMedicalHistory(medicalHistory);
-        jdbcMedicalHistory.addSymptoms(recordId, symptoms);
 
-        return "OK|Symptoms are saved";
-    }
+        if(recordId>0) {
+            jdbcMedicalHistory.addSymptoms(recordId, symptoms);
+            return "OK|Symptoms are saved";
+        }
+
+        return "ERROR|Failed to create medical history record in database.";    }
 
     private String handleAddExtraInfo(String[] parts) {
 
-        int clientId = Integer.parseInt(parts[1]);
-        double height = Double.parseDouble(parts[2]);
-        double weight = Double.parseDouble(parts[3]);
+        int clientId;
+        double height ;
+        double weight;
+        if (parts.length < 4) {
+            throw new IllegalArgumentException("Missing arguments for ADD_EXTRA_INFO (expected: CLIENT_ID|HEIGHT|WEIGHT).");
+        }
+
+        try {
+            clientId = Integer.parseInt(parts[1]);
+            height = Double.parseDouble(parts[2]);
+            weight = Double.parseDouble(parts[3]);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid format for Client ID, height, or weight.", e);
+        }
 
         jdbcClient.updateHeightWeight(clientId, height, weight);
         return "OK|Extra info saved";
@@ -122,10 +146,20 @@ public class CommandProcessor {
 
 
     private String handleGetHistory(String[] parts) {
-        int clientId = Integer.parseInt(parts[1]);
+        int clientId;
+
+        if (parts.length < 2) {
+            throw new IllegalArgumentException("Missing Client ID for GET_HISTORY.");
+        }
+
+        try {
+            clientId = Integer.parseInt(parts[1]);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid Client ID format.", e);
+        }
         List<MedicalHistory> list = jdbcMedicalHistory.getMedicalHistoryByClientId(clientId);
 
-        if (list.isEmpty()) {
+        if (list.isEmpty() ||list==null) {
             return "ERROR|No history found";
         }
 
@@ -147,10 +181,7 @@ public class CommandProcessor {
 
     }
 
-    private String handleSignals(String[] parts,
-                                 CommandType cmd,
-                                 ReceiveDataViaNetwork receive,
-                                 SendDataViaNetwork send) throws Exception {
+    private String handleSignals(String[] parts, CommandType cmd, ReceiveDataViaNetwork receive, SendDataViaNetwork send) throws Exception {
 
         int clientId = Integer.parseInt(parts[1]);
         int numSamples = Integer.parseInt(parts[2]);
@@ -191,7 +222,9 @@ public class CommandProcessor {
     }
 
     private String handleRegisterUser(String[] parts) {
-
+        if (parts.length < 3) {
+            throw new IllegalArgumentException("Missing username or password for REGISTER_USER.");
+        }
         String username = parts[1];
         String passwordPlain = parts[2];
 
@@ -212,7 +245,9 @@ public class CommandProcessor {
     }
 
     private String handleLoginUser(String[] parts) {
-
+        if (parts.length < 3) {
+            throw new IllegalArgumentException("Missing username or password for LOGIN_USER.");
+        }
         String username = parts[1];
         String passwordPlain = parts[2];
 
@@ -230,8 +265,16 @@ public class CommandProcessor {
 
     private String handleCheckClient(String[] parts) {
 
-        int userId = Integer.parseInt(parts[1]);
+        int userId;
+        if (parts.length < 2) {
+            throw new IllegalArgumentException("Missing User ID for CHECK_CLIENT.");
+        }
 
+        try {
+            userId = Integer.parseInt(parts[1]);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid User ID format.", e);
+        }
         JDBCClient jdbcClient = new JDBCClient();
         Client c = jdbcClient.getClientByUserId(userId);
 
@@ -255,17 +298,39 @@ public class CommandProcessor {
 
     private String handleCreateClient(String[] parts) {
 
-        int userId = Integer.parseInt(parts[1]);
+        int userId, day, month, year;
+        if (parts.length < 7) {
+            throw new IllegalArgumentException("Missing arguments for CREATE_CLIENT (expected: USER_ID|NAME|SURNAME|D-M-Y|SEX|MAIL).");
+        }
         String name = parts[2];
         String surname = parts[3];
-        String dobStr = parts[4];
         String sex = parts[5];
         String mail = parts[6];
 
-        String[] dobParts = dobStr.split("-");
-        int day = Integer.parseInt(dobParts[0]);
-        int month = Integer.parseInt(dobParts[1]);
-        int year = Integer.parseInt(dobParts[2]);
+        try{
+            userId = Integer.parseInt(parts[4]);
+            day = Integer.parseInt(parts[5]);
+            month = Integer.parseInt(parts[6]);
+            year = Integer.parseInt(parts[7]);
+            String[] dobStr = parts[4].split("-");
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+            throw new IllegalArgumentException("Invalid ID or DOB format. Expected: USER_ID|NAME|SURNAME|D-M-Y|SEX|MAIL", e);
+        }
+
+        LocalDate dobObject;
+        try {
+            dobObject = LocalDate.of(year, month, day);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid date format in DOB: " + parts[4], e);
+        }
+
+        try {
+            // Valida si la cadena 'sex' es un valor válido de Enum
+            Sex.valueOf(sex);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid value for SEX: " + sex, e);
+        }
+
 
         Client c = new Client();
         c.setUserId(userId);
@@ -393,7 +458,16 @@ public class CommandProcessor {
 
     private String handleAddObservations(String[] parts) {
 
-        int recordId = Integer.parseInt(parts[1]);
+        int recordId;
+        if (parts.length < 3) {
+            throw new IllegalArgumentException("Missing arguments for ADD_OBSERVATIONS (expected: RECORD_ID|NOTE).");
+        }
+
+        try {
+            recordId = Integer.parseInt(parts[1]);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid Record ID format.", e);
+        }
         String note = parts[2];
 
         jdbcMedicalHistory.updateObservations(recordId, note);
@@ -403,7 +477,16 @@ public class CommandProcessor {
 
     private String handleCreateDoctor(String[] parts) {
 
-        int userId = Integer.parseInt(parts[1]);
+        int userId;
+        if (parts.length < 6) {
+            throw new IllegalArgumentException("Missing arguments for CREATE_DOCTOR (expected: USER_ID|NAME|SURNAME|SPECIALTY|EMAIL).");
+        }
+
+        try {
+            userId = Integer.parseInt(parts[1]);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid User ID format.", e);
+        }
         String name = parts[2];
         String surname = parts[3];
         String specialty = parts[4];
@@ -420,9 +503,11 @@ public class CommandProcessor {
         d.setSurname(surname);
         d.setEmail(email);
 
-
-        d.setSpecialty(DoctorSpecialty.valueOf(specialty));
-
+        try {
+            d.setSpecialty(DoctorSpecialty.valueOf(specialty));
+        }catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid value for Doctor Specialty."+ specialty, e);
+        }
         jdbcDoctor.addDoctor(d);
 
         return "OK|DoctorCreated";

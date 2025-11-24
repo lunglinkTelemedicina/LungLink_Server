@@ -42,20 +42,4 @@ public class UIUtils {
         }
     }
 
-    public static double readDouble(String message) {
-        while (true) {
-            try {
-                System.out.print(message);
-                String input = reader.readLine();
-
-                return Double.parseDouble(input.trim());
-
-            } catch (IOException ex) {
-                System.out.println("Error reading input. Try again.");
-
-            } catch (NumberFormatException ex) {
-                System.out.println("Please enter a valid number.");
-            }
-        }
-    }
 }

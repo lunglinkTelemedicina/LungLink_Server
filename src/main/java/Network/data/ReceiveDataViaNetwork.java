@@ -30,7 +30,7 @@ public class ReceiveDataViaNetwork {
     public byte[] receiveBytes() throws IOException {
         int length = dataInputStream.readInt();
         byte[] buffer = new byte[length];
-        dataInputStream.readFully(buffer); // block till all bytes arrive
+        dataInputStream.readFully(buffer); //Block till all bytes arrive
         return buffer;
     }
 
@@ -52,6 +52,5 @@ public class ReceiveDataViaNetwork {
         if (dataInputStream != null) dataInputStream.close();
         if (socket != null) socket.close();
     }
-    //TODO receive medicalHistory cuando las signals este claro como se recogen y se guardan
 
 }

@@ -14,7 +14,7 @@ public class MedicalHistory {
     private int doctorId;
 
     public MedicalHistory() {
-        //constructor vacio
+        //empty constructor
     }
 
     public MedicalHistory(int recordId, LocalDate date, String observations, List<String> symptomsList, int clientId,  int doctorId) {

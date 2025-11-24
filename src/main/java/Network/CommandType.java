@@ -16,7 +16,7 @@ public enum CommandType {
     CHECK_CLIENT,
     CREATE_CLIENT;
 
-    //Convierte el string en enum
+    //Converts the string into an enum
     public static CommandType fromString(String s) {
         try {
             return CommandType.valueOf(s);

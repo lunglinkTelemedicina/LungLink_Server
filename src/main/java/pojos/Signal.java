@@ -8,11 +8,11 @@ import java.util.List;
 public class Signal {
 
     private int signalId;
-    private TypeSignal type;// Paciente
-    private List<Integer> signal_values;    // Muestras de la señal
+    private TypeSignal type;// Patient
+    private List<Integer> signal_values;    // Signal samples
     private String signalFile;
     private int samplingRate = 100;
-    private int recordId;  // (solo servidor lo usa)
+    private int recordId;  // Used only by the server
 
     public Signal() {
         this.signal_values = new ArrayList<>();

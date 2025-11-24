@@ -11,13 +11,13 @@ public class JDBCConnectionManager {
         try {
             Class.forName("org.sqlite.JDBC");
 
-            // Crear carpeta database si no existe
+            //Create database folder if it does not exist
             File dbDirectory = new File("./database");
             if (!dbDirectory.exists()) {
                 dbDirectory.mkdirs();
             }
 
-            // Crear base solo UNA VEZ, NO en cada conexión
+            //Create the database only once, not every time we connect
             try (Connection conn = DriverManager.getConnection("jdbc:sqlite:./database/lunglink.db")) {
                 conn.createStatement().execute("PRAGMA foreign_keys = ON");
                 createTables(conn);

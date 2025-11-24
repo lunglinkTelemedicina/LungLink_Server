@@ -6,7 +6,8 @@ import jdbc.*;
 public class MainServer {
     public static void main(String[] args) {
 
-        new JDBCConnectionManager();  //inicializar connection manager para que se cree la base de datos
+        //Start the connection manager so the database is created
+        new JDBCConnectionManager();
 
         int port = 9000;
         //Create the server socket
@@ -16,7 +17,7 @@ public class MainServer {
         Thread serverThread = new Thread(server::start);
         serverThread.start();
 
-        // Start admin interface (console UI)
+        //Start admin interface (console UI)
         ServerUI ui = new ServerUI(server);
         ui.start();
     }

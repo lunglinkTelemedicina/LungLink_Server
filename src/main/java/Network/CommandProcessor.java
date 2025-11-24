@@ -13,7 +13,7 @@ import java.util.*;
 
 public class CommandProcessor {
 
-    //Estas clases acceden a la base de datos
+    //These classes access the database
     private final JDBCClient jdbcClient;
     private final JDBCMedicalHistory jdbcMedicalHistory;
     private final JDBCSignal jdbcSignal;
@@ -24,14 +24,14 @@ public class CommandProcessor {
         this.jdbcSignal = new JDBCSignal();
     }
 
-    //Este metodo recibe un mensaje y según como empiece llama a un metodo o a otro para manejar la peticion
+    //This method gets a message and, depending on how it starts, calls one method or another to handle the request.
     public String handleClientRequest(String message, ReceiveDataViaNetwork receive, SendDataViaNetwork send) {
 
-        //Mensaje vacio
+        //Empty message
         if (message == null || message.isEmpty())
             return "ERROR|Empty command";
 
-        // Dividimos el mensaje: CMD|param1|param2|...
+        //We split the message: CMD|param1|param2|...
         String[] parts = message.split("\\|");
         CommandType cmd = CommandType.fromString(parts[0]);   //El comando
 
@@ -71,7 +71,7 @@ public class CommandProcessor {
             }
 
         } catch (Exception ex) {
-            // Si algo falla en cualquier comando → devolvemos error al cliente
+            //If something fails in any command, we send an error back to the client
             return "ERROR|" + ex.getMessage();
         }
     }
@@ -81,10 +81,10 @@ public class CommandProcessor {
         int clientId = Integer.parseInt(parts[1]);
         String symptomsCSV = parts[2];
 
-        // Pasamos de string de sintomas con ',' a una lista de sintomas
+        //We change the symptoms string with ',' into a list of symptoms
         List<String> symptoms = new ArrayList<>(Arrays.asList(symptomsCSV.split(",")));
 
-        // Creamos un objeto MedicalHistory solo para síntomas
+        //We create a MedicalHistory object only for the symptoms
         MedicalHistory medicalHistory = new MedicalHistory();
         medicalHistory.setClientId(clientId);
         medicalHistory.setDate(LocalDate.now());

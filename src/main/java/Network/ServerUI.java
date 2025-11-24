@@ -1,17 +1,14 @@
 package Network;
 
-import java.io.*;
-
+import utils.UIUtils;
 
 
 public class ServerUI {
     private final ServerConnection serverConnection;
-    private final BufferedReader reader;
     private final String ADMIN_PASSWORD = "admin123";  // change before delivering
 
     public ServerUI(ServerConnection serverConnection) {
         this.serverConnection = serverConnection;
-        this.reader = new BufferedReader(new InputStreamReader(System.in));
     }
 
     public void start() {
@@ -24,20 +21,14 @@ public class ServerUI {
             System.out.println("1) View connected clients\n");
             System.out.println("2) Stop server\n");
 
-            String option;
-            try {
-                option = reader.readLine();
-            } catch (IOException e) {
-                System.out.println("Error reading input. Try again.");
-                continue;
-            }
+            int option = UIUtils.readInt("Option: ");
 
             switch (option) {
-                case "1":
+                case 1:
                     showConnectedClients();
                     break;
 
-                case "2":
+                case 2:
                     attemptShutdown();
                     break;
 
@@ -54,9 +45,7 @@ public class ServerUI {
 
     private void attemptShutdown() {
 
-        try {
-            System.out.print("Enter admin password: ");
-            String entered = reader.readLine();
+        String entered = UIUtils.readString("Enter admin password: ");
 
             if (!entered.equals(ADMIN_PASSWORD)) {
                 System.out.println("Incorrect password.");
@@ -67,8 +56,7 @@ public class ServerUI {
 
             if (clients > 0) {
                 System.out.println("WARNING: There are " + clients + " connected clients");
-                System.out.println("Are you sure you want to stop the server? (yes/no): ");
-                String answer = reader.readLine();
+                String answer = UIUtils.readString("Are you sure you want to stop the server? (yes/no): ");
 
                 if(!answer.equalsIgnoreCase("yes")) {
                     System.out.println("Shutdown cancelled");
@@ -76,17 +64,14 @@ public class ServerUI {
                 }
             }
 
-
             serverConnection.broadcastShutdownMessage();
-            Thread.sleep(200);
+            try {
+                Thread.sleep(200);//Small delay
+            }catch(InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
             serverConnection.stopServer();
             System.exit(0);
-
-
-        } catch (IOException e) {
-            System.out.println("Error reading password.");
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

@@ -84,9 +84,6 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
                 if (symptomsStr != null && !symptomsStr.isEmpty()) {
                     mh.setSymptomsList(Arrays.asList(symptomsStr.split(",")));
                 }
-
-                // Si en el futuro MedicalHistory guarda señales, aquí podrías cargarlas:
-                // loadSignalsForHistory(mh, conn);
             }
 
         } catch (SQLException e) {
@@ -175,7 +172,7 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
     public void addSymptoms(int recordId, List<String> symptomsList) {
 
         if (symptomsList == null || symptomsList.isEmpty()) {
-            System.out.println("No hay síntomas para añadir.");
+            System.out.println("There are no symptoms to add.");
             return;
         }
 

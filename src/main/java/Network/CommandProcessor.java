@@ -7,8 +7,6 @@ import pojos.*;
 import utils.SecurityUtils;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -150,17 +148,10 @@ public class CommandProcessor {
         send.sendString("Client can send the data");
 
         // receive raw bytes
-        byte[] csvraw = receive.receiveBytes();
+        byte[] raw = receive.receiveBytes();
 
-        //create csv path
-        String fileName = type.name() + "_record" + numSamples + ".csv";
-        String path = "signals/" + fileName;
-
-        //save csv
-        Files.write(Paths.get(path), csvraw);
-
-        Signal signal = new Signal();
-        //signal.fromByteArray(raw);
+        Signal signal = new Signal(type);
+        signal.fromByteArray(raw);
 
         MedicalHistory medicalHistory = new MedicalHistory();
         medicalHistory.setClientId(clientId);
@@ -168,13 +159,20 @@ public class CommandProcessor {
 
         int recordId = jdbcMedicalHistory.addMedicalHistory(medicalHistory);
         signal.setRecordId(recordId);
-        signal.setType(type);
-        signal.setSignalFile(fileName);
 
-        jdbcSignal.addSignal(signal);
+        try {
+            String fileName = signal.saveAsFile();
+            signal.setSignalFile(fileName);
 
-        return "OK|Signal saved";
+            jdbcSignal.addSignal(signal);
 
+            return "OK|Signal saved";
+        } catch (IOException e) {
+            System.err.println("Error saving signal file: " + e.getMessage());
+            send.sendString("Error saving signal");
+        }
+
+        return "ERROR|Signal could not be saved";
     }
 
     private String handleRegisterUser(String[] parts) {

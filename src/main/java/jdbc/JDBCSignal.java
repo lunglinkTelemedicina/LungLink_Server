@@ -15,8 +15,8 @@ public class JDBCSignal implements SignalManager {
     @Override
     public void addSignal(Signal signal) {
         String sql = """
-            INSERT INTO signal (type, signal_file, record_id)
-            VALUES (?, ?, ?)
+            INSERT INTO signal (type, signal_values, signal_file, sampling_rate, record_id)
+            VALUES (?, ?, ?, ?, ?)
         """;
 
 
@@ -24,8 +24,10 @@ public class JDBCSignal implements SignalManager {
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, signal.getType() != null ? signal.getType().name() : null);
-            ps.setString(2, signal.getSignalFile());
-            ps.setInt(3, signal.getRecordId());
+            ps.setString(2, signal.valuesToDB());
+            ps.setString(3, signal.getSignalFile());
+            ps.setInt(4, signal.getSamplingRate());
+            ps.setInt(5, signal.getRecordId());
 
             ps.executeUpdate();
 
@@ -55,6 +57,10 @@ public class JDBCSignal implements SignalManager {
                 String typeString = rs.getString("type");
                 if (typeString != null)
                     s.setType(TypeSignal.valueOf(typeString.toUpperCase()));
+
+                String valuesString = rs.getString("signal_values");
+                if (valuesString != null)
+                    s.valuesToDB();
 
                 s.setSignalFile(rs.getString("signal_file"));
 
@@ -87,6 +93,10 @@ public class JDBCSignal implements SignalManager {
                 String typeString = rs.getString("type");
                 if (typeString != null)
                     s.setType(TypeSignal.valueOf(typeString.toUpperCase()));
+
+                String valuesString = rs.getString("signal_values");
+                if (valuesString != null)
+                    s.valuesToList(valuesString);
 
                 s.setSignalFile(rs.getString("signal_file"));
                 s.setRecordId(recordId);

@@ -13,8 +13,6 @@ public interface MedicalHistoryManager {
     List<MedicalHistory> getMedicalHistoryByClientId(int clientId);
     List<MedicalHistory> getMedicalHistories();
     void addSymptoms(int recordId, List<String> symptoms);
-    void addSignalToMedicalHistory(int recordId, Signal signal);
-    List<Signal> loadSignalsForHistory(MedicalHistory mh, Connection conn);
     void deleteMedicalHistory(int id);
 
 }

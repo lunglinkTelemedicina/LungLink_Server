@@ -104,9 +104,7 @@ public class JDBCConnectionManager {
                 CREATE TABLE IF NOT EXISTS signal (
                      signal_id INTEGER PRIMARY KEY AUTOINCREMENT,
                      type TEXT NOT NULL,
-                     signal_values TEXT NOT NULL,
                      signal_file TEXT,
-                     sampling_rate INTEGER DEFAULT 100,
                      record_id INTEGER NOT NULL,
                      FOREIGN KEY (record_id) REFERENCES medicalhistory(record_id)
                 );

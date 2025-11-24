@@ -409,9 +409,10 @@ public class CommandProcessor {
         String specialty = parts[4];
         String email = parts[5];
 
+        // Check if doctor already exists
         Doctor existing = jdbcDoctor.getDoctorByUserId(userId);
         if (existing != null) {
-            return "OK|Doctor Already Exists";
+            return "OK|" + existing.getDoctorId();
         }
 
         Doctor d = new Doctor();
@@ -419,15 +420,18 @@ public class CommandProcessor {
         d.setName(name);
         d.setSurname(surname);
         d.setEmail(email);
-
-
         d.setSpecialty(DoctorSpecialty.valueOf(specialty));
 
         jdbcDoctor.addDoctor(d);
 
-        return "OK|DoctorCreated";
-    }
+        Doctor created = jdbcDoctor.getDoctorByUserId(userId);
+        if (created == null) {
+            return "ERROR|DoctorNotCreated";
+        }
 
+        // RETURN FORMAT:  OK|doctorId
+        return "OK|" + created.getDoctorId();
+    }
 
 
 

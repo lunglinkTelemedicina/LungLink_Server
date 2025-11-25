@@ -292,6 +292,30 @@ public class JDBCClient implements ClientManager {
         }
     }
 
+    public int countClientsByDoctor(int doctorId) {
+
+        String sql = "SELECT COUNT(*) FROM client WHERE doctor_id = ?";
+
+        JDBCConnectionManager cm = new JDBCConnectionManager();
+
+        try (Connection conn = cm.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, doctorId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+
 
 
 }

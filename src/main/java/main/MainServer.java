@@ -18,14 +18,23 @@ public class MainServer {
         //Start the connection manager so the database is created
         new JDBCConnectionManager();
 
+//        JDBCDoctor jdbcDoctor = new JDBCDoctor();
+//        List<Doctor> doctors = jdbcDoctor.getDoctors();
+//
+//        DoctorAssignmentService doctorAssignmentService = new DoctorAssignmentService(doctors);
+//
+//        for (Doctor d : doctors) {
+//            System.out.println("DOCTOR >> " + d.getName() + " | " + d.getSpecialty());
+//        }
+        DoctorAssignmentService doctorAssignmentService = new DoctorAssignmentService();
+
         JDBCDoctor jdbcDoctor = new JDBCDoctor();
         List<Doctor> doctors = jdbcDoctor.getDoctors();
-
-        DoctorAssignmentService doctorAssignmentService = new DoctorAssignmentService(doctors);
 
         for (Doctor d : doctors) {
             System.out.println("DOCTOR >> " + d.getName() + " | " + d.getSpecialty());
         }
+
         int port = 9000;
         //Create the server socket
         ServerConnection server = new ServerConnection(port, doctorAssignmentService);

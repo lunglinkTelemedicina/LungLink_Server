@@ -230,15 +230,15 @@ public class JDBCDoctor implements DoctorManager {
     }
 
     public boolean isPatientAssignedToDoctor(int doctorId, int clientId) {
-        String sql = "SELECT COUNT(*) FROM doctor_patient WHERE doctor_id = ? AND client_id = ?";
+        String sql = "SELECT COUNT(*) FROM client WHERE client_id = ? AND doctor_id = ?";
 
         JDBCConnectionManager cm = new JDBCConnectionManager();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, doctorId);
-            ps.setInt(2, clientId);
+            ps.setInt(1, clientId);
+            ps.setInt(2, doctorId);
 
             ResultSet rs = ps.executeQuery();
 

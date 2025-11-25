@@ -37,3 +37,35 @@ build/
 
 ### Mac OS ###
 .DS_Store
+/target/classes/pojos/Client.class
+/target/classes/Network/ClientHandler.class
+/target/classes/jdbcInterfaces/ClientManager.class
+/target/classes/Network/CommandProcessor$1.class
+/target/classes/Network/CommandProcessor.class
+/target/classes/Network/CommandType.class
+/target/classes/pojos/Doctor.class
+/target/classes/Network/DoctorAssignmentService$1.class
+/target/classes/Network/DoctorAssignmentService.class
+/target/classes/jdbcInterfaces/DoctorManager.class
+/target/classes/pojos/DoctorSpecialty.class
+/target/classes/jdbc/JDBCClient.class
+/target/classes/jdbc/JDBCConnectionManager.class
+/target/classes/jdbc/JDBCDoctor.class
+/target/classes/jdbc/JDBCMedicalHistory.class
+/target/classes/jdbc/JDBCSignal.class
+/target/classes/jdbc/JDBCUser.class
+/target/classes/main/MainServer.class
+/target/classes/pojos/MedicalHistory.class
+/target/classes/jdbcInterfaces/MedicalHistoryManager.class
+/target/classes/Network/data/ReceiveDataViaNetwork.class
+/target/classes/utils/SecurityUtils.class
+/target/classes/Network/data/SendDataViaNetwork.class
+/target/classes/Network/ServerConnection.class
+/target/classes/Network/ServerUI.class
+/target/classes/pojos/Sex.class
+/target/classes/pojos/Signal.class
+/target/classes/jdbcInterfaces/SignalManager.class
+/target/classes/pojos/TypeSignal.class
+/target/classes/utils/UIUtils.class
+/target/classes/pojos/User.class
+/target/classes/jdbcInterfaces/UserManager.class

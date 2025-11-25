@@ -2,9 +2,13 @@ package Network;
 
 import Network.data.ReceiveDataViaNetwork;
 import Network.data.SendDataViaNetwork;
-import jdbc.*;
+
+import jdbc.JDBCClient;
 import jdbc.JDBCMedicalHistory;
 import jdbc.JDBCSignal;
+import jdbc.JDBCDoctor;
+import jdbc.JDBCUser;
+
 import pojos.*;
 import pojos.TypeSignal;
 
@@ -25,12 +29,12 @@ public class ClientHandler implements Runnable {
 
     private boolean running = true;
 
-    public ClientHandler(Socket socket, ServerConnection serverConnection) {
+    public ClientHandler(Socket socket, ServerConnection serverConnection, DoctorAssignmentService doctorAssignmentService) {
         this.socket = socket;
         this.serverConnection = serverConnection;
         this.receive = new ReceiveDataViaNetwork(socket);
         this.send = new SendDataViaNetwork(socket);
-        this.processor = new CommandProcessor();
+        this.processor = new CommandProcessor(doctorAssignmentService);
     }
 
     @Override

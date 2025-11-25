@@ -268,5 +268,30 @@ public class JDBCClient implements ClientManager {
         return null;
     }
 
+    public void updateDoctorForClient(int clientId, int doctorId) {
+
+        String sql = "UPDATE client SET doctor_id = ? WHERE client_id = ?";
+
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, doctorId);
+            ps.setInt(2, clientId);
+
+            int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+                System.out.println("Doctor " + doctorId + " assigned to client " + clientId);
+            } else {
+                System.out.println("No client found with ID " + clientId);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error assigning doctor to client");
+            e.printStackTrace();
+        }
+    }
+
+
 
 }

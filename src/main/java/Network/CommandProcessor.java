@@ -2,7 +2,13 @@ package Network;
 
 import Network.data.ReceiveDataViaNetwork;
 import Network.data.SendDataViaNetwork;
-import jdbc.*;
+
+import jdbc.JDBCClient;
+import jdbc.JDBCMedicalHistory;
+import jdbc.JDBCSignal;
+import jdbc.JDBCDoctor;
+import jdbc.JDBCUser;
+
 import pojos.*;
 import utils.SecurityUtils;
 
@@ -18,12 +24,14 @@ public class CommandProcessor {
     private final JDBCMedicalHistory jdbcMedicalHistory;
     private final JDBCSignal jdbcSignal;
     private final JDBCDoctor jdbcDoctor;
+    private final DoctorAssignmentService doctorAssignmentService;
 
-    public CommandProcessor() {
+    public CommandProcessor(DoctorAssignmentService doctorAssignmentService) {
         this.jdbcClient = new JDBCClient();
         this.jdbcMedicalHistory = new JDBCMedicalHistory();
         this.jdbcSignal = new JDBCSignal();
         this.jdbcDoctor = new JDBCDoctor();
+        this.doctorAssignmentService = doctorAssignmentService;
     }
 
     //This method gets a message and, depending on how it starts, calls one method or another to handle the request.
@@ -140,11 +148,8 @@ public class CommandProcessor {
 
             if (mh.getObservations() != null)
                 response += "OBS: " + mh.getObservations() + "\n";
-
         }
-
         return response;
-
     }
 
     private String handleSignals(String[] parts,
@@ -168,6 +173,20 @@ public class CommandProcessor {
         Signal signal = new Signal(type);
         signal.fromByteArray(raw);
 
+        //so that the doctor is assigned automatically
+        Doctor assigned = doctorAssignmentService.getDoctorForSignal(type);
+
+        if(assigned == null) {
+            return "ERROR|No doctor available for " + type.name();
+        }
+
+        System.out.println("Doctor assigned: " + assigned.getName() + "(" + assigned.getSpecialty() + ")");
+
+        // Store the doctor assignment in the DB
+        jdbcClient.updateDoctorForClient(clientId, assigned.getDoctorId());
+
+
+
         MedicalHistory medicalHistory = new MedicalHistory();
         medicalHistory.setClientId(clientId);
         medicalHistory.setDate(LocalDate.now());
@@ -181,13 +200,13 @@ public class CommandProcessor {
 
             jdbcSignal.addSignal(signal);
 
-            return "OK|Signal saved";
+            return "OK|Signal saved|AssignedDoctor=" + assigned.getName() + ";" + assigned.getSpecialty();
+
         } catch (IOException e) {
             System.err.println("Error saving signal file: " + e.getMessage());
             send.sendString("Error saving signal");
+            return "ERROR|Signal could not be saved";
         }
-
-        return "ERROR|Signal could not be saved";
     }
 
     private String handleRegisterUser(String[] parts) {
@@ -196,7 +215,6 @@ public class CommandProcessor {
         String passwordPlain = parts[2];
 
         String passwordHash = SecurityUtils.hashPassword(passwordPlain);
-
 
         User user = new User(username, passwordHash);
         user.setUsername(username);
@@ -232,6 +250,7 @@ public class CommandProcessor {
 
         int userId = Integer.parseInt(parts[1]);
 
+        //comentar esto??
         JDBCClient jdbcClient = new JDBCClient();
         Client c = jdbcClient.getClientByUserId(userId);
 
@@ -432,11 +451,6 @@ public class CommandProcessor {
         // RETURN FORMAT:  OK|doctorId
         return "OK|" + created.getDoctorId();
     }
-
-
-
-
-
 }
 
 

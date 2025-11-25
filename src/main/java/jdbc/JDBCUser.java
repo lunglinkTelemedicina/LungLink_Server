@@ -27,7 +27,7 @@ public class JDBCUser implements UserManager {
                 }
             }
 
-            System.out.println("User correctly added with ID: \n" + user.getId());
+            System.out.println("User correctly added with ID: " + user.getId() + "\n");
 
         } catch (SQLException e) {
             System.err.println("Error when adding a user");

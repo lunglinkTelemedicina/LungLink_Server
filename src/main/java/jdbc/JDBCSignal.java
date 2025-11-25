@@ -69,6 +69,7 @@ public class JDBCSignal implements SignalManager {
         return s;
     }
 
+
     @Override
     public List<Signal> getSignalsByRecordId(int recordId) {
         List<Signal> list = new ArrayList<>();

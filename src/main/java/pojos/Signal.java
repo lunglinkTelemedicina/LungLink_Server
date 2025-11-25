@@ -1,5 +1,6 @@
 package pojos;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -82,20 +83,44 @@ public class Signal {
             signal_values.add(val);
         }
     }
+//    public String saveAsFile() throws IOException {
+//
+//        String folder = "signals/";
+//        String fileName = type.name() + "_record" + recordId + ".csv";
+//
+//        java.io.File dir = new java.io.File(folder);
+//        if (!dir.exists()) dir.mkdirs();
+//
+//        FileWriter fw = new FileWriter(folder + fileName);
+//
+//        for (int v : signal_values) fw.write(v + ",");
+//        fw.close();
+//
+//        return fileName; // This goes into SQL in column signal_file
+//    }
+
     public String saveAsFile() throws IOException {
 
+        // Carpeta donde guardar las señales
         String folder = "signals/";
         String fileName = type.name() + "_record" + recordId + ".csv";
 
-        java.io.File dir = new java.io.File(folder);
+        // Crear carpeta si no existe
+        File dir = new File(folder);
         if (!dir.exists()) dir.mkdirs();
 
-        FileWriter fw = new FileWriter(folder + fileName);
+        // Crear objeto File con ruta completa
+        File file = new File(dir, fileName);
 
-        for (int v : signal_values) fw.write(v + ",");
-        fw.close();
+        // Escribir el archivo
+        try (FileWriter fw = new FileWriter(file)) {
+            for (int v : signal_values) {
+                fw.write(v + ",");
+            }
+        }
 
-        return fileName; // This goes into SQL in column signal_file
+        // Devolver ruta ABSOLUTA (lo que guardamos en la base de datos)
+        return file.getAbsolutePath();
     }
 
     public String valuesToDB() {

@@ -20,7 +20,8 @@ public enum CommandType {
     GET_DOCTOR_PATIENTS,
     GET_PATIENT_HISTORY_DOCTOR,
     GET_PATIENT_SIGNALS,
-    ADD_OBSERVATIONS;
+    ADD_OBSERVATIONS,
+    GET_SIGNAL_FILE;
 
     //Converts the string into an enum
     public static CommandType fromString(String s) {

@@ -12,7 +12,9 @@ import jdbc.JDBCUser;
 import pojos.*;
 import utils.SecurityUtils;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -87,6 +89,8 @@ public class CommandProcessor {
                     return handleGetPatientsSignals(parts);
                 case ADD_OBSERVATIONS:
                     return handleAddObservations(parts);
+                case GET_SIGNAL_FILE:
+                    return handleGetSignalFile(parts, send);
 
 
                 default:
@@ -480,6 +484,37 @@ public class CommandProcessor {
         // RETURN FORMAT:  OK|doctorId
         return "OK|" + created.getDoctorId();
     }
+
+    private String handleGetSignalFile(String[] parts, SendDataViaNetwork send) {
+        try {
+            int signalId = Integer.parseInt(parts[1]);
+
+            Signal s = jdbcSignal.getSignalById(signalId);
+            if (s == null) {
+                return "ERROR|Signal not found";
+            }
+
+            File file = new File(s.getSignalFile());
+            if (!file.exists()) {
+                return "ERROR|File not found on server";
+            }
+
+            // Leer bytes
+            byte[] data = Files.readAllBytes(file.toPath());
+
+            // Enviar autorización
+            send.sendString("OK|SENDING_FILE|" + data.length);
+
+            // Enviar bytes
+            send.sendBytes(data);
+
+            return "NO_REPLY";
+
+        } catch (Exception e) {
+            return "ERROR|" + e.getMessage();
+        }
+    }
+
 }
 
 

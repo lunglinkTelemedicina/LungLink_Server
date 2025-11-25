@@ -165,7 +165,7 @@ public class CommandProcessor {
                 : TypeSignal.EMG;
 
         // tell client to send bytes
-        send.sendString("Client can send the data");
+        send.sendString("OK|Client can send data");
 
         // receive raw bytes
         byte[] raw = receive.receiveBytes();
@@ -204,7 +204,6 @@ public class CommandProcessor {
 
         } catch (IOException e) {
             System.err.println("Error saving signal file: " + e.getMessage());
-            send.sendString("Error saving signal");
             return "ERROR|Signal could not be saved";
         }
     }

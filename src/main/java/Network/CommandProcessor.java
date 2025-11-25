@@ -165,7 +165,7 @@ public class CommandProcessor {
                 : TypeSignal.EMG;
 
         // tell client to send bytes
-        send.sendString("OK|Client can send data");
+        send.sendString("OK|Client can send the data");
 
         // receive raw bytes
         byte[] raw = receive.receiveBytes();

@@ -23,6 +23,9 @@ public class MainServer {
 
         DoctorAssignmentService doctorAssignmentService = new DoctorAssignmentService(doctors);
 
+        for (Doctor d : doctors) {
+            System.out.println("DOCTOR >> " + d.getName() + " | " + d.getSpecialty());
+        }
         int port = 9000;
         //Create the server socket
         ServerConnection server = new ServerConnection(port, doctorAssignmentService);

@@ -169,22 +169,38 @@ public class CommandProcessor {
 
         // receive raw bytes
         byte[] raw = receive.receiveBytes();
+        System.out.println("handleSignals → received " + raw.length + " raw bytes for " + type); //TODO NUEVO
 
         Signal signal = new Signal(type);
         signal.fromByteArray(raw);
+        System.out.println("handleSignals → signal has " +
+                signal.getValues().size() + " samples"); //TODO NUEVO
 
         //so that the doctor is assigned automatically
-        Doctor assigned = doctorAssignmentService.getDoctorForSignal(type);
-
-        if(assigned == null) {
-            return "ERROR|No doctor available for " + type.name();
-        }
-
-        System.out.println("Doctor assigned: " + assigned.getName() + "(" + assigned.getSpecialty() + ")");
-
+//        Doctor assigned = doctorAssignmentService.getDoctorForSignal(type);
+//
+//        if(assigned == null) {
+//            return "ERROR|No doctor available for " + type.name();
+//        }
+//
+//        System.out.println("Doctor assigned: " + assigned.getName() + "(" + assigned.getSpecialty() + ")");
         // Store the doctor assignment in the DB
-        jdbcClient.updateDoctorForClient(clientId, assigned.getDoctorId());
+       // jdbcClient.updateDoctorForClient(clientId, assigned.getDoctorId());
 
+        Doctor assigned = null;
+        try {
+            assigned = doctorAssignmentService.getDoctorForSignal(type);
+            if (assigned == null) {
+                System.out.println("handleSignals → WARNING: No doctor available for " + type.name());
+            } else {
+                System.out.println("handleSignals → Doctor assigned: " +
+                        assigned.getName() + " (" + assigned.getSpecialty() + ")");
+                jdbcClient.updateDoctorForClient(clientId, assigned.getDoctorId());
+            }
+        } catch (Exception e) {
+            System.out.println("handleSignals → ERROR assigning doctor: " + e.getMessage());
+            // seguimos igualmente, solo sin doctor
+        }
 
 
         MedicalHistory medicalHistory = new MedicalHistory();
@@ -197,10 +213,18 @@ public class CommandProcessor {
         try {
             String fileName = signal.saveAsFile();
             signal.setSignalFile(fileName);
+            System.out.println("handleSignals → signal file saved as " + fileName);
 
             jdbcSignal.addSignal(signal);
+            System.out.println("handleSignals → signal stored in DB with recordId=" + recordId);
 
-            return "OK|Signal saved|AssignedDoctor=" + assigned.getName() + ";" + assigned.getSpecialty();
+            //return "OK|Signal saved|AssignedDoctor=" + assigned.getName() + ";" + assigned.getSpecialty();
+            if (assigned == null) {
+                return "OK|Signal saved|NoDoctorAssigned";
+            } else {
+                return "OK|Signal saved|AssignedDoctor=" +
+                        assigned.getName() + ";" + assigned.getSpecialty();
+            }
 
         } catch (IOException e) {
             System.err.println("Error saving signal file: " + e.getMessage());

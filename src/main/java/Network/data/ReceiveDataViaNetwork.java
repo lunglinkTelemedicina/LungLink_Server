@@ -17,6 +17,7 @@ public class ReceiveDataViaNetwork {
             System.err.println("Error initializing ReceiveDataViaNetwork: " + e.getMessage());
             e.printStackTrace();
         }
+
     }
 
     public int receiveInt() throws IOException{

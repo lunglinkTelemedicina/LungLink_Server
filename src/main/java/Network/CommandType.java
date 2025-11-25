@@ -24,6 +24,9 @@ public enum CommandType {
 
     //Converts the string into an enum
     public static CommandType fromString(String s) {
+        if (s == null) return UNKNOWN;
+
+        s = s.trim().toUpperCase();
         try {
             return CommandType.valueOf(s);
         } catch (Exception e) {

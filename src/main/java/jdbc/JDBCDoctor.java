@@ -228,5 +228,29 @@ public class JDBCDoctor implements DoctorManager {
 
         return list;
     }
+
+    public boolean isPatientAssignedToDoctor(int doctorId, int clientId) {
+        String sql = "SELECT COUNT(*) FROM doctor_patient WHERE doctor_id = ? AND client_id = ?";
+
+        JDBCConnectionManager cm = new JDBCConnectionManager();
+
+        try (Connection conn = cm.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, doctorId);
+            ps.setInt(2, clientId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 }
 

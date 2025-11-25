@@ -355,7 +355,13 @@ public class CommandProcessor {
 
     private String handleGetPatientHistoryDoctor(String[] parts) {
 
-        int clientId = Integer.parseInt(parts[1]);
+        int doctorId = Integer.parseInt(parts[1]);
+        int clientId = Integer.parseInt(parts[2]);
+
+        if(!jdbcDoctor.isPatientAssignedToDoctor(doctorId, clientId)){
+            return "ERROR|Patients not assigned to this Doctor";
+        }
+
         List<MedicalHistory> list = jdbcMedicalHistory.getMedicalHistoryByClientId(clientId);
 
         if (list.isEmpty()) {

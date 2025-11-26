@@ -197,5 +197,27 @@ public class JDBCUser implements UserManager {
         return -1;
     }
 
+    public int getUserIdByUsernameOnlyIfExists(String username) {
+
+        String sql = "SELECT user_id FROM user WHERE username = ?";
+
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("user_id");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
+
+
 }
 

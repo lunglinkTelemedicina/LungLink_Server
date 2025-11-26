@@ -3,11 +3,7 @@ package Network;
 import Network.data.ReceiveDataViaNetwork;
 import Network.data.SendDataViaNetwork;
 
-import jdbc.JDBCClient;
-import jdbc.JDBCMedicalHistory;
-import jdbc.JDBCSignal;
-import jdbc.JDBCDoctor;
-import jdbc.JDBCUser;
+import jdbc.*;
 
 import pojos.*;
 import utils.SecurityUtils;
@@ -15,6 +11,8 @@ import utils.SecurityUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -178,35 +176,18 @@ public class CommandProcessor {
 
         Signal signal = new Signal(type);
         signal.fromByteArray(raw);
-        System.out.println("handleSignals → signal has " +
-                signal.getValues().size() + " samples"); //TODO NUEVO
+        System.out.println("handleSignals → signal has " + signal.getValues().size() + " samples");
 
-        //so that the doctor is assigned automatically
-//        Doctor assigned = doctorAssignmentService.getDoctorForSignal(type);
-//
-//        if(assigned == null) {
-//            return "ERROR|No doctor available for " + type.name();
-//        }
-//
-//        System.out.println("Doctor assigned: " + assigned.getName() + "(" + assigned.getSpecialty() + ")");
-        // Store the doctor assignment in the DB
-       // jdbcClient.updateDoctorForClient(clientId, assigned.getDoctorId());
+        Doctor assigned = doctorAssignmentService.getDoctorForSignal(type);
 
-        Doctor assigned = null;
-        try {
-            assigned = doctorAssignmentService.getDoctorForSignal(type);
-            if (assigned == null) {
-                System.out.println("handleSignals → WARNING: No doctor available for " + type.name());
-            } else {
-                System.out.println("handleSignals → Doctor assigned: " +
-                        assigned.getName() + " (" + assigned.getSpecialty() + ")");
-                jdbcClient.updateDoctorForClient(clientId, assigned.getDoctorId());
-            }
-        } catch (Exception e) {
-            System.out.println("handleSignals → ERROR assigning doctor: " + e.getMessage());
-            // seguimos igualmente, solo sin doctor
+        if (assigned == null) {
+            System.out.println("handleSignals → WARNING: No doctor available for " + type);
+            return "ERROR|No doctor available for " + type.name();
         }
 
+        // 5) Asignar el doctor al CLIENTE
+        jdbcClient.updateDoctorForClient(clientId, assigned.getDoctorId());
+        System.out.println("Doctor assigned: " + assigned.getName() + "(" + assigned.getSpecialty() + ")");
 
         MedicalHistory medicalHistory = new MedicalHistory();
         medicalHistory.setClientId(clientId);
@@ -215,21 +196,28 @@ public class CommandProcessor {
         int recordId = jdbcMedicalHistory.addMedicalHistory(medicalHistory);
         signal.setRecordId(recordId);
 
+        String updateMH = "UPDATE medicalhistory SET doctor_id = ? WHERE record_id = ?";
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(updateMH)) {
+
+            ps.setInt(1, assigned.getDoctorId());
+            ps.setInt(2, recordId);
+            ps.executeUpdate();
+
+            System.out.println("MedicalHistory " + recordId +
+                    " updated with doctor_id=" + assigned.getDoctorId());
+        }
+
         try {
             String fileName = signal.saveAsFile();
             signal.setSignalFile(fileName);
+
             System.out.println("handleSignals → signal file saved as " + fileName);
 
             jdbcSignal.addSignal(signal);
             System.out.println("handleSignals → signal stored in DB with recordId=" + recordId);
 
-            //return "OK|Signal saved|AssignedDoctor=" + assigned.getName() + ";" + assigned.getSpecialty();
-            if (assigned == null) {
-                return "OK|Signal saved|NoDoctorAssigned";
-            } else {
-                return "OK|Signal saved|AssignedDoctor=" +
-                        assigned.getName() + ";" + assigned.getSpecialty();
-            }
+            return "OK|Signal saved|AssignedDoctor=" + assigned.getName() + ";" + assigned.getSpecialty();
 
         } catch (IOException e) {
             System.err.println("Error saving signal file: " + e.getMessage());

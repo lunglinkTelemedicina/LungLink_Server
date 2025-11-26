@@ -253,36 +253,90 @@ public class JDBCDoctor implements DoctorManager {
         return false;
     }
 
+//    public void insertDoctorByDefault() {
+//        String checkSql = "SELECT COUNT(*) FROM doctor";
+//
+//        JDBCConnectionManager cm = JDBCConnectionManager.getInstance();
+//
+//        try (Connection conn = cm.getConnection();
+//             PreparedStatement checkPs = conn.prepareStatement(checkSql);
+//             ResultSet rs = checkPs.executeQuery()) {
+//
+//            if (rs.next() && rs.getInt(1) == 0) {
+//
+//                String insertSql = "INSERT INTO doctor (name, surname, email, specialty, user_id) VALUES (?, ?, ?, ?, ?)";
+//
+//                try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
+//
+//                    insertPs.setString(1, "Alfredo");
+//                    insertPs.setString(2, "Jiménez");
+//                    insertPs.setString(3, "ajimenez@lunglink.com");
+//                    insertPs.setString(4, "GENERAL_MEDICINE");
+//                    int userId = JDBCUser.getInstance().getUserIdByUsername("AlfredoJimenez");
+//                    insertPs.setInt(5, userId);
+//
+//                    insertPs.executeUpdate();
+//                }
+//            }
+//
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
     public void insertDoctorByDefault() {
-        String checkSql = "SELECT COUNT(*) FROM doctor";
+
+        String email = "ajimenez@lunglink.com";
 
         JDBCConnectionManager cm = JDBCConnectionManager.getInstance();
 
+        // 1) Comprobar si YA EXISTE el doctor por email
+        String checkSql = "SELECT COUNT(*) FROM doctor WHERE email = ?";
+
         try (Connection conn = cm.getConnection();
-             PreparedStatement checkPs = conn.prepareStatement(checkSql);
-             ResultSet rs = checkPs.executeQuery()) {
+             PreparedStatement checkPs = conn.prepareStatement(checkSql)) {
 
-            if (rs.next() && rs.getInt(1) == 0) {
+            checkPs.setString(1, email);
+            ResultSet rs = checkPs.executeQuery();
 
-                String insertSql = "INSERT INTO doctor (name, surname, email, specialty, user_id) VALUES (?, ?, ?, ?, ?)";
-
-                try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
-
-                    insertPs.setString(1, "Alfredo");
-                    insertPs.setString(2, "Jiménez");
-                    insertPs.setString(3, "ajimenez@lunglink.com");
-                    insertPs.setString(4, "GENERAL_MEDICINE");
-                    int userId = JDBCUser.getInstance().getUserIdByUsername("AlfredoJimenez");
-                    insertPs.setInt(5, userId);
-
-                    insertPs.executeUpdate();
-                }
+            if (rs.next() && rs.getInt(1) > 0) {
+                System.out.println("Default doctor already exists.");
+                return;
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        // 2) Obtener user_id SIN crear usuario nuevo
+        int userId = JDBCUser.getInstance().getUserIdByUsernameOnlyIfExists("AlfredoJimenez");
+
+        if (userId == -1) {
+            System.err.println("ERROR: Default doctor user not found. Run insertDefaultDoctorUser() first.");
+            return;
+        }
+
+        // 3) Insertar el DOCTOR
+        String insertSql = "INSERT INTO doctor (name, surname, email, specialty, user_id) VALUES (?, ?, ?, ?, ?)";
+
+        try (Connection conn = cm.getConnection();
+             PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
+
+            insertPs.setString(1, "Alfredo");
+            insertPs.setString(2, "Jiménez");
+            insertPs.setString(3, email);
+            insertPs.setString(4, "GENERAL_MEDICINE");
+            insertPs.setInt(5, userId);
+
+            insertPs.executeUpdate();
+
+            System.out.println("Default doctor inserted.");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
+
 
     private static JDBCDoctor instance;
 

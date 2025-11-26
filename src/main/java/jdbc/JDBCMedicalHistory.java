@@ -194,6 +194,38 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
             System.err.println("Error when adding symptoms ");
             e.printStackTrace();
         }
+
+        int clientId = getClientIdByRecordId(recordId);
+
+        if (clientId != -1) {
+
+            // Asignamos doctor por defecto SOLO si no tiene uno
+            int defaultDoctorId = JDBCDoctor.getInstance().getDefaultDoctorId();
+
+            String checkSql = "SELECT doctor_id FROM client WHERE client_id = ?";
+
+            try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
+                 PreparedStatement ps = conn.prepareStatement(checkSql)) {
+
+                ps.setInt(1, clientId);
+                ResultSet rs = ps.executeQuery();
+
+                boolean hasDoctor = false;
+
+                if (rs.next()) {
+                    int currentDoctor = rs.getInt("doctor_id");
+                    hasDoctor = (currentDoctor != 0); // 0 = no doctor asignado
+                }
+
+                if (!hasDoctor) {
+                    JDBCClient.getInstance().assignDefaultDoctorToClient(clientId);
+                    System.out.println("Default doctor assigned to client " + clientId);
+                }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -215,6 +247,7 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
         }
     }
 
+
     public void updateObservations(int recordId, String observations) {
 
         String sql = "UPDATE medicalhistory SET observations = ? WHERE record_id = ?";
@@ -233,6 +266,28 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
         }
     }
 
+    private int getClientIdByRecordId(int recordId) {
+
+        String sql = "SELECT client_id FROM medicalhistory WHERE record_id = ?";
+
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, recordId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("client_id");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println("Client id for record " + recordId + " = " + clientId);
+
+
+        return -1;
+    }
 
 
 }

@@ -252,5 +252,67 @@ public class JDBCDoctor implements DoctorManager {
 
         return false;
     }
+
+    public void insertDoctorByDefault() {
+        String checkSql = "SELECT COUNT(*) FROM doctor";
+
+        JDBCConnectionManager cm = JDBCConnectionManager.getInstance();
+
+        try (Connection conn = cm.getConnection();
+             PreparedStatement checkPs = conn.prepareStatement(checkSql);
+             ResultSet rs = checkPs.executeQuery()) {
+
+            if (rs.next() && rs.getInt(1) == 0) {
+
+                String insertSql = "INSERT INTO doctor (name, surname, email, specialty, user_id) VALUES (?, ?, ?, ?, ?)";
+
+                try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
+
+                    insertPs.setString(1, "Alfredo");
+                    insertPs.setString(2, "Jiménez");
+                    insertPs.setString(3, "ajimenez@lunglink.com");
+                    insertPs.setString(4, "GENERAL_MEDICINE");
+                    int userId = JDBCUser.getInstance().getUserIdByUsername("AlfredoJimenez");
+                    insertPs.setInt(5, userId);
+
+                    insertPs.executeUpdate();
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static JDBCDoctor instance;
+
+    public static synchronized JDBCDoctor getInstance() {
+        if (instance == null) {
+            instance = new JDBCDoctor();
+        }
+        return instance;
+    }
+
+    public int getDefaultDoctorId() {
+        String sql = "SELECT doctor_id FROM doctor WHERE email = ?";
+
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, "ajimenez@lunglink.com"); // el doctor por defecto
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("doctor_id");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
+
+
 }
 

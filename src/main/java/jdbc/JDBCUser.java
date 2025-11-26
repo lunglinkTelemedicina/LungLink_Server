@@ -136,5 +136,66 @@ public class JDBCUser implements UserManager {
 
         return null;
     }
+
+    private static JDBCUser instance;
+
+    public static synchronized JDBCUser getInstance() {
+        if (instance == null) {
+            instance = new JDBCUser();
+        }
+        return instance;
+    }
+
+    public void insertDefaultDoctorUser() {
+
+        String checkSql = "SELECT COUNT(*) FROM user WHERE username = ?";
+
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
+             PreparedStatement checkPs = conn.prepareStatement(checkSql)) {
+
+            checkPs.setString(1, "doctor");
+            ResultSet rs = checkPs.executeQuery();
+
+            if (!rs.next() || rs.getInt(1) == 0) {
+
+                String insertSql = "INSERT INTO user (username, password) VALUES (?, ?)";
+
+                try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
+
+                    String hashedPassword = utils.SecurityUtils.hashPassword("doctor123");
+
+                    insertPs.setString(1, "AlfredoJimenez");
+                    insertPs.setString(2, hashedPassword);
+                    insertPs.executeUpdate();
+
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int getUserIdByUsername(String username) {
+
+        String sql = "SELECT id FROM user WHERE username = ?";
+
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("id");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
+
 }
 

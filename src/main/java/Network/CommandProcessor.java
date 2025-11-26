@@ -85,8 +85,8 @@ public class CommandProcessor {
                     return handleGetDoctorPatients(parts);
                 case GET_PATIENT_HISTORY_DOCTOR:
                     return handleGetPatientHistoryDoctor(parts);
-                case GET_PATIENT_SIGNALS:
-                    return handleGetPatientsSignals(parts);
+                case GET_PATIENT_SIGNALS_DOCTOR:
+                    return handleGetPatientSignalsDoctor(parts);
                 case ADD_OBSERVATIONS:
                     return handleAddObservations(parts);
                 case GET_SIGNAL_FILE:
@@ -419,9 +419,14 @@ public class CommandProcessor {
         return response.toString();
     }
 
-    private String handleGetPatientsSignals(String[] parts) {
+    private String handleGetPatientSignalsDoctor(String[] parts) {
 
-        int clientId = Integer.parseInt(parts[1]);
+        int doctorId = Integer.parseInt(parts[1]);
+        int clientId = Integer.parseInt(parts[2]);
+
+        if (!jdbcDoctor.isPatientAssignedToDoctor(doctorId, clientId)) {
+            return "ERROR|Patient not assigned to this Doctor";
+        }
 
         List<Signal> signals = jdbcSignal.getSignalsByClientId(clientId);
 
@@ -435,12 +440,12 @@ public class CommandProcessor {
             sb.append("SIGNAL_ID: ").append(s.getSignalId()).append("\n");
             sb.append("TYPE: ").append(s.getType() != null ? s.getType().name() : "").append("\n");
             sb.append("RECORD_ID: ").append(s.getRecordId()).append("\n");
-            sb.append("FILE: ").append(s.getSignalFile() != null ? s.getSignalFile() : "").append("\n");
-            sb.append("\n");
+            sb.append("FILE: ").append(s.getSignalFile()).append("\n\n");
         }
 
         return sb.toString();
     }
+
 
 
     private String handleAddObservations(String[] parts) {

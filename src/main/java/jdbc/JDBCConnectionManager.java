@@ -21,6 +21,7 @@ public class JDBCConnectionManager {
             try (Connection conn = DriverManager.getConnection("jdbc:sqlite:./database/lunglink.db")) {
                 conn.createStatement().execute("PRAGMA foreign_keys = ON");
                 createTables(conn);
+
             }
 
             System.out.println("LungLink database correctly initialized\n");

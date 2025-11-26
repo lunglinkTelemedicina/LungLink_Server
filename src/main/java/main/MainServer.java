@@ -17,6 +17,8 @@ public class MainServer {
 
         //Start the connection manager so the database is created
         JDBCConnectionManager.getInstance();
+        JDBCUser.getInstance().insertDefaultDoctorUser();
+        JDBCDoctor.getInstance().insertDoctorByDefault();
 
         DoctorAssignmentService doctorAssignmentService = new DoctorAssignmentService();
 

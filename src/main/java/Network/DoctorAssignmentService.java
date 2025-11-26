@@ -31,7 +31,7 @@ public class DoctorAssignmentService {
                 break;
 
             case EMG:
-                required = DoctorSpecialty.RHEUMATOLOGIST;
+                required = DoctorSpecialty.NEUROPHYSIOLOGIST;
                 break;
         }
 

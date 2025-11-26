@@ -313,6 +313,32 @@ public class JDBCDoctor implements DoctorManager {
         return -1;
     }
 
+    public Doctor getDefaultDoctor() {
+        String sql = "SELECT * FROM doctor WHERE email = ?";
+
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, "ajimenez@lunglink.com");
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Doctor d = new Doctor();
+                d.setDoctorId(rs.getInt("doctor_id"));
+                d.setName(rs.getString("name"));
+                d.setSurname(rs.getString("surname"));
+                d.setEmail(rs.getString("email"));
+                d.setSpecialty(DoctorSpecialty.valueOf(rs.getString("specialty")));
+                return d;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
 
 }
 

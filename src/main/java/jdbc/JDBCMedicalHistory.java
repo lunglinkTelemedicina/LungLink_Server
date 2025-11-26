@@ -269,6 +269,7 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
     private int getClientIdByRecordId(int recordId) {
 
         String sql = "SELECT client_id FROM medicalhistory WHERE record_id = ?";
+        int clientId = -1;
 
         try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -277,14 +278,13 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                return rs.getInt("client_id");
+                clientId = rs.getInt("client_id");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
         System.out.println("Client id for record " + recordId + " = " + clientId);
-
 
         return -1;
     }

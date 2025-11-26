@@ -119,7 +119,8 @@ public class CommandProcessor {
         int recordId = jdbcMedicalHistory.addMedicalHistory(medicalHistory);
         jdbcMedicalHistory.addSymptoms(recordId, symptoms);
 
-        return "OK|Symptoms are saved";
+        Doctor defaultDoctor = jdbcDoctor.getDefaultDoctor();
+        return "OK|Symptoms are saved|AssignedDoctor=" + defaultDoctor.getName() + ";" + defaultDoctor.getSpecialty();
     }
 
     private String handleAddExtraInfo(String[] parts) {

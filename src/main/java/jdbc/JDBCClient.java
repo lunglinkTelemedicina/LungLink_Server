@@ -296,7 +296,7 @@ public class JDBCClient implements ClientManager {
 
         String sql = "SELECT COUNT(*) FROM client WHERE doctor_id = ?";
 
-        JDBCConnectionManager cm = new JDBCConnectionManager();
+        JDBCConnectionManager cm = JDBCConnectionManager.getInstance();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

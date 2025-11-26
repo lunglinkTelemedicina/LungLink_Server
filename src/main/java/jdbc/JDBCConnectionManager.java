@@ -7,7 +7,7 @@ public class JDBCConnectionManager {
 
     private static JDBCConnectionManager instance;
 
-    public JDBCConnectionManager() {
+    private JDBCConnectionManager() {
         try {
             Class.forName("org.sqlite.JDBC");
 

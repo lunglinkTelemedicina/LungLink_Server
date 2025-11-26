@@ -232,7 +232,7 @@ public class JDBCDoctor implements DoctorManager {
     public boolean isPatientAssignedToDoctor(int doctorId, int clientId) {
         String sql = "SELECT COUNT(*) FROM client WHERE client_id = ? AND doctor_id = ?";
 
-        JDBCConnectionManager cm = new JDBCConnectionManager();
+        JDBCConnectionManager cm = JDBCConnectionManager.getInstance();
 
         try (Connection conn = cm.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

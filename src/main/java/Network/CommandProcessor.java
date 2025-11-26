@@ -494,18 +494,15 @@ public class CommandProcessor {
                 return "ERROR|Signal not found";
             }
 
-            File file = new File(s.getSignalFile());
+            File file = new File("signals/" + s.getSignalFile());
             if (!file.exists()) {
+                System.out.println("File  not found: " + file.getAbsolutePath());
                 return "ERROR|File not found on server";
             }
 
-            // Leer bytes
             byte[] data = Files.readAllBytes(file.toPath());
 
-            // Enviar autorización
             send.sendString("OK|SENDING_FILE|" + data.length);
-
-            // Enviar bytes
             send.sendBytes(data);
 
             return "NO_REPLY";

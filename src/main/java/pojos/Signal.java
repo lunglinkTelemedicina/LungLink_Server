@@ -101,26 +101,22 @@ public class Signal {
 
     public String saveAsFile() throws IOException {
 
-        // Carpeta donde guardar las señales
         String folder = "signals/";
         String fileName = type.name() + "_record" + recordId + ".csv";
 
-        // Crear carpeta si no existe
         File dir = new File(folder);
         if (!dir.exists()) dir.mkdirs();
 
-        // Crear objeto File con ruta completa
         File file = new File(dir, fileName);
 
-        // Escribir el archivo
         try (FileWriter fw = new FileWriter(file)) {
             for (int v : signal_values) {
                 fw.write(v + ",");
             }
         }
 
-        // Devolver ruta ABSOLUTA (lo que guardamos en la base de datos)
-        return file.getAbsolutePath();
+
+        return fileName;
     }
 
     public String valuesToDB() {

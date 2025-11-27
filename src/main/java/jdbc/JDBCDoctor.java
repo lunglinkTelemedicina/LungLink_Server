@@ -342,7 +342,7 @@ public class JDBCDoctor implements DoctorManager {
 
 
     public int getDefaultDoctorId() {
-        String sql = "SELECT id FROM doctor WHERE email = ?";
+        String sql = "SELECT doctor_id FROM doctor WHERE email = ?";
 
         try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -351,7 +351,7 @@ public class JDBCDoctor implements DoctorManager {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                return rs.getInt("id");
+                return rs.getInt("doctor_id");
             }
 
         } catch (Exception e) {
@@ -372,7 +372,7 @@ public class JDBCDoctor implements DoctorManager {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 Doctor d = new Doctor();
-                d.setDoctorId(rs.getInt("id"));
+                d.setDoctorId(rs.getInt("doctor_id"));
                 d.setName(rs.getString("name"));
                 d.setSurname(rs.getString("surname"));
                 d.setEmail(rs.getString("email"));

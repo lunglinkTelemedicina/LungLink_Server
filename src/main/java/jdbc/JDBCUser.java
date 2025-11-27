@@ -36,13 +36,19 @@ public class JDBCUser implements UserManager {
             }
 
             System.out.println("User correctly added with ID: " + user.getId() + "\n");
+            return user.id;
 
         } catch (SQLException e) {
+
+            if (e.getMessage().contains("UNIQUE constraint failed: user.username")) {
+                System.out.println("Username already exists: " + user.getUsername());
+                return -1;
+            }
             System.err.println("Error when adding a user");
             e.printStackTrace();
+            return -1;
         }
-
-        return user.id;
+       // return user.id;
     }
 
 

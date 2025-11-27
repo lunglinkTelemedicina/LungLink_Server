@@ -434,11 +434,11 @@ public class CommandProcessor {
                     response.append("FILE: ").append(signals.get(0).getSignalFile()).append("\n");
                 }
             }
-            if (mh.getSymptomsList() != null) {
-                response.append("SYMPTOMS: ")
-                        .append(String.join(",", mh.getSymptomsList()))
-                        .append("\n");
-            }
+//            if (mh.getSymptomsList() != null) {
+//                response.append("SYMPTOMS: ")
+//                        .append(String.join(",", mh.getSymptomsList()))
+//                        .append("\n");
+//            }
 
             if (mh.getObservations() != null) {
                 response.append("OBS: ").append(mh.getObservations()).append("\n");

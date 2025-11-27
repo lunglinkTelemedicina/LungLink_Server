@@ -181,6 +181,36 @@ public class JDBCSignal implements SignalManager {
         return null; // No signal → it was a symptoms entry
     }
 
+    public int getClientIdBySignalId(int signalId) {
+
+        String sql = """
+        SELECT client.client_id
+        FROM signal
+        JOIN medicalhistory ON signal.record_id = medicalhistory.record_id
+        JOIN client ON medicalhistory.client_id = client.client_id
+        WHERE signal.signal_id = ?
+    """;
+
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, signalId);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
+
+
+
+
 }
 
 

@@ -528,6 +528,12 @@ public class CommandProcessor {
                 return "ERROR|Signal not found";
             }
 
+            int clientOwner = jdbcSignal.getClientIdBySignalId(signalId);
+
+            if (clientOwner != Integer.parseInt(parts[2])) {
+                return "ERROR|Signal does not belong to this patient";
+            }
+
             File file = new File("signals/" + s.getSignalFile());
             if (!file.exists()) {
                 System.out.println("File  not found: " + file.getAbsolutePath());

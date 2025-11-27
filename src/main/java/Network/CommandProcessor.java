@@ -467,14 +467,12 @@ public class CommandProcessor {
         for (Signal s : signals) {
             sb.append("SIGNAL_ID: ").append(s.getSignalId()).append("\n");
             sb.append("TYPE: ").append(s.getType() != null ? s.getType().name() : "").append("\n");
-            sb.append("RECORD_ID: ").append(s.getRecordId()).append("\n");
+            //sb.append("RECORD_ID: ").append(s.getRecordId()).append("\n");
             sb.append("FILE: ").append(s.getSignalFile()).append("\n\n");
         }
 
         return sb.toString();
     }
-
-
 
     private String handleAddObservations(String[] parts) {
 

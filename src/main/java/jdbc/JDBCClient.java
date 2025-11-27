@@ -315,30 +315,30 @@ public class JDBCClient implements ClientManager {
         return 0;
     }
 
-    public void assignDefaultDoctorToClient(int clientId) {
-
-        int defaultDoctorId = JDBCDoctor.getInstance().getDefaultDoctorId();
-
-        if (defaultDoctorId == -1) {
-            System.err.println("No default doctor found!");
-            return;
-        }
-
-        String sql = "UPDATE client SET doctor_id = ? WHERE client_id = ?";
-
-        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, defaultDoctorId);
-            ps.setInt(2, clientId);
-
-            ps.executeUpdate();
-            System.out.println("Assigning default doctor to client " + clientId);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+//    public void assignDefaultDoctorToClient(int clientId) {
+//
+//        int defaultDoctorId = JDBCDoctor.getInstance().getDefaultDoctorId();
+//
+//        if (defaultDoctorId == -1) {
+//            System.err.println("No default doctor found!");
+//            return;
+//        }
+//
+//        String sql = "UPDATE client SET doctor_id = ? WHERE client_id = ?";
+//
+//        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
+//             PreparedStatement ps = conn.prepareStatement(sql)) {
+//
+//            ps.setInt(1, defaultDoctorId);
+//            ps.setInt(2, clientId);
+//
+//            ps.executeUpdate();
+//            System.out.println("Assigning default doctor to client " + clientId);
+//
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     private static JDBCClient instance;
 

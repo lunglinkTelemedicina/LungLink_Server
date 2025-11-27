@@ -7,6 +7,14 @@ import java.sql.*;
 
 public class JDBCUser implements UserManager {
 
+    private static JDBCUser instance;
+
+    public static synchronized JDBCUser getInstance() {
+        if (instance == null) {
+            instance = new JDBCUser();
+        }
+        return instance;
+    }
 
     @Override
     public int addUser(User user) {
@@ -137,44 +145,43 @@ public class JDBCUser implements UserManager {
         return null;
     }
 
-    private static JDBCUser instance;
+    public void insertDefaultDoctorUser(Connection conn) {
 
-    public static synchronized JDBCUser getInstance() {
-        if (instance == null) {
-            instance = new JDBCUser();
-        }
-        return instance;
-    }
+        String sqlCheck = "SELECT COUNT(*) FROM user WHERE username = ?";
 
-    public void insertDefaultDoctorUser() {
+        try (PreparedStatement ps = conn.prepareStatement(sqlCheck)) {
 
-        String checkSql = "SELECT COUNT(*) FROM user WHERE username = ?";
+            ps.setString(1, "AlfredoJimenez");
+            ResultSet rs = ps.executeQuery();
 
-        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
-             PreparedStatement checkPs = conn.prepareStatement(checkSql)) {
-
-            checkPs.setString(1, "doctor");
-            ResultSet rs = checkPs.executeQuery();
-
-            if (!rs.next() || rs.getInt(1) == 0) {
-
-                String insertSql = "INSERT INTO user (username, password) VALUES (?, ?)";
-
-                try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
-
-                    String hashedPassword = utils.SecurityUtils.hashPassword("doctor123");
-
-                    insertPs.setString(1, "AlfredoJimenez");
-                    insertPs.setString(2, hashedPassword);
-                    insertPs.executeUpdate();
-
-                }
+            if (rs.next() && rs.getInt(1) > 0) {
+                System.out.println("Default doctor USER already exists.");
+                return;
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        // Insert default user
+        String sqlInsert = "INSERT INTO user (username, password) VALUES (?, ?)";
+
+        try (PreparedStatement ps = conn.prepareStatement(sqlInsert)) {
+
+            String hashedPassword = utils.SecurityUtils.hashPassword("doctor123");
+
+            ps.setString(1, "AlfredoJimenez");
+            ps.setString(2, hashedPassword);
+            ps.executeUpdate();
+
+            System.out.println("Default doctor USER created.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
+
 
     public int getUserIdByUsername(String username) {
 
@@ -199,7 +206,7 @@ public class JDBCUser implements UserManager {
 
     public int getUserIdByUsernameOnlyIfExists(String username) {
 
-        String sql = "SELECT user_id FROM user WHERE username = ?";
+        String sql = "SELECT id FROM user WHERE username = ?";
 
         try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -208,7 +215,7 @@ public class JDBCUser implements UserManager {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                return rs.getInt("user_id");
+                return rs.getInt("id");
             }
 
         } catch (SQLException e) {

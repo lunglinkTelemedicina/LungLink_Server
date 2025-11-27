@@ -10,6 +10,15 @@ import java.util.List;
 
 public class JDBCDoctor implements DoctorManager {
 
+    private static JDBCDoctor instance;
+
+    public static synchronized JDBCDoctor getInstance() {
+        if (instance == null) {
+            instance = new JDBCDoctor();
+        }
+        return instance;
+    }
+
     @Override
     public void addDoctor(Doctor doctor) {
 
@@ -284,20 +293,16 @@ public class JDBCDoctor implements DoctorManager {
 //        }
 //    }
 
-    public void insertDoctorByDefault() {
+    public void insertDoctorByDefault(Connection conn) {
 
         String email = "ajimenez@lunglink.com";
 
-        JDBCConnectionManager cm = JDBCConnectionManager.getInstance();
-
-        // 1) Comprobar si YA EXISTE el doctor por email
+        // 1: Check if doctor exists
         String checkSql = "SELECT COUNT(*) FROM doctor WHERE email = ?";
 
-        try (Connection conn = cm.getConnection();
-             PreparedStatement checkPs = conn.prepareStatement(checkSql)) {
-
-            checkPs.setString(1, email);
-            ResultSet rs = checkPs.executeQuery();
+        try (PreparedStatement ps = conn.prepareStatement(checkSql)) {
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
 
             if (rs.next() && rs.getInt(1) > 0) {
                 System.out.println("Default doctor already exists.");
@@ -308,28 +313,26 @@ public class JDBCDoctor implements DoctorManager {
             e.printStackTrace();
         }
 
-        // 2) Obtener user_id SIN crear usuario nuevo
+        // 2: Get user_id
         int userId = JDBCUser.getInstance().getUserIdByUsernameOnlyIfExists("AlfredoJimenez");
 
         if (userId == -1) {
-            System.err.println("ERROR: Default doctor user not found. Run insertDefaultDoctorUser() first.");
+            System.err.println("ERROR: Default doctor user not found.");
             return;
         }
 
-        // 3) Insertar el DOCTOR
-        String insertSql = "INSERT INTO doctor (name, surname, email, specialty, user_id) VALUES (?, ?, ?, ?, ?)";
+        // 3: Insert doctor
+        String insertSql =
+                "INSERT INTO doctor (name, surname, email, specialty, user_id) VALUES (?, ?, ?, ?, ?)";
 
-        try (Connection conn = cm.getConnection();
-             PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
+        try (PreparedStatement ps = conn.prepareStatement(insertSql)) {
+            ps.setString(1, "Alfredo");
+            ps.setString(2, "Jiménez");
+            ps.setString(3, email);
+            ps.setString(4, "GENERAL_MEDICINE");
+            ps.setInt(5, userId);
 
-            insertPs.setString(1, "Alfredo");
-            insertPs.setString(2, "Jiménez");
-            insertPs.setString(3, email);
-            insertPs.setString(4, "GENERAL_MEDICINE");
-            insertPs.setInt(5, userId);
-
-            insertPs.executeUpdate();
-
+            ps.executeUpdate();
             System.out.println("Default doctor inserted.");
 
         } catch (SQLException e) {
@@ -338,17 +341,8 @@ public class JDBCDoctor implements DoctorManager {
     }
 
 
-    private static JDBCDoctor instance;
-
-    public static synchronized JDBCDoctor getInstance() {
-        if (instance == null) {
-            instance = new JDBCDoctor();
-        }
-        return instance;
-    }
-
     public int getDefaultDoctorId() {
-        String sql = "SELECT doctor_id FROM doctor WHERE email = ?";
+        String sql = "SELECT id FROM doctor WHERE email = ?";
 
         try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -357,7 +351,7 @@ public class JDBCDoctor implements DoctorManager {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                return rs.getInt("doctor_id");
+                return rs.getInt("id");
             }
 
         } catch (Exception e) {
@@ -378,7 +372,7 @@ public class JDBCDoctor implements DoctorManager {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 Doctor d = new Doctor();
-                d.setDoctorId(rs.getInt("doctor_id"));
+                d.setDoctorId(rs.getInt("id"));
                 d.setName(rs.getString("name"));
                 d.setSurname(rs.getString("surname"));
                 d.setEmail(rs.getString("email"));

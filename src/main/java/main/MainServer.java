@@ -10,15 +10,22 @@ import pojos.Doctor;
 import jdbc.JDBCConnectionManager;
 
 
+import java.sql.Connection;
 import java.util.List;
 
 public class MainServer {
     public static void main(String[] args) {
 
         //Start the connection manager so the database is created
-        JDBCConnectionManager.getInstance();
-        JDBCUser.getInstance().insertDefaultDoctorUser();
-        JDBCDoctor.getInstance().insertDoctorByDefault();
+        //JDBCConnectionManager.getInstance();
+//        JDBCUser.getInstance().insertDefaultDoctorUser();
+//        JDBCDoctor.getInstance().insertDoctorByDefault();
+
+        JDBCConnectionManager cm = JDBCConnectionManager.getInstance();
+        Connection conn = cm.getConnection();
+
+        JDBCUser.getInstance().insertDefaultDoctorUser(conn);
+        JDBCDoctor.getInstance().insertDoctorByDefault(conn);
 
         DoctorAssignmentService doctorAssignmentService = new DoctorAssignmentService();
 

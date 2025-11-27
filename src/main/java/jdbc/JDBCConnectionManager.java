@@ -114,6 +114,7 @@ public class JDBCConnectionManager {
 
             System.out.println("Tables created or correctly verified");
 
+
         } catch (SQLException e) {
             if (e.getMessage().contains("already exist")) {
                 System.out.println("Tables already exist");

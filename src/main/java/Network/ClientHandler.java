@@ -65,6 +65,7 @@ public class ClientHandler implements Runnable {
             closeConnection();
             System.out.println("Closed handler for: " + socket.getRemoteSocketAddress());
         }
+
     }
 
     public void closeConnection(){

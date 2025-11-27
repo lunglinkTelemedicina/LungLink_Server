@@ -40,6 +40,15 @@ public class SendDataViaNetwork {
 
     }
 
+    public void sendRawBytes(byte[] data) {
+        try {
+            dataOutputStream.write(data);  // SIN writeInt
+            dataOutputStream.flush();
+        } catch (IOException e) {
+            System.out.println("Error sending raw bytes: " + e.getMessage());
+        }
+    }
+
     public void releaseResources() {
         try {
             if (dataOutputStream != null) {

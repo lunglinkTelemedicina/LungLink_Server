@@ -497,7 +497,8 @@ public class CommandProcessor {
             byte[] data = Files.readAllBytes(file.toPath());
 
             send.sendString("OK|SENDING_FILE|" + data.length);
-            send.sendBytes(data);
+            send.sendRawBytes(data);
+           // send.sendBytes(data);
 
             return "NO_REPLY";
 

@@ -47,11 +47,14 @@ public class ClientHandler implements Runnable {
                 // PROCESS COMMAND WITH THE BRAIN
                 String response = processor.handleClientRequest(message, receive, send);
 
-                // SEND RESPONSE BACK
-                send.sendString(response);
 
                 if (response.startsWith("OK|Disconnected")) {
                     running = false;
+                }
+
+                // SEND RESPONSE BACK
+                if (!response.equals("NO_REPLY")) {
+                    send.sendString(response);
                 }
             }
 

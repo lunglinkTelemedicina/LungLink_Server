@@ -139,21 +139,42 @@ public class CommandProcessor {
         if (list.isEmpty()) {
             return "ERROR|No history found";
         }
-
-        String response = "";
-
+        StringBuilder response = new StringBuilder();
         for (MedicalHistory mh : list) {
 
-            response += "DATE: " + mh.getDate() + "\n";
+            response.append("RECORD ID: ").append(mh.getRecordId()).append("\n");
+            response.append("DATE: ").append(mh.getDate()).append("\n");
 
-            if (mh.getSymptomsList() != null)
-                response += "SYMPTOMS: " + mh.getSymptomsList() + "\n";
+            // Obtener si este record tiene señal asociada (ECG/EMG)
+            TypeSignal type = jdbcSignal.getSignalTypeByRecordId(mh.getRecordId());
 
-            if (mh.getObservations() != null)
-                response += "OBS: " + mh.getObservations() + "\n";
+            if (type == null) {
+                // ES UN REGISTRO DE SÍNTOMAS
+                response.append("TYPE: SYMPTOMS\n");
+                if (mh.getSymptomsList() != null) {
+                    response.append("SYMPTOMS: ")
+                            .append(String.join(",", mh.getSymptomsList()))
+                            .append("\n");
+                }
+            } else {
+                // ES ECG o EMG
+                response.append("TYPE: ").append(type.name()).append("\n");
+                // Coger archivo de la señal
+                List<Signal> signals = jdbcSignal.getSignalsByRecordId(mh.getRecordId());
+                if (!signals.isEmpty()) {
+                    response.append("FILE: ")
+                            .append(signals.get(0).getSignalFile())
+                            .append("\n");
+                }
+            }
+            if (mh.getObservations() != null) {
+                response.append("OBS: ").append(mh.getObservations()).append("\n");
+            }
+            response.append("\n");
         }
-        return response;
+        return response.toString();
     }
+
 
     private String handleSignals(String[] parts,
                                  CommandType cmd,
@@ -392,6 +413,24 @@ public class CommandProcessor {
             response.append("RECORD_ID: ").append(mh.getRecordId()).append("\n");
             response.append("DATE: ").append(mh.getDate()).append("\n");
 
+            TypeSignal type = jdbcSignal.getSignalTypeByRecordId(mh.getRecordId());
+
+            if (type == null) {
+                response.append("TYPE: SYMPTOMS\n");
+
+                if (mh.getSymptomsList() != null) {
+                    response.append("SYMPTOMS: ")
+                            .append(String.join(",", mh.getSymptomsList()))
+                            .append("\n");
+                }
+            } else {
+                response.append("TYPE: ").append(type.name()).append("\n");
+
+                List<Signal> signals = jdbcSignal.getSignalsByRecordId(mh.getRecordId());
+                if (!signals.isEmpty()) {
+                    response.append("FILE: ").append(signals.get(0).getSignalFile()).append("\n");
+                }
+            }
             if (mh.getSymptomsList() != null) {
                 response.append("SYMPTOMS: ")
                         .append(String.join(",", mh.getSymptomsList()))

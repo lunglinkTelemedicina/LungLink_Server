@@ -10,8 +10,6 @@ import java.util.List;
 
 public class JDBCSignal implements SignalManager {
 
-
-
     @Override
     public void addSignal(Signal signal) {
         String sql = """
@@ -158,6 +156,29 @@ public class JDBCSignal implements SignalManager {
         }
 
         return list;
+    }
+
+    public TypeSignal getSignalTypeByRecordId(int recordId) {
+        String sql = "SELECT type FROM signal WHERE record_id = ? LIMIT 1";
+
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, recordId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                String typeStr = rs.getString("type");
+                if (typeStr != null) {
+                    return TypeSignal.valueOf(typeStr.toUpperCase());
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null; // No signal → it was a symptoms entry
     }
 
 }

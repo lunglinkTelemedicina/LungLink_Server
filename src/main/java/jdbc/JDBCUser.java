@@ -2,6 +2,7 @@ package jdbc;
 
 import jdbcInterfaces.UserManager;
 import pojos.User;
+import utils.SecurityUtils;
 
 import java.sql.*;
 
@@ -23,7 +24,7 @@ public class JDBCUser implements UserManager {
         try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            String hashedPassword = utils.SecurityUtils.hashPassword(user.getPassword());
+            String hashedPassword = SecurityUtils.hashPassword(user.getPassword());
 
             ps.setString(1, user.getUsername());
             ps.setString(2, hashedPassword);

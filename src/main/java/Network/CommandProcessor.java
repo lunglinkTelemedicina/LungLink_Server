@@ -254,10 +254,11 @@ public class CommandProcessor {
         String username = parts[1];
         String passwordPlain = parts[2];
 
-        String passwordHash = SecurityUtils.hashPassword(passwordPlain);
+        //String passwordHash = SecurityUtils.hashPassword(passwordPlain);
 
-        User user = new User(username, passwordHash);
-        user.setUsername(username);
+        //User user = new User(username, passwordHash);
+        //user.setUsername(username);
+        User user = new User(username, passwordPlain);
 
         JDBCUser jdbcUser = new JDBCUser();
         int newId = jdbcUser.addUser(user);
@@ -274,10 +275,12 @@ public class CommandProcessor {
         String username = parts[1];
         String passwordPlain = parts[2];
 
-        String passwordHash = SecurityUtils.hashPassword(passwordPlain);
+        //String passwordHash = SecurityUtils.hashPassword(passwordPlain);
 
         JDBCUser jdbcUser = new JDBCUser();
-        User user = jdbcUser.validateLogin(username, passwordHash);
+        //User user = jdbcUser.validateLogin(username, passwordHash);
+
+        User user = jdbcUser.validateLogin(username, passwordPlain);
 
         if (user == null) {
             return "ERROR|Invalid credentials";

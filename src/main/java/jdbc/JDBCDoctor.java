@@ -30,7 +30,7 @@ public class JDBCDoctor implements DoctorManager {
             ps.setString(1, doctor.getName());
             ps.setString(2, doctor.getSurname());
             ps.setString(3, doctor.getEmail());
-            ps.setString(4, doctor.getSpecialty() != null ? doctor.getSpecialty().toString() : null);
+            ps.setString(4, doctor.getSpecialty() != null ? doctor.getSpecialty().name() : null);
             ps.setInt(5, doctor.getUserId());
 
             ps.executeUpdate();
@@ -262,37 +262,6 @@ public class JDBCDoctor implements DoctorManager {
         return false;
     }
 
-//    public void insertDoctorByDefault() {
-//        String checkSql = "SELECT COUNT(*) FROM doctor";
-//
-//        JDBCConnectionManager cm = JDBCConnectionManager.getInstance();
-//
-//        try (Connection conn = cm.getConnection();
-//             PreparedStatement checkPs = conn.prepareStatement(checkSql);
-//             ResultSet rs = checkPs.executeQuery()) {
-//
-//            if (rs.next() && rs.getInt(1) == 0) {
-//
-//                String insertSql = "INSERT INTO doctor (name, surname, email, specialty, user_id) VALUES (?, ?, ?, ?, ?)";
-//
-//                try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
-//
-//                    insertPs.setString(1, "Alfredo");
-//                    insertPs.setString(2, "Jiménez");
-//                    insertPs.setString(3, "ajimenez@lunglink.com");
-//                    insertPs.setString(4, "GENERAL_MEDICINE");
-//                    int userId = JDBCUser.getInstance().getUserIdByUsername("AlfredoJimenez");
-//                    insertPs.setInt(5, userId);
-//
-//                    insertPs.executeUpdate();
-//                }
-//            }
-//
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     public void insertDoctorByDefault(Connection conn) {
 
         String email = "ajimenez@lunglink.com";
@@ -329,7 +298,7 @@ public class JDBCDoctor implements DoctorManager {
             ps.setString(1, "Alfredo");
             ps.setString(2, "Jiménez");
             ps.setString(3, email);
-            ps.setString(4, "GENERAL_MEDICINE");
+            ps.setString(4, DoctorSpecialty.GENERAL_MEDICINE.name());
             ps.setInt(5, userId);
 
             ps.executeUpdate();

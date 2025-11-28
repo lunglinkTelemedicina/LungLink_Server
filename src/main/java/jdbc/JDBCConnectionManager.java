@@ -82,7 +82,7 @@ public class JDBCConnectionManager {
                     sex TEXT,
                     weight DOUBLE,
                     height DOUBLE,
-                    doctor_id INTEGER,
+                    doctor_id INTEGER NULL, 
                     user_id INTEGER NOT NULL,
                     FOREIGN KEY (doctor_id) REFERENCES doctor(doctor_id),  -- foreign key para el doctor asignado
                     FOREIGN KEY (user_id) REFERENCES user(id)  -- foreign key al usuario para el login

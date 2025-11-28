@@ -245,28 +245,89 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
         }
     }
 
-    private int getClientIdByRecordId(int recordId) {
+    public void assignPendingRecordsToDoctor(int doctorId, DoctorSpecialty specialty) {
 
-        String sql = "SELECT client_id FROM medicalhistory WHERE record_id = ?";
-        int clientId = -1;
+        String selectRecords = """
+            SELECT m.record_id
+            FROM medicalhistory m
+            LEFT JOIN signal s ON m.record_id = s.record_id
+            WHERE m.doctor_id IS NULL
+        """;
+
+        //chooses specialty
+        switch (specialty) {
+            case CARDIOLOGIST ->
+                    selectRecords += " AND s.type = 'ECG'";
+
+            case NEUROPHYSIOLOGIST ->
+                    selectRecords += " AND s.type = 'EMG'";
+
+            case GENERAL_MEDICINE ->
+                    selectRecords += " AND s.type IS NULL";
+        }
+
+        List<Integer> pendingRecords = new ArrayList<>();
 
         try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(selectRecords)) {
 
-            ps.setInt(1, recordId);
             ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                clientId = rs.getInt("client_id");
+            while (rs.next()) {
+                pendingRecords.add(rs.getInt(1));
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("Client id for record " + recordId + " = " + clientId);
 
-        return -1;
+
+        if (pendingRecords.isEmpty()) {
+            System.out.println("No pending records for specialty " + specialty);
+            return;
+        }
+
+        String updateMH = """
+            UPDATE medicalhistory
+            SET doctor_id = ?
+            WHERE record_id = ?
+        """;
+
+        String updateClient = """
+            UPDATE client
+            SET doctor_id = ?
+            WHERE client_id = (
+                SELECT client_id FROM medicalhistory WHERE record_id = ?
+            )
+        """;
+
+        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
+             PreparedStatement psMH = conn.prepareStatement(updateMH);
+             PreparedStatement psC = conn.prepareStatement(updateClient)) {
+
+            conn.setAutoCommit(false);
+
+            for (int recordId : pendingRecords) {
+
+                psMH.setInt(1, doctorId);
+                psMH.setInt(2, recordId);
+                psMH.executeUpdate();
+
+                psC.setInt(1, doctorId);
+                psC.setInt(2, recordId);
+                psC.executeUpdate();
+            }
+
+            conn.commit();
+
+            System.out.println("Assigned " + pendingRecords.size() +
+                    " records + clients to doctor " + doctorId +
+                    " (" + specialty + ")");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
 
 
 }

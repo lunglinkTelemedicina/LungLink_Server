@@ -206,30 +206,38 @@ public class CommandProcessor {
 
         if (assigned == null) {
             System.out.println("handleSignals → WARNING: No doctor available for " + type);
-            return "ERROR|No doctor available for " + type.name();
-        }
-
-        // 5) Asignar el doctor al CLIENTE
+            //return "ERROR|No doctor available for " + type.name();
+        } else {
+        // asignar doctor al cliente
         jdbcClient.updateDoctorForClient(clientId, assigned.getDoctorId());
-        System.out.println("Doctor assigned: " + assigned.getName() + "(" + assigned.getSpecialty() + ")");
+        System.out.println("Doctor assigned: " + assigned.getName() + " (" + assigned.getSpecialty() + ")");
+         }
 
         MedicalHistory medicalHistory = new MedicalHistory();
         medicalHistory.setClientId(clientId);
         medicalHistory.setDate(LocalDate.now());
 
+        if (assigned != null) {
+            medicalHistory.setDoctorId(assigned.getDoctorId());
+        } else {
+            medicalHistory.setDoctorId(0);  // o NO setear doctorId
+        }
+
         int recordId = jdbcMedicalHistory.addMedicalHistory(medicalHistory);
         signal.setRecordId(recordId);
 
-        String updateMH = "UPDATE medicalhistory SET doctor_id = ? WHERE record_id = ?";
-        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(updateMH)) {
+        if (assigned != null) {
+            String updateMH = "UPDATE medicalhistory SET doctor_id = ? WHERE record_id = ?";
+            try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
+                 PreparedStatement ps = conn.prepareStatement(updateMH)) {
 
-            ps.setInt(1, assigned.getDoctorId());
-            ps.setInt(2, recordId);
-            ps.executeUpdate();
+                ps.setInt(1, assigned.getDoctorId());
+                ps.setInt(2, recordId);
+                ps.executeUpdate();
 
-            System.out.println("MedicalHistory " + recordId +
-                    " updated with doctor_id=" + assigned.getDoctorId());
+                System.out.println("MedicalHistory " + recordId +
+                        " updated with doctor_id=" + assigned.getDoctorId());
+            }
         }
 
         try {
@@ -241,7 +249,14 @@ public class CommandProcessor {
             jdbcSignal.addSignal(signal);
             System.out.println("handleSignals → signal stored in DB with recordId=" + recordId);
 
-            return "OK|Signal saved|AssignedDoctor=" + assigned.getName() + ";" + assigned.getSpecialty();
+            //return "OK|Signal saved|AssignedDoctor=" + assigned.getName() + ";" + assigned.getSpecialty();
+
+            if (assigned != null) {
+                return "OK|Signal saved|AssignedDoctor=" +
+                        assigned.getName() + ";" + assigned.getSpecialty();
+            } else {
+                return "OK|Signal saved|AssignedDoctor=NONE";
+            }
 
         } catch (IOException e) {
             System.err.println("Error saving signal file: " + e.getMessage());
@@ -517,8 +532,7 @@ public class CommandProcessor {
         if (created == null) {
             return "ERROR|DoctorNotCreated";
         }
-
-        // RETURN FORMAT:  OK|doctorId
+        jdbcMedicalHistory.assignPendingRecordsToDoctor(created.getDoctorId(), created.getSpecialty());
         return "OK|" + created.getDoctorId();
     }
 

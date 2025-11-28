@@ -269,10 +269,6 @@ public class CommandProcessor {
         String username = parts[1];
         String passwordPlain = parts[2];
 
-        //String passwordHash = SecurityUtils.hashPassword(passwordPlain);
-
-        //User user = new User(username, passwordHash);
-        //user.setUsername(username);
         User user = new User(username, passwordPlain);
 
         JDBCUser jdbcUser = new JDBCUser();
@@ -282,7 +278,7 @@ public class CommandProcessor {
             return "OK|" + newId;
         }
 
-        return "ERROR|User registration failed";
+        return "ERROR|This user already exists.";
     }
 
     private String handleLoginUser(String[] parts) {

@@ -1,0 +1,57 @@
+@options
+@packages
+-classpath
+'C:/Users/Martina Zandio/.m2/repository/org/xerial/sqlite-jdbc/3.41.2.1/sqlite-jdbc-3.41.2.1.jar;C:/Users/Martina Zandio/.m2/repository/com/google/code/gson/gson/2.10.1/gson-2.10.1.jar'
+-encoding
+'UTF-8'
+-protected
+-source
+'21'
+-sourcepath
+'C:/Users/Martina Zandio/IdeaProjects/LungLink_Server/src/main/java'
+-author
+-bottom
+'Copyright &#169; 2025. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'C:/Users/Martina Zandio/IdeaProjects/LungLink_Server/target/site/apidocs'
+-docencoding
+'UTF-8'
+-Xdoclint:none
+-doctitle
+'Server_Repository 1.0-SNAPSHOT API'
+-use
+-version
+-windowtitle
+'Server_Repository 1.0-SNAPSHOT API'
+jdbc
+jdbcInterfaces
+main
+Network
+Network.data
+pojos
+utils
+C:\Users\Martina Zandio\.m2\repository\org\xerial\sqlite-jdbc\3.41.2.1\sqlite-jdbc-3.41.2.1.jar = 1762244930193
+C:\Users\Martina Zandio\.m2\repository\com\google\code\gson\gson\2.10.1\gson-2.10.1.jar = 1762244929159
+C:\Users\Martina Zandio\IdeaProjects\LungLink_Server\src\main\java = 1763902274737
+C:\Users\Martina Zandio\IdeaProjects\LungLink_Server\target\site\apidocs\allclasses-index.html = 1764437706878
+C:\Users\Martina Zandio\IdeaProjects\LungLink_Server\target\site\apidocs\allpackages-index.html = 1764437706887
+C:\Users\Martina Zandio\IdeaProjects\LungLink_Server\target\site\apidocs\copy.svg = 1764437706990
+C:\Users\Martina Zandio\IdeaProjects\LungLink_Server\target\site\apidocs\element-list = 1764437706447
+C:\Users\Martina Zandio\IdeaProjects\LungLink_Server\target\site\apidocs\help-doc.html = 1764437706977
+C:\Users\Martina Zandio\IdeaProjects\LungLink_Server\target\site\apidocs\index-all.html = 1764437706959
+C:\Users\Martina Zandio\IdeaProjects\LungLink_Server\target\site\apidocs\index.html = 1764437706831
+C:\Users\Martina Zandio\IdeaProjects\LungLink_Server\target\site\apidocs\link.svg = 1764437706992
+C:\Users\Martina Zandio\IdeaProjects\LungLink_Server\target\site\apidocs\member-search-index.js = 1764437706897
+C:\Users\Martina Zandio\IdeaProjects\LungLink_Server\target\site\apidocs\module-search-index.js = 1764437706890
+C:\Users\Martina Zandio\IdeaProjects\LungLink_Server\target\site\apidocs\overview-summary.html = 1764437706970
+C:\Users\Martina Zandio\IdeaProjects\LungLink_Server\target\site\apidocs\overview-tree.html = 1764437706821
+C:\Users\Martina Zandio\IdeaProjects\LungLink_Server\target\site\apidocs\package-search-index.js = 1764437706892
+C:\Users\Martina Zandio\IdeaProjects\LungLink_Server\target\site\apidocs\script.js = 1764437706987
+C:\Users\Martina Zandio\IdeaProjects\LungLink_Server\target\site\apidocs\search-page.js = 1764437707001
+C:\Users\Martina Zandio\IdeaProjects\LungLink_Server\target\site\apidocs\search.html = 1764437706965
+C:\Users\Martina Zandio\IdeaProjects\LungLink_Server\target\site\apidocs\search.js = 1764437706998
+C:\Users\Martina Zandio\IdeaProjects\LungLink_Server\target\site\apidocs\stylesheet.css = 1764437706983
+C:\Users\Martina Zandio\IdeaProjects\LungLink_Server\target\site\apidocs\tag-search-index.js = 1764437706900
+C:\Users\Martina Zandio\IdeaProjects\LungLink_Server\target\site\apidocs\type-search-index.js = 1764437706894

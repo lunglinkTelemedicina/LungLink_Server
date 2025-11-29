@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"jdbc"},{"l":"jdbcInterfaces"},{"l":"main"},{"l":"Network"},{"l":"Network.data"},{"l":"pojos"},{"l":"utils"}];updateSearchResults();

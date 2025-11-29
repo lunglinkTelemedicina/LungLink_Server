@@ -1,15 +1,20 @@
 package jdbcInterfaces;
 
+import pojos.Client;
 import pojos.Doctor;
+
+import java.sql.Connection;
 import java.util.List;
 
 
 public interface DoctorManager {
 
-    public void addDoctor(Doctor doctor);
-    public Doctor getDoctorById(int id);
-    public List<Doctor> getDoctors();
-    public void updateDoctor(Doctor doctor);
-    public void deleteDoctor(int id);
+    void addDoctor(Doctor doctor);
+    Doctor getDoctorByUserId(int userId);
+    List<Doctor> getDoctors();
+    List<Client> getClientsByDoctorId(int doctorId);
+    boolean isPatientAssignedToDoctor(int doctorId, int clientId);
+    void insertDoctorByDefault(Connection conn);
+    int getDefaultDoctorId();
 
 }

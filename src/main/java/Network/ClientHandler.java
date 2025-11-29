@@ -3,21 +3,9 @@ package Network;
 import Network.data.ReceiveDataViaNetwork;
 import Network.data.SendDataViaNetwork;
 
-import jdbc.JDBCClient;
-import jdbc.JDBCMedicalHistory;
-import jdbc.JDBCSignal;
-import jdbc.JDBCDoctor;
-import jdbc.JDBCUser;
-
 import pojos.*;
-import pojos.TypeSignal;
-
-
 import java.io.*;
 import java.net.Socket;
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
 
 public class ClientHandler implements Runnable {
     private final Socket socket;
@@ -44,15 +32,12 @@ public class ClientHandler implements Runnable {
 
                 String message = receive.receiveString();
 
-                // PROCESS COMMAND WITH THE BRAIN
                 String response = processor.handleClientRequest(message, receive, send);
-
 
                 if (response.startsWith("OK|Disconnected")) {
                     running = false;
                 }
 
-                // SEND RESPONSE BACK
                 if (!response.equals("NO_REPLY")) {
                     send.sendString(response);
                 }

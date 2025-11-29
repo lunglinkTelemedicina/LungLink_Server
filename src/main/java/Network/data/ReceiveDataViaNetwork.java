@@ -31,7 +31,7 @@ public class ReceiveDataViaNetwork {
     public byte[] receiveBytes() throws IOException {
         int length = dataInputStream.readInt();
         byte[] buffer = new byte[length];
-        dataInputStream.readFully(buffer); //Block till all bytes arrive
+        dataInputStream.readFully(buffer);
         return buffer;
     }
 

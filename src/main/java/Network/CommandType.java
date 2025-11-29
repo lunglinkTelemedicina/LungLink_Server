@@ -1,7 +1,5 @@
 package Network;
 
-//No es un pojo. No es un dato, es parte del protocolo de comunicación entre clietne y servidor
-
 public enum CommandType {
     SEND_SYMPTOMS,
     ADD_EXTRA_INFO,

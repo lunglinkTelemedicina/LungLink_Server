@@ -6,7 +6,6 @@ import Network.data.SendDataViaNetwork;
 import jdbc.*;
 
 import pojos.*;
-import utils.SecurityUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,13 +36,12 @@ public class CommandProcessor {
     //This method gets a message and, depending on how it starts, calls one method or another to handle the request.
     public String handleClientRequest(String message, ReceiveDataViaNetwork receive, SendDataViaNetwork send) {
 
-        //Empty message
         if (message == null || message.isEmpty())
             return "ERROR|Empty command";
 
-        //We split the message: CMD|param1|param2|...
+        //Split the message
         String[] parts = message.split("\\|");
-        CommandType cmd = CommandType.fromString(parts[0]);   //El comando
+        CommandType cmd = CommandType.fromString(parts[0]);
 
         try {
 
@@ -51,25 +49,18 @@ public class CommandProcessor {
 
                 case LOGIN_USER:
                     return handleLoginUser(parts);
-
                 case REGISTER_USER:
                     return handleRegisterUser(parts);
-
                 case CHECK_CLIENT:
                     return handleCheckClient(parts);
-
                 case CREATE_CLIENT:
                     return handleCreateClient(parts);
-
                 case SEND_SYMPTOMS:
                     return handleSendSymptoms(parts);
-
                 case ADD_EXTRA_INFO:
                     return handleAddExtraInfo(parts);
-
                 case GET_HISTORY:
                     return handleGetHistory(parts);
-
                 case SEND_ECG:
                 case SEND_EMG:
                     return handleSignals(parts, cmd, receive, send);
@@ -89,8 +80,6 @@ public class CommandProcessor {
                     return handleAddObservations(parts);
                 case GET_SIGNAL_FILE:
                     return handleGetSignalFile(parts, send);
-
-
                 default:
                     return "ERROR|Unknown command" + cmd;
             }
@@ -106,31 +95,23 @@ public class CommandProcessor {
         int clientId = Integer.parseInt(parts[1]);
         String symptomsCSV = parts[2];
 
-        // 1. OBTENER DOCTOR BALANCEADO (REVISIÓN DE CARGA)
-        // Llamamos a getDoctorForSignal(null) para obtener al GENERAL_MEDICINE menos ocupado.
         Doctor assignedDoctor = doctorAssignmentService.getDoctorForSignal(null);
 
         if (assignedDoctor == null) {
             return "ERROR|No General Medicine Doctor available";
         }
 
-        // 2. Crear el objeto MedicalHistory y ASIGNAR el doctor balanceado
         MedicalHistory medicalHistory = new MedicalHistory();
         medicalHistory.setClientId(clientId);
         medicalHistory.setDate(LocalDate.now());
-        // Establecemos el doctor balanceado antes de insertarlo
         medicalHistory.setDoctorId(assignedDoctor.getDoctorId());
 
-        // 3. Insertar MH y síntomas. La MH ya se inserta con el doctorId correcto.
         int recordId = jdbcMedicalHistory.addMedicalHistory(medicalHistory);
-// Aquí solo actualizamos la lista de síntomas en el registro.
         jdbcMedicalHistory.addSymptoms(recordId, Arrays.asList(symptomsCSV.split(",")));
 
-        // 4. Actualizar el doctor asignado al cliente.
         jdbcClient.updateDoctorForClient(clientId, assignedDoctor.getDoctorId());
 
-        // 5. Responder al cliente
-        return "OK|Symptoms are saved|AssignedDoctor=" + assignedDoctor.getName() + ";" + assignedDoctor.getSpecialty();
+        return "OK|Symptoms are saved, your assigned doctor is " + assignedDoctor.getName() + " specialized in " + assignedDoctor.getSpecialty();
     }
 
 
@@ -158,11 +139,10 @@ public class CommandProcessor {
             response.append("RECORD ID: ").append(mh.getRecordId()).append("\n");
             response.append("DATE: ").append(mh.getDate()).append("\n");
 
-            // Obtener si este record tiene señal asociada (ECG/EMG)
+            // obtain record if it has a signal associated
             TypeSignal type = jdbcSignal.getSignalTypeByRecordId(mh.getRecordId());
 
             if (type == null) {
-                // ES UN REGISTRO DE SÍNTOMAS
                 response.append("TYPE: SYMPTOMS\n");
                 if (mh.getSymptomsList() != null) {
                     response.append("SYMPTOMS: ")
@@ -170,9 +150,7 @@ public class CommandProcessor {
                             .append("\n");
                 }
             } else {
-                // ES ECG o EMG
                 response.append("TYPE: ").append(type.name()).append("\n");
-                // Coger archivo de la señal
                 List<Signal> signals = jdbcSignal.getSignalsByRecordId(mh.getRecordId());
                 if (!signals.isEmpty()) {
                     response.append("FILE: ")
@@ -206,21 +184,19 @@ public class CommandProcessor {
 
         // receive raw bytes
         byte[] raw = receive.receiveBytes();
-        System.out.println("handleSignals → received " + raw.length + " raw bytes for " + type); //TODO NUEVO
 
         Signal signal = new Signal(type);
         signal.fromByteArray(raw);
-        System.out.println("handleSignals → signal has " + signal.getValues().size() + " samples");
+        System.out.println("Signal received with " + signal.getValues().size() + " samples");
 
         Doctor assigned = doctorAssignmentService.getDoctorForSignal(type);
 
         if (assigned == null) {
-            System.out.println("handleSignals → WARNING: No doctor available for " + type);
-            //return "ERROR|No doctor available for " + type.name();
+            System.out.println("WARNING: No doctor available for " + type);
         } else {
-        // asignar doctor al cliente
+        // assign doctor depending on the typ of signal sent
         jdbcClient.updateDoctorForClient(clientId, assigned.getDoctorId());
-        System.out.println("Doctor assigned: " + assigned.getName() + " (" + assigned.getSpecialty() + ")");
+        System.out.println("Doctor assigned: " + assigned.getName() + " specialized in " + assigned.getSpecialty());
          }
 
         MedicalHistory medicalHistory = new MedicalHistory();
@@ -230,7 +206,7 @@ public class CommandProcessor {
         if (assigned != null) {
             medicalHistory.setDoctorId(assigned.getDoctorId());
         } else {
-            medicalHistory.setDoctorId(0);  // o NO setear doctorId
+            medicalHistory.setDoctorId(0);
         }
 
         int recordId = jdbcMedicalHistory.addMedicalHistory(medicalHistory);
@@ -246,7 +222,7 @@ public class CommandProcessor {
                 ps.executeUpdate();
 
                 System.out.println("MedicalHistory " + recordId +
-                        " updated with doctor_id=" + assigned.getDoctorId());
+                        " updated with doctor_id = " + assigned.getDoctorId());
             }
         }
 
@@ -254,18 +230,16 @@ public class CommandProcessor {
             String fileName = signal.saveAsFile();
             signal.setSignalFile(fileName);
 
-            System.out.println("handleSignals → signal file saved as " + fileName);
+            System.out.println("Signal file saved as " + fileName);
 
             jdbcSignal.addSignal(signal);
-            System.out.println("handleSignals → signal stored in DB with recordId=" + recordId);
-
-            //return "OK|Signal saved|AssignedDoctor=" + assigned.getName() + ";" + assigned.getSpecialty();
+            System.out.println("Signal stored in LungLink database with recordId" + recordId);
 
             if (assigned != null) {
-                return "OK|Signal saved|AssignedDoctor=" +
+                return "OK|Signal saved with doctor assigned " +
                         assigned.getName() + ";" + assigned.getSpecialty();
             } else {
-                return "OK|Signal saved|AssignedDoctor=NONE";
+                return "OK|Signal saved with no doctor assigned";
             }
 
         } catch (IOException e) {
@@ -296,10 +270,7 @@ public class CommandProcessor {
         String username = parts[1];
         String passwordPlain = parts[2];
 
-        //String passwordHash = SecurityUtils.hashPassword(passwordPlain);
-
         JDBCUser jdbcUser = new JDBCUser();
-        //User user = jdbcUser.validateLogin(username, passwordHash);
 
         User user = jdbcUser.validateLogin(username, passwordPlain);
 
@@ -314,7 +285,6 @@ public class CommandProcessor {
 
         int userId = Integer.parseInt(parts[1]);
 
-        //comentar esto??
         JDBCClient jdbcClient = new JDBCClient();
         Client c = jdbcClient.getClientByUserId(userId);
 
@@ -458,11 +428,6 @@ public class CommandProcessor {
                     response.append("FILE: ").append(signals.get(0).getSignalFile()).append("\n");
                 }
             }
-//            if (mh.getSymptomsList() != null) {
-//                response.append("SYMPTOMS: ")
-//                        .append(String.join(",", mh.getSymptomsList()))
-//                        .append("\n");
-//            }
 
             if (mh.getObservations() != null) {
                 response.append("OBS: ").append(mh.getObservations()).append("\n");
@@ -494,7 +459,6 @@ public class CommandProcessor {
         for (Signal s : signals) {
             sb.append("SIGNAL_ID: ").append(s.getSignalId()).append("\n");
             sb.append("TYPE: ").append(s.getType() != null ? s.getType().name() : "").append("\n");
-            //sb.append("RECORD_ID: ").append(s.getRecordId()).append("\n");
             sb.append("FILE: ").append(s.getSignalFile()).append("\n\n");
         }
 
@@ -567,7 +531,6 @@ public class CommandProcessor {
 
             send.sendString("OK|SENDING_FILE|" + data.length);
             send.sendRawBytes(data);
-           // send.sendBytes(data);
 
             return "NO_REPLY";
 

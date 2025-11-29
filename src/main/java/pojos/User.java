@@ -11,15 +11,10 @@ public class User {
         this.password = password;
     }
 
-    public User(){
-
-    }
-
     public User(int id, String password) {
         this.id = id;
         this.password = password;
     }
-
 
     public User(String username, String password) {
         this.username = username;

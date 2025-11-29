@@ -49,39 +49,6 @@ public class JDBCDoctor implements DoctorManager {
         }
     }
 
-    @Override
-    public Doctor getDoctorById(int id) {
-
-        String sql = "SELECT * FROM doctor WHERE doctor_id = ?";
-
-        Doctor doctor = null;
-
-        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                doctor = new Doctor();
-                doctor.setDoctorId(rs.getInt("doctor_id"));
-                doctor.setName(rs.getString("name"));
-                doctor.setSurname(rs.getString("surname"));
-                doctor.setEmail(rs.getString("email"));
-                String specialtyStr = rs.getString("specialty");
-                if (specialtyStr != null) {
-                    doctor.setSpecialty(DoctorSpecialty.valueOf(specialtyStr));
-                }
-                doctor.setUserId(rs.getInt("user_id"));
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error when obtaining the doctor by ID:");
-            e.printStackTrace();
-        }
-
-        return doctor;
-    }
 
     public Doctor getDoctorByUserId(int userId) {
 
@@ -144,56 +111,6 @@ public class JDBCDoctor implements DoctorManager {
         }
 
         return doctors;
-    }
-
-    @Override
-    public void updateDoctor(Doctor doctor) {
-
-        String sql = "UPDATE doctor SET name = ?, surname = ?, email = ?, specialty = ?, user_id = ? WHERE doctor_id = ?";
-
-        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, doctor.getName());
-            ps.setString(2, doctor.getSurname());
-            ps.setString(3, doctor.getEmail());
-            ps.setString(4, doctor.getSpecialty() != null ? doctor.getSpecialty().toString() : null);
-            ps.setInt(5, doctor.getUserId());
-            ps.setInt(6, doctor.getDoctorId());
-
-            int rowsUpdated = ps.executeUpdate();
-            if (rowsUpdated > 0) {
-                System.out.println("Doctor with id " + doctor.getDoctorId() + " correctly updated");
-            } else {
-                System.out.println("Doctor not found");
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error when updating the doctor");
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void deleteDoctor(int id) {
-
-        String sql = "DELETE FROM doctor WHERE doctor_id = ?";
-
-        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, id);
-            int rowsDeleted = ps.executeUpdate();
-            if (rowsDeleted > 0) {
-                System.out.println("Doctor with id " + id + " correctly deleted");
-            } else {
-                System.out.println("Doctor not found");
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error when deleting a doctor");
-            e.printStackTrace();
-        }
     }
 
     public List<Client> getClientsByDoctorId(int doctorId) {
@@ -266,7 +183,6 @@ public class JDBCDoctor implements DoctorManager {
 
         String email = "ajimenez@lunglink.com";
 
-        // 1: Check if doctor exists
         String checkSql = "SELECT COUNT(*) FROM doctor WHERE email = ?";
 
         try (PreparedStatement ps = conn.prepareStatement(checkSql)) {
@@ -282,7 +198,6 @@ public class JDBCDoctor implements DoctorManager {
             e.printStackTrace();
         }
 
-        // 2: Get user_id
         int userId = JDBCUser.getInstance().getUserIdByUsernameOnlyIfExists("AlfredoJimenez");
 
         if (userId == -1) {
@@ -290,7 +205,6 @@ public class JDBCDoctor implements DoctorManager {
             return;
         }
 
-        // 3: Insert doctor
         String insertSql =
                 "INSERT INTO doctor (name, surname, email, specialty, user_id) VALUES (?, ?, ?, ?, ?)";
 
@@ -316,7 +230,7 @@ public class JDBCDoctor implements DoctorManager {
         try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, "ajimenez@lunglink.com"); // el doctor por defecto
+            ps.setString(1, "ajimenez@lunglink.com"); //default doctor
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
@@ -329,32 +243,6 @@ public class JDBCDoctor implements DoctorManager {
 
         return -1;
     }
-
-    public Doctor getDefaultDoctor() {
-        String sql = "SELECT * FROM doctor WHERE email = ?";
-
-        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, "ajimenez@lunglink.com");
-
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                Doctor d = new Doctor();
-                d.setDoctorId(rs.getInt("doctor_id"));
-                d.setName(rs.getString("name"));
-                d.setSurname(rs.getString("surname"));
-                d.setEmail(rs.getString("email"));
-                d.setSpecialty(DoctorSpecialty.valueOf(rs.getString("specialty")));
-                return d;
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
 
 
 }

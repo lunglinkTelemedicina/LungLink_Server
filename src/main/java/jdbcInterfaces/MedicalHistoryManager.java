@@ -1,5 +1,6 @@
 package jdbcInterfaces;
 
+import pojos.DoctorSpecialty;
 import pojos.MedicalHistory;
 import pojos.Signal;
 
@@ -9,12 +10,9 @@ import java.util.List;
 public interface MedicalHistoryManager {
 
     int addMedicalHistory(MedicalHistory history);
-    MedicalHistory getMedicalHistoryById(int id);
     List<MedicalHistory> getMedicalHistoryByClientId(int clientId);
-    List<MedicalHistory> getMedicalHistories();
     void addSymptoms(int recordId, List<String> symptoms);
-    //void addSignalToMedicalHistory(int recordId, Signal signal);
-   // List<Signal> loadSignalsForHistory(MedicalHistory mh, Connection conn);
-    void deleteMedicalHistory(int id);
+    void updateObservations(int recordId, String observations);
+    void assignPendingRecordsToDoctor(int doctorId, DoctorSpecialty specialty);
 
 }

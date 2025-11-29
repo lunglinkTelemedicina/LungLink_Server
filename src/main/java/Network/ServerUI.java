@@ -5,7 +5,7 @@ import utils.UIUtils;
 
 public class ServerUI {
     private final ServerConnection serverConnection;
-    private final String ADMIN_PASSWORD = "admin123";  // change before delivering
+    private final String ADMIN_PASSWORD = "admin123";
 
     public ServerUI(ServerConnection serverConnection) {
         this.serverConnection = serverConnection;
@@ -18,7 +18,7 @@ public class ServerUI {
         while (true) {
 
             System.out.println("\nChoose an option:\n");
-            System.out.println("1) View connected clients");
+            System.out.println("1) View connected users");
             System.out.println("2) Stop server");
 
             int option = UIUtils.readInt("Option: ");
@@ -40,7 +40,7 @@ public class ServerUI {
 
     private void showConnectedClients() {
         int count = serverConnection.getConnectedClientCount();
-        System.out.println("Connected clients: " + count);
+        System.out.println("Connected users: " + count);
     }
 
     private void attemptShutdown() {
@@ -66,7 +66,7 @@ public class ServerUI {
 
             serverConnection.broadcastShutdownMessage();
             try {
-                Thread.sleep(200);//Small delay
+                Thread.sleep(200);
             }catch(InterruptedException e) {
                 throw new RuntimeException(e);
             }

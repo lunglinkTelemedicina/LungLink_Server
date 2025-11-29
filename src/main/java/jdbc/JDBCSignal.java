@@ -1,8 +1,7 @@
 package jdbc;
 
 import jdbcInterfaces.SignalManager;
-import pojos.Signal;
-import pojos.TypeSignal;
+import pojos.*;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -16,7 +15,6 @@ public class JDBCSignal implements SignalManager {
             INSERT INTO signal (type, signal_file, record_id)
             VALUES (?, ?, ?)
         """;
-
 
         try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -101,23 +99,6 @@ public class JDBCSignal implements SignalManager {
         return list;
     }
 
-    @Override
-    public void deleteSignal(int signalId) {
-        String sql = "DELETE FROM signal WHERE signal_id = ?";
-
-        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, signalId);
-            ps.executeUpdate();
-
-            System.out.println("Signal deleted.");
-
-        } catch (SQLException e) {
-            System.err.println("Error deleting signal:");
-            e.printStackTrace();
-        }
-    }
 
     public List<Signal> getSignalsByClientId(int clientId) {
 
@@ -178,7 +159,7 @@ public class JDBCSignal implements SignalManager {
             e.printStackTrace();
         }
 
-        return null; // No signal → it was a symptoms entry
+        return null;
     }
 
     public int getClientIdBySignalId(int signalId) {

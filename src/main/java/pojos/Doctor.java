@@ -26,9 +26,6 @@ public class Doctor {
 
     }
 
-    public Doctor(int id, String name, String surname, String email, DoctorSpecialty specialty) {
-    }
-
 
     public int getDoctorId() {
         return doctorId;

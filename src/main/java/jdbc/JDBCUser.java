@@ -49,75 +49,10 @@ public class JDBCUser implements UserManager {
             e.printStackTrace();
             return -1;
         }
-       // return user.id;
-    }
-
-
-    @Override
-    public User getUserByUsername(String username) {
-        String sql = "SELECT * FROM user WHERE username = ?";
-
-
-        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, username);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                User u = new User();
-                u.setId(rs.getInt("id"));
-                u.setUsername(rs.getString("username"));
-                u.setPassword(rs.getString("password"));
-                return u;
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error when obtaining the user by its username");
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-
-
-    @Override
-    public void deleteUser(int id) {
-        String sql = "DELETE FROM user WHERE id = ?";
-
-        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, id);
-            ps.executeUpdate();
-            System.out.println("User " + id + "correctly deleted");
-
-        } catch (SQLException e) {
-            System.err.println("Error when deleting user by id: ");
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void deleteUserByName(String username) {
-        String sql = "DELETE FROM user WHERE username = ?";
-
-        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, username);
-            ps.executeUpdate();
-            System.out.println("User " + username + " correctly deleted ");
-
-        } catch (SQLException e) {
-            System.err.println("Error when deleting user by name: ");
-            e.printStackTrace();
-        }
     }
 
     @Override
     public User validateLogin(String username, String passwordPlain) {
-
 
         String passwordHash = utils.SecurityUtils.hashPassword(passwordPlain);
 
@@ -170,7 +105,6 @@ public class JDBCUser implements UserManager {
             e.printStackTrace();
         }
 
-        // Insert default user
         String sqlInsert = "INSERT INTO user (username, password) VALUES (?, ?)";
 
         try (PreparedStatement ps = conn.prepareStatement(sqlInsert)) {
@@ -188,28 +122,6 @@ public class JDBCUser implements UserManager {
         }
     }
 
-
-
-    public int getUserIdByUsername(String username) {
-
-        String sql = "SELECT id FROM user WHERE username = ?";
-
-        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, username);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt("id");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return -1;
-    }
 
     public int getUserIdByUsernameOnlyIfExists(String username) {
 

@@ -1,26 +1,15 @@
 package main;
+
 import Network.*;
-import Network.ServerUI;
-import jdbc.JDBCClient;
-import jdbc.JDBCMedicalHistory;
-import jdbc.JDBCSignal;
-import jdbc.JDBCDoctor;
-import jdbc.JDBCUser;
-import pojos.Doctor;
-import jdbc.JDBCConnectionManager;
-
-
+import jdbc.*;
+import pojos.*;
 import java.sql.Connection;
 import java.util.List;
-//A MI SI M FUNCIONA
+
 public class MainServer {
     public static void main(String[] args) {
 
-        //Start the connection manager so the database is created
-        //JDBCConnectionManager.getInstance();
-//        JDBCUser.getInstance().insertDefaultDoctorUser();
-//        JDBCDoctor.getInstance().insertDoctorByDefault();
-
+        //starting connection with database
         JDBCConnectionManager cm = JDBCConnectionManager.getInstance();
         Connection conn = cm.getConnection();
 
@@ -41,7 +30,6 @@ public class MainServer {
         Thread serverThread = new Thread(server::start);
         serverThread.start();
 
-        //Start admin interface (console UI)
         ServerUI ui = new ServerUI(server);
         ui.start();
     }

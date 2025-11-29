@@ -10,13 +10,9 @@ import java.util.List;
 
 public class DoctorAssignmentService {
 
-    //private List<Doctor> doctors;
     private JDBCClient jdbcClient = new JDBCClient();
     private JDBCDoctor jdbcDoctor = new JDBCDoctor();
 
-//    public DoctorAssignmentService(List<Doctor> doctors) {
-//        this.doctors = doctors;
-//    }
     public DoctorAssignmentService() {}
 
     public Doctor getDoctorForSignal(TypeSignal signalType) {
@@ -26,7 +22,7 @@ public class DoctorAssignmentService {
         int minPatients = Integer.MAX_VALUE;
 
         if (signalType == null) {
-            // Symptoms case → General Medicine
+            // when only symptoms are saved in the medical history
             required = DoctorSpecialty.GENERAL_MEDICINE;
         } else {
         switch (signalType) {
@@ -41,8 +37,7 @@ public class DoctorAssignmentService {
 
         if (required == null) return null;
 
-        //Find the doctor in that specialty with the fewest patients
-
+        // find the doctor in that specialty with the fewest patients
         List<Doctor> doctors = jdbcDoctor.getDoctors();
 
         for (Doctor d : doctors) {

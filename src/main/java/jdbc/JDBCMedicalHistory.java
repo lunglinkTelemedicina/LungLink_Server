@@ -9,7 +9,6 @@ import java.util.*;
 
 public class JDBCMedicalHistory implements MedicalHistoryManager {
 
-
     @Override
     public int addMedicalHistory(MedicalHistory m) {
 
@@ -33,7 +32,6 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
                 ps.setNull(3, Types.INTEGER);
             }
 
-            // observations
             ps.setString(4, m.getObservations());
 
             ps.executeUpdate();
@@ -53,45 +51,6 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
         }
 
         return generatedId;
-    }
-
-    @Override
-    public MedicalHistory getMedicalHistoryById(int recordId) {
-
-        String sql = "SELECT * FROM medicalhistory WHERE record_id = ?";
-        MedicalHistory mh = null;
-
-        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, recordId);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                mh = new MedicalHistory();
-                mh.setRecordId(rs.getInt("record_id"));
-
-                String dateStr = rs.getString("date");
-                if (dateStr != null) {
-                    mh.setDate(LocalDate.parse(dateStr));
-                }
-
-                mh.setClientId(rs.getInt("client_id"));
-                mh.setDoctorId(rs.getInt("doctor_id"));
-                mh.setObservations(rs.getString("observations"));
-
-                String symptomsStr = rs.getString("symptomsList");
-                if (symptomsStr != null && !symptomsStr.isEmpty()) {
-                    mh.setSymptomsList(Arrays.asList(symptomsStr.split(",")));
-                }
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error when obtaining medical history by id:");
-            e.printStackTrace();
-       }
-
-        return mh;
     }
 
     @Override
@@ -135,39 +94,6 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
         return list;
     }
 
-    @Override
-    public List<MedicalHistory> getMedicalHistories() {
-
-        List<MedicalHistory> list = new ArrayList<>();
-        String sql = "SELECT * FROM medicalhistory";
-
-        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
-             Statement st = conn.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-
-            while (rs.next()) {
-                MedicalHistory mh = new MedicalHistory();
-                mh.setRecordId(rs.getInt("record_id"));
-
-                String dateStr = rs.getString("date");
-                if (dateStr != null) {
-                    mh.setDate(LocalDate.parse(dateStr));
-                }
-
-                mh.setClientId(rs.getInt("client_id"));
-                mh.setDoctorId(rs.getInt("doctor_id"));
-                mh.setObservations(rs.getString("observations"));
-
-                list.add(mh);
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error when obtaining medical histories ");
-            e.printStackTrace();
-        }
-
-        return list;
-    }
 
     public void addSymptoms(int recordId, List<String> symptomsList) {
 
@@ -189,7 +115,7 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
 
             System.out.println("Symptoms correctly added to medical history " + recordId);
 
-            // SIEMPRE asignar doctor general para síntomas
+            // default doctor assigned when patient only has symptoms
             int defaultDoctorId = JDBCDoctor.getInstance().getDefaultDoctorId();
 
             String updateMH = "UPDATE medicalhistory SET doctor_id = ? WHERE record_id = ?";
@@ -205,27 +131,6 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
             e.printStackTrace();
         }
     }
-
-
-    @Override
-    public void deleteMedicalHistory(int recordId) {
-
-        String sql = "DELETE FROM medicalhistory WHERE record_id = ?";
-
-        try (Connection conn = JDBCConnectionManager.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, recordId);
-            ps.executeUpdate();
-
-            System.out.println("Medical History " + recordId + "correctly deleted ");
-
-        } catch (SQLException e) {
-            System.err.println("Error when deleting medical history");
-            e.printStackTrace();
-        }
-    }
-
 
     public void updateObservations(int recordId, String observations) {
 
@@ -254,7 +159,6 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
             WHERE m.doctor_id IS NULL
         """;
 
-        //chooses specialty
         switch (specialty) {
 
             case CARDIOLOGIST:
@@ -331,7 +235,5 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
             e.printStackTrace();
         }
     }
-
-
 
 }

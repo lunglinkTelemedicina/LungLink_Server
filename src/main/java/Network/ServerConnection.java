@@ -21,8 +21,7 @@ public class ServerConnection{
         this.doctorAssignmentService = doctorAssignmentService;
     }
 
-    //Starts server and accepts clients until stopped
-
+    // starts server and accepts clients until stopped
     public void start(){
         try{
             ServerSocket serverSocket = new ServerSocket(port);
@@ -33,11 +32,11 @@ public class ServerConnection{
                     Socket socket = serverSocket.accept();
                     System.out.println("New client connected: " + socket.getRemoteSocketAddress()+"\n");
 
-                    // Create handler
+                    // create handler
                     ClientHandler handler = new ClientHandler(socket,  this, doctorAssignmentService);
                     registerClient(handler);
 
-                    // Start handler thread
+                    // start handler thread
                     new Thread(handler).start();
 
                 } catch (IOException e) {

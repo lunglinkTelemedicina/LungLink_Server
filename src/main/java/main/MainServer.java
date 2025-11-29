@@ -12,7 +12,7 @@ import jdbc.JDBCConnectionManager;
 
 import java.sql.Connection;
 import java.util.List;
-
+//aqui teneis que estar
 public class MainServer {
     public static void main(String[] args) {
 

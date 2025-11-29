@@ -13,15 +13,15 @@ public class ServerUI {
 
     public void start() {
 
-        System.out.println("SERVER ADMIN PANEL");
+        System.out.println("\nSERVER ADMIN PANEL");
 
         while (true) {
 
-            System.out.println("\nChoose an option:\n");
+            System.out.println("Choose an option:\n");
             System.out.println("1) View connected users");
             System.out.println("2) Stop server");
 
-            int option = UIUtils.readInt("Option: ");
+            int option = UIUtils.readInt("\nOption: ");
 
             switch (option) {
                 case 1:

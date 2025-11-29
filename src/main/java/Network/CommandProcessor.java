@@ -106,25 +106,35 @@ public class CommandProcessor {
         int clientId = Integer.parseInt(parts[1]);
         String symptomsCSV = parts[2];
 
-        //We change the symptoms string with ',' into a list of symptoms
-        List<String> symptoms = new ArrayList<>(Arrays.asList(symptomsCSV.split(",")));
+        // 1. OBTENER DOCTOR BALANCEADO (REVISIÓN DE CARGA)
+        // Llamamos a getDoctorForSignal(null) para obtener al GENERAL_MEDICINE menos ocupado.
+        Doctor assignedDoctor = doctorAssignmentService.getDoctorForSignal(null);
 
-        //We create a MedicalHistory object only for the symptoms
+        if (assignedDoctor == null) {
+            return "ERROR|No General Medicine Doctor available";
+        }
+
+        // 2. Crear el objeto MedicalHistory y ASIGNAR el doctor balanceado
         MedicalHistory medicalHistory = new MedicalHistory();
         medicalHistory.setClientId(clientId);
         medicalHistory.setDate(LocalDate.now());
+        // Establecemos el doctor balanceado antes de insertarlo
+        medicalHistory.setDoctorId(assignedDoctor.getDoctorId());
 
+        // 3. Insertar MH y síntomas. La MH ya se inserta con el doctorId correcto.
         int recordId = jdbcMedicalHistory.addMedicalHistory(medicalHistory);
-        jdbcMedicalHistory.addSymptoms(recordId, symptoms);
+// Aquí solo actualizamos la lista de síntomas en el registro.
+        jdbcMedicalHistory.addSymptoms(recordId, Arrays.asList(symptomsCSV.split(",")));
 
-        int defaultDoctorId = jdbcDoctor.getDefaultDoctorId();
-        jdbcClient.updateDoctorForClient(clientId, defaultDoctorId);
+        // 4. Actualizar el doctor asignado al cliente.
+        jdbcClient.updateDoctorForClient(clientId, assignedDoctor.getDoctorId());
 
-        Doctor defaultDoctor = jdbcDoctor.getDefaultDoctor();
-        return "OK|Symptoms are saved|AssignedDoctor=" + defaultDoctor.getName() + ";" + defaultDoctor.getSpecialty();
+        // 5. Responder al cliente
+        return "OK|Symptoms are saved|AssignedDoctor=" + assignedDoctor.getName() + ";" + assignedDoctor.getSpecialty();
     }
 
-    private String handleAddExtraInfo(String[] parts) {
+
+        private String handleAddExtraInfo(String[] parts) {
 
         int clientId = Integer.parseInt(parts[1]);
         double height = Double.parseDouble(parts[2]);

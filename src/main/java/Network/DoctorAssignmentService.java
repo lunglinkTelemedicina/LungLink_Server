@@ -25,6 +25,10 @@ public class DoctorAssignmentService {
         Doctor bestDoctor = null;
         int minPatients = Integer.MAX_VALUE;
 
+        if (signalType == null) {
+            // Symptoms case → General Medicine
+            required = DoctorSpecialty.GENERAL_MEDICINE;
+        } else {
         switch (signalType) {
             case ECG:
                 required = DoctorSpecialty.CARDIOLOGIST;
@@ -33,7 +37,7 @@ public class DoctorAssignmentService {
             case EMG:
                 required = DoctorSpecialty.NEUROPHYSIOLOGIST;
                 break;
-        }
+        }}
 
         if (required == null) return null;
 

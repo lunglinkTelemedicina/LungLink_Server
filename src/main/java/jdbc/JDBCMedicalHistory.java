@@ -256,14 +256,18 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
 
         //chooses specialty
         switch (specialty) {
-            case CARDIOLOGIST ->
-                    selectRecords += " AND s.type = 'ECG'";
 
-            case NEUROPHYSIOLOGIST ->
-                    selectRecords += " AND s.type = 'EMG'";
+            case CARDIOLOGIST:
+                selectRecords += " AND s.type = 'ECG'";
+                break;
 
-            case GENERAL_MEDICINE ->
-                    selectRecords += " AND s.type IS NULL";
+            case NEUROPHYSIOLOGIST:
+                selectRecords += " AND s.type = 'EMG'";
+                break;
+
+            case GENERAL_MEDICINE:
+                selectRecords += " AND s.type IS NULL";
+                break;
         }
 
         List<Integer> pendingRecords = new ArrayList<>();

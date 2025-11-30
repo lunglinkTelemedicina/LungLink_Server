@@ -5,7 +5,13 @@ import pojos.*;
 
 import java.sql.*;
 import java.time.LocalDate;
-
+/**
+ * Implementation of the {@code ClientManager} interface using JDBC (Java Database Connectivity)
+ * for client data persistence in the database.
+ *
+ * This class follows the Singleton pattern to ensure that only one instance exists
+ * to manage client operations.
+ */
 public class JDBCClient implements ClientManager {
 
     private static JDBCClient instance;
@@ -16,7 +22,13 @@ public class JDBCClient implements ClientManager {
         }
         return instance;
     }
-
+    /**
+     * Inserts a new client into the 'client' table.
+     *
+     * @param client The Client object to insert. Must contain name, surname, date of birth,
+     * mail, sex, weight, height, and user ID.
+     * @return The automatically generated ID for the new client, or -1 if an error occurred.
+     */
     @Override
     public int addClient(Client client) {
         String sql = """
@@ -56,7 +68,13 @@ public class JDBCClient implements ClientManager {
 
         return generatedId;
     }
-
+    /**
+     * Updates the weight and height fields for a specific client.
+     *
+     * @param clientId The ID of the client to update.
+     * @param weight The new weight value (kg).
+     * @param height The new height value (cm).
+     */
     public void updateHeightWeight(int clientId, double weight, double height) {
 
         String sql = """
@@ -86,7 +104,12 @@ public class JDBCClient implements ClientManager {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Retrieves a Client object from the database using its associated User ID.
+     *
+     * @param userId The ID of the user associated with the client ('user_id' column).
+     * @return The Client object corresponding to the user ID, or null if not found or an error occurs.
+     */
     public Client getClientByUserId(int userId) {
 
         String sql = """
@@ -129,7 +152,12 @@ public class JDBCClient implements ClientManager {
 
         return null;
     }
-
+    /**
+     * Updates or unassigns the doctor responsible for a specific client.
+     *
+     * @param clientId The ID of the client to modify.
+     * @param doctorId The ID of the doctor to assign. If the value is less than or equal to 0, NULL will be assigned (unassign doctor).
+     */
     public void updateDoctorForClient(int clientId, int doctorId) {
 
         String sql = "UPDATE client SET doctor_id = ? WHERE client_id = ?";
@@ -160,7 +188,12 @@ public class JDBCClient implements ClientManager {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Counts the total number of clients currently assigned to a specific doctor.
+     *
+     * @param doctorId The ID of the doctor whose clients are to be counted.
+     * @return The number of clients associated with the doctor, or 0 if there are none or an exception occurs.
+     */
     public int countClientsByDoctor(int doctorId) {
 
         String sql = "SELECT COUNT(*) FROM client WHERE doctor_id = ?";

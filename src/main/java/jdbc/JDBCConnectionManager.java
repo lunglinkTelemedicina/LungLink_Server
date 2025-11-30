@@ -2,11 +2,21 @@ package jdbc;
 
 import java.io.File;
 import java.sql.*;
-
+/**
+ * Manages the connection to the SQLite database.
+ * * <p>This class follows the **Singleton pattern** to ensure that the database
+ * driver is loaded, the database file is created, and the schema (tables)
+ * is initialized only once throughout the application lifecycle.</p>
+ */
 public class JDBCConnectionManager {
 
     private static JDBCConnectionManager instance;
-
+    /**
+     * Private constructor to prevent direct instantiation (Singleton pattern).
+     * * <p>Initializes the SQLite JDBC driver, creates the database directory (if necessary),
+     * and calls {@link #createTables(Connection)} to ensure the database schema is ready.</p>
+     * * @throws RuntimeException if there is an error initializing the database (e.g., driver not found).
+     */
     private JDBCConnectionManager() {
         try {
             Class.forName("org.sqlite.JDBC");
@@ -31,14 +41,23 @@ public class JDBCConnectionManager {
         }
 
     }
-
+    /**
+     * Gets the single instance of the JDBCConnectionManager (Singleton).
+     *
+     * @return The instance of JDBCConnectionManager.
+     */
     public static synchronized JDBCConnectionManager getInstance() {
         if (instance == null) {
             instance = new JDBCConnectionManager();
         }
         return instance;
     }
-
+    /**
+     * Retrieves a new {@link Connection} object for interacting with the database.
+     *
+     * @return A new active database connection.
+     * @throws RuntimeException if the connection cannot be established.
+     */
     public Connection getConnection(){
         try{
             return DriverManager.getConnection("jdbc:sqlite:./database/lunglink.db");
@@ -48,7 +67,12 @@ public class JDBCConnectionManager {
     }
 
 
-
+    /**
+     * Creates all necessary tables in the database if they do not already exist.
+     * * <p>Tables created: user, doctor, client, medicalhistory, signal.</p>
+     *
+     * @param conn The active database connection used to execute the CREATE TABLE statements.
+     */
     public void createTables(Connection conn) {
         try (Statement stmt = conn.createStatement()) {
 

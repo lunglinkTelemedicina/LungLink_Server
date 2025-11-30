@@ -5,18 +5,34 @@ import pojos.User;
 import utils.SecurityUtils;
 
 import java.sql.*;
-
+/**
+ * Implementation of the {@code UserManager} interface using JDBC
+ * for managing user persistence in the database.
+ * This class handles user registration, login validation (using hashed passwords),
+ * and management of the default doctor user entry.
+ *
+ * This class follows the Singleton pattern.
+ */
 public class JDBCUser implements UserManager {
 
     private static JDBCUser instance;
-
+    /**
+     * Retrieves the single instance of the JDBCUser class (Singleton pattern).
+     *
+     * @return The JDBCUser instance.
+     */
     public static synchronized JDBCUser getInstance() {
         if (instance == null) {
             instance = new JDBCUser();
         }
         return instance;
     }
-
+    /**
+     * Inserts a new user into the 'user' table after hashing the password.
+     *
+     * @param user The User object to insert, containing username and plain password.
+     * @return The automatically generated user ID, or -1 if the insertion fails (e.g., username already exists).
+     */
     @Override
     public int addUser(User user) {
         String sql = "INSERT INTO user (username, password) VALUES (?, ?)";
@@ -50,7 +66,14 @@ public class JDBCUser implements UserManager {
             return -1;
         }
     }
-
+    /**
+     * Validates a user's login credentials by hashing the provided plain password
+     * and checking against the stored hash in the database.
+     *
+     * @param username The username provided by the user.
+     * @param passwordPlain The plain text password provided by the user.
+     * @return A partially populated User object (containing ID and username) if credentials are valid, or null otherwise.
+     */
     @Override
     public User validateLogin(String username, String passwordPlain) {
 
@@ -86,7 +109,13 @@ public class JDBCUser implements UserManager {
 
         return null;
     }
-
+    /**
+     * Inserts the default doctor user ("AlfredoJimenez" with password "doctor123") into the 'user' table
+     * if the user does not already exist.
+     *
+     * @param conn The active database connection.
+     * @implNote This method is designed to be called during database initialization.
+     */
     public void insertDefaultDoctorUser(Connection conn) {
 
         String sqlCheck = "SELECT COUNT(*) FROM user WHERE username = ?";
@@ -122,7 +151,12 @@ public class JDBCUser implements UserManager {
         }
     }
 
-
+    /**
+     * Retrieves the user ID for a given username, primarily used to link the default doctor profile.
+     *
+     * @param username The username to look up.
+     * @return The user ID if the username exists, or -1 otherwise.
+     */
     public int getUserIdByUsernameOnlyIfExists(String username) {
 
         String sql = "SELECT id FROM user WHERE username = ?";

@@ -6,9 +6,19 @@ import pojos.*;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
-
+/**
+ * Implementation of the {@code MedicalHistoryManager} interface using JDBC
+ * for managing persistence operations related to medical history records in the database.
+ * * This class handles creating, retrieving, and updating medical history entries,
+ * as well as managing the assignment of pending records to doctors based on signal type.
+ */
 public class JDBCMedicalHistory implements MedicalHistoryManager {
-
+    /**
+     * Inserts a new medical history record into the 'medicalhistory' table.
+     * * @param m The MedicalHistory object to insert. It must contain the client ID, date,
+     * and observations. The doctor ID is optional.
+     * @return The automatically generated record ID for the new medical history, or -1 if an error occurred.
+     */
     @Override
     public int addMedicalHistory(MedicalHistory m) {
 
@@ -52,7 +62,11 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
 
         return generatedId;
     }
-
+    /**
+     * Retrieves all medical history records associated with a specific client ID.
+     * * @param clientId The ID of the client whose history records are to be retrieved.
+     * @return A list of {@code MedicalHistory} objects for the given client. Returns an empty list if none are found.
+     */
     @Override
     public List<MedicalHistory> getMedicalHistoryByClientId(int clientId) {
 
@@ -94,7 +108,13 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
         return list;
     }
 
-
+    /**
+     * Adds a list of symptoms to an existing medical history record.
+     * <p>After successfully adding symptoms, this method assigns the default doctor
+     * (retrieved from {@code JDBCDoctor.getDefaultDoctorId()}) to the medical history record.</p>
+     * * @param recordId The ID of the medical history record to update.
+     * @param symptomsList The list of symptoms (Strings) to add.
+     */
     public void addSymptoms(int recordId, List<String> symptomsList) {
 
         if (symptomsList == null || symptomsList.isEmpty()) {
@@ -131,7 +151,11 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Updates the observations field for an existing medical history record.
+     * * @param recordId The ID of the medical history record to update.
+     * @param observations The new observation text to set.
+     */
     public void updateObservations(int recordId, String observations) {
 
         String sql = "UPDATE medicalhistory SET observations = ? WHERE record_id = ?";
@@ -149,7 +173,18 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Assigns pending medical history records to a specific doctor based on the doctor's specialty
+     * and the type of signal (ECG or EMG) associated with the record.
+     * * <p>A record is considered "pending" if its {@code doctor_id} is NULL.</p>
+     * * <ul>
+     * <li>**CARDIOLOGIST:** Assigns records that have an 'ECG' signal.</li>
+     * <li>**NEUROPHYSIOLOGIST:** Assigns records that have an 'EMG' signal.</li>
+     * <li>**GENERAL_MEDICINE:** Assigns records that have NO signal attached (s.type IS NULL).</li>
+     * </ul>
+     * * @param doctorId The ID of the doctor to assign the records to.
+     * @param specialty The specialty of the doctor, used to filter which pending records to assign.
+     */
     public void assignPendingRecordsToDoctor(int doctorId, DoctorSpecialty specialty) {
 
         String selectRecords = """

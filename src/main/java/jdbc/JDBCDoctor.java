@@ -1,5 +1,4 @@
 package jdbc;
-
 import jdbcInterfaces.*;
 import pojos.*;
 
@@ -8,17 +7,32 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementation of the {@code DoctorManager} interface using JDBC
+ * for managing Doctor and associated Client data persistence in the database.
+ *
+ * This class follows the Singleton pattern.
+ */
 public class JDBCDoctor implements DoctorManager {
 
     private static JDBCDoctor instance;
-
+    /**
+     * Retrieves the single instance of the JDBCDoctor class (Singleton pattern).
+     *
+     * @return The JDBCDoctor instance.
+     */
     public static synchronized JDBCDoctor getInstance() {
         if (instance == null) {
             instance = new JDBCDoctor();
         }
         return instance;
     }
-
+    /**
+     * Inserts a new Doctor into the 'doctor' table and sets the generated doctor ID
+     * back into the provided Doctor object.
+     *
+     * @param doctor The Doctor object to insert.
+     */
     @Override
     public void addDoctor(Doctor doctor) {
 
@@ -49,7 +63,12 @@ public class JDBCDoctor implements DoctorManager {
         }
     }
 
-
+    /**
+     * Retrieves a Doctor object from the database using its associated User ID.
+     *
+     * @param userId The ID of the user associated with the doctor.
+     * @return The Doctor object corresponding to the user ID, or null if not found or an error occurs.
+     */
     public Doctor getDoctorByUserId(int userId) {
 
         String sql = "SELECT * FROM doctor WHERE user_id = ?";
@@ -80,7 +99,11 @@ public class JDBCDoctor implements DoctorManager {
 
         return d;
     }
-
+    /**
+     * Retrieves a list of all Doctor entries from the database.
+     *
+     * @return A List of all Doctor objects found.
+     */
     @Override
     public List<Doctor> getDoctors() {
 
@@ -112,7 +135,12 @@ public class JDBCDoctor implements DoctorManager {
 
         return doctors;
     }
-
+    /**
+     * Retrieves a list of all Client objects assigned to a specific doctor ID.
+     *
+     * @param doctorId The ID of the doctor whose clients are to be retrieved.
+     * @return A List of Client objects assigned to the doctor.
+     */
     public List<Client> getClientsByDoctorId(int doctorId) {
 
         List<Client> list = new ArrayList<>();
@@ -154,7 +182,13 @@ public class JDBCDoctor implements DoctorManager {
 
         return list;
     }
-
+    /**
+     * Checks if a specific client is currently assigned to a specific doctor.
+     *
+     * @param doctorId The ID of the doctor to check assignment against.
+     * @param clientId The ID of the client to verify.
+     * @return true if the client is assigned to the doctor, false otherwise.
+     */
     public boolean isPatientAssignedToDoctor(int doctorId, int clientId) {
         String sql = "SELECT COUNT(*) FROM client WHERE client_id = ? AND doctor_id = ?";
 
@@ -178,7 +212,13 @@ public class JDBCDoctor implements DoctorManager {
 
         return false;
     }
-
+    /**
+     * Inserts a default doctor ("Alfredo Jiménez") into the database if one does not already exist,
+     * relying on a preexisting "AlfredoJimenez" user entry.
+     *
+     * @param conn The active database connection.
+     * @implNote This method requires that the corresponding user ("AlfredoJimenez") already exists in the 'user' table.
+     */
     public void insertDoctorByDefault(Connection conn) {
 
         String email = "ajimenez@lunglink.com";
@@ -223,7 +263,11 @@ public class JDBCDoctor implements DoctorManager {
         }
     }
 
-
+    /**
+     * Retrieves the doctor ID of the default doctor ("ajimenez@lunglink.com").
+     *
+     * @return The doctor ID of the default doctor, or -1 if the doctor is not found or an error occurs.
+     */
     public int getDefaultDoctorId() {
         String sql = "SELECT doctor_id FROM doctor WHERE email = ?";
 

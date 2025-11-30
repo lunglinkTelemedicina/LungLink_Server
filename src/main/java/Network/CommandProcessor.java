@@ -15,7 +15,13 @@ import java.sql.PreparedStatement;
 import java.time.LocalDate;
 import java.util.*;
 
-
+/**
+ * Server-side class responsible for processing and responding to all incoming
+ * client commands.
+ * * <p>It acts as the intermediary between the network layer ({@code ClientHandler})
+ * and the database layer (JDBC classes), executing necessary business logic
+ * and coordinating doctor assignment.</p>
+ */
 public class CommandProcessor {
 
     //These classes access the database
@@ -24,7 +30,11 @@ public class CommandProcessor {
     private final JDBCSignal jdbcSignal;
     private final JDBCDoctor jdbcDoctor;
     private final DoctorAssignmentService doctorAssignmentService;
-
+    /**
+     * Constructs a CommandProcessor and initializes all necessary JDBC and service dependencies.
+     *
+     * @param doctorAssignmentService The service used to determine the appropriate doctor for a new record or signal.
+     */
     public CommandProcessor(DoctorAssignmentService doctorAssignmentService) {
         this.jdbcClient = new JDBCClient();
         this.jdbcMedicalHistory = new JDBCMedicalHistory();
@@ -33,8 +43,16 @@ public class CommandProcessor {
         this.doctorAssignmentService = doctorAssignmentService;
     }
 
-    //This method gets a message and, depending on how it starts, calls one method or another to handle the request.
-    public String handleClientRequest(String message, ReceiveDataViaNetwork receive, SendDataViaNetwork send) {
+    /**
+     * Parses the incoming message string, determines the command type, and delegates
+     * the request to the appropriate private handler method.
+     *
+     * @param message The raw command string received from the client.
+     * @param receive The data channel used to receive subsequent binary data (e.g., signals).
+     * @param send The data channel used to send binary data (e.g., requested signal files).
+     * @return A response string (starting with "OK|" or "ERROR|") to be sent back to the client,
+     * or "NO_REPLY" if a custom binary transmission follows.
+     */    public String handleClientRequest(String message, ReceiveDataViaNetwork receive, SendDataViaNetwork send) {
 
         if (message == null || message.isEmpty())
             return "ERROR|Empty command";
@@ -89,7 +107,10 @@ public class CommandProcessor {
             return "ERROR|" + ex.getMessage();
         }
     }
-
+    /**
+     * Handles the SEND_SYMPTOMS command: creates a new medical history record
+     * and assigns a General Medicine doctor.
+     */
     private String handleSendSymptoms(String[] parts) {
 
         int clientId = Integer.parseInt(parts[1]);
@@ -114,7 +135,9 @@ public class CommandProcessor {
         return "OK|Symptoms are saved, your assigned doctor is " + assignedDoctor.getName() + " specialized in " + assignedDoctor.getSpecialty();
     }
 
-
+    /**
+     * Handles the ADD_EXTRA_INFO command: updates the client's weight and height.
+     */
         private String handleAddExtraInfo(String[] parts) {
 
         int clientId = Integer.parseInt(parts[1]);
@@ -125,7 +148,10 @@ public class CommandProcessor {
         return "OK|Extra info saved";
     }
 
-
+    /**
+     * Handles the GET_HISTORY command (Client perspective): retrieves the client's
+     * medical history and formats it for console display.
+     */
     private String handleGetHistory(String[] parts) {
         int clientId = Integer.parseInt(parts[1]);
         List<MedicalHistory> list = jdbcMedicalHistory.getMedicalHistoryByClientId(clientId);
@@ -166,7 +192,13 @@ public class CommandProcessor {
         return response.toString();
     }
 
-
+    /**
+     * Handles the SEND_ECG/SEND_EMG commands: coordinates the reception of binary
+     * signal data, processes and saves the signal, creates a medical history record,
+     * and assigns a specialized doctor (Cardiologist/Neurophysiologist) if available.
+     *
+     * @throws Exception if data reception or saving fails.
+     */
     private String handleSignals(String[] parts,
                                  CommandType cmd,
                                  ReceiveDataViaNetwork receive,
@@ -247,7 +279,9 @@ public class CommandProcessor {
             return "ERROR|Signal could not be saved";
         }
     }
-
+    /**
+     * Handles the REGISTER_USER command: creates a new user entry.
+     */
     private String handleRegisterUser(String[] parts) {
 
         String username = parts[1];
@@ -264,7 +298,9 @@ public class CommandProcessor {
 
         return "ERROR|This user already exists.";
     }
-
+    /**
+     * Handles the LOGIN_USER command: validates user credentials.
+     */
     private String handleLoginUser(String[] parts) {
 
         String username = parts[1];
@@ -280,7 +316,9 @@ public class CommandProcessor {
 
         return "OK|" + user.getId() + "|" + user.getUsername();
     }
-
+    /**
+     * Handles the CHECK_CLIENT command: checks if a user ID has an associated client profile.
+     */
     private String handleCheckClient(String[] parts) {
 
         int userId = Integer.parseInt(parts[1]);
@@ -305,7 +343,9 @@ public class CommandProcessor {
                 c.getSex().name() + "|" +
                 c.getMail();
     }
-
+    /**
+     * Handles the CREATE_CLIENT command: creates a new client profile linked to an existing user ID.
+     */
     private String handleCreateClient(String[] parts) {
 
         int userId = Integer.parseInt(parts[1]);
@@ -337,7 +377,9 @@ public class CommandProcessor {
 
         return "ERROR|Client creation failed";
     }
-
+    /**
+     * Handles the CHECK_DOCTOR command: checks if a user ID has an associated doctor profile.
+     */
     private String handleCheckDoctor(String[] parts) {
 
         int userId = Integer.parseInt(parts[1]);
@@ -353,7 +395,10 @@ public class CommandProcessor {
                 d.getName() + "|" +
                 d.getSurname();
     }
-
+    /**
+     * Handles the GET_DOCTOR_PATIENTS command: retrieves a list of all clients assigned
+     * to a given doctor ID and formats the list for transmission.
+     */
     private String handleGetDoctorPatients(String[] parts) {
 
         int doctorId = Integer.parseInt(parts[1]);
@@ -387,7 +432,10 @@ public class CommandProcessor {
 
         return sb.toString();
     }
-
+    /**
+     * Handles the GET_PATIENT_HISTORY_DOCTOR command: retrieves a specific patient's
+     * medical history, but only if the patient is assigned to the requesting doctor.
+     */
     private String handleGetPatientHistoryDoctor(String[] parts) {
 
         int doctorId = Integer.parseInt(parts[1]);
@@ -438,7 +486,10 @@ public class CommandProcessor {
 
         return response.toString();
     }
-
+    /**
+     * Handles the GET_PATIENT_SIGNALS_DOCTOR command: retrieves a list of a patient's
+     * signals, verifying the doctor's assignment first.
+     */
     private String handleGetPatientSignalsDoctor(String[] parts) {
 
         int doctorId = Integer.parseInt(parts[1]);
@@ -464,7 +515,10 @@ public class CommandProcessor {
 
         return sb.toString();
     }
-
+    /**
+     * Handles the ADD_OBSERVATIONS command: updates the observation field of a
+     * specific medical history record.
+     */
     private String handleAddObservations(String[] parts) {
 
         int recordId = Integer.parseInt(parts[1]);
@@ -474,7 +528,10 @@ public class CommandProcessor {
 
         return "OK|Observation added";
     }
-
+    /**
+     * Handles the CREATE_DOCTOR command: creates a new doctor profile and
+     * assigns any pending medical records matching their specialty.
+     */
     private String handleCreateDoctor(String[] parts) {
 
         int userId = Integer.parseInt(parts[1]);
@@ -505,7 +562,10 @@ public class CommandProcessor {
         jdbcMedicalHistory.assignPendingRecordsToDoctor(created.getDoctorId(), created.getSpecialty());
         return "OK|" + created.getDoctorId();
     }
-
+    /**
+     * Handles the GET_SIGNAL_FILE command: retrieves a signal file from the server's
+     * disk, sends a header with the size, and sends the raw binary content.
+     */
     private String handleGetSignalFile(String[] parts, SendDataViaNetwork send) {
         try {
             int signalId = Integer.parseInt(parts[1]);

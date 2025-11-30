@@ -196,9 +196,9 @@ public class CommandProcessor {
      * Handles the SEND_ECG/SEND_EMG commands: coordinates the reception of binary
      * signal data, processes and saves the signal, creates a medical history record,
      * and assigns a specialized doctor (Cardiologist/Neurophysiologist) if available.
-     *
      * @throws Exception if data reception or saving fails.
      */
+
     private String handleSignals(String[] parts,
                                  CommandType cmd,
                                  ReceiveDataViaNetwork receive,
@@ -598,5 +598,4 @@ public class CommandProcessor {
             return "ERROR|" + e.getMessage();
         }
     }
-
 }

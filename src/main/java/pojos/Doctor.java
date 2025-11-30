@@ -2,6 +2,10 @@ package pojos;
 
 import java.util.List;
 
+/**
+ * Represents a doctor in the system. Includes personal data,
+ * specialty, assigned patients and the user account linked to the doctor.
+ */
 public class Doctor {
 
     private int doctorId;
@@ -12,6 +16,9 @@ public class Doctor {
     private List<Client> patients;
     private int userId;
 
+    /**
+     * Creates a fully defined Doctor.
+     */
     public Doctor(int doctorId, String name, String surname, String email, DoctorSpecialty specialty, List<Client> patients,  int userId) {
         this.doctorId = doctorId;
         this.name = name;
@@ -21,11 +28,10 @@ public class Doctor {
         this.patients = patients;
         this.userId = userId;
     }
-
-    public Doctor(){
-
-    }
-
+    /**
+     * Creates an empty Doctor instance.
+     */
+    public Doctor(){}
 
     public int getDoctorId() {
         return doctorId;

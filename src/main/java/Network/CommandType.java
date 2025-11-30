@@ -1,5 +1,9 @@
 package Network;
 
+/**
+ * Contains all commands used in the client–server communication protocol.
+ * Each value represents an action that the server can interpret and process.
+ */
 public enum CommandType {
     SEND_SYMPTOMS,
     ADD_EXTRA_INFO,
@@ -21,6 +25,13 @@ public enum CommandType {
     ADD_OBSERVATIONS,
     GET_SIGNAL_FILE;
 
+    /**
+     * Converts a string into the corresponding CommandType.
+     * Returns UNKNOWN if the string does not match any valid command.
+     * @param s the string received from the network
+     * @return the matching command type or UNKNOWN if no match exists
+     */
+
     //Converts the string into an enum
     public static CommandType fromString(String s) {
         if (s == null) return UNKNOWN;
@@ -33,4 +44,3 @@ public enum CommandType {
         }
     }
 }
-

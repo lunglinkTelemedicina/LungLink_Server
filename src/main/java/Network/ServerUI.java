@@ -66,30 +66,30 @@ public class ServerUI {
 
         String entered = UIUtils.readString("Enter admin password: ");
 
-            if (!entered.equals(ADMIN_PASSWORD)) {
-                System.out.println("Incorrect password.");
+        if (!entered.equals(ADMIN_PASSWORD)) {
+            System.out.println("Incorrect password.");
+            return;
+        }
+
+        int clients = serverConnection.getConnectedClientCount();
+
+        if (clients > 0) {
+            System.out.println("WARNING: There are " + clients + " connected clients");
+            String answer = UIUtils.readString("Are you sure you want to stop the server? (yes/no): ");
+
+            if(!answer.equalsIgnoreCase("yes")) {
+                System.out.println("Shutdown cancelled");
                 return;
             }
-
-            int clients = serverConnection.getConnectedClientCount();
-
-            if (clients > 0) {
-                System.out.println("WARNING: There are " + clients + " connected clients");
-                String answer = UIUtils.readString("Are you sure you want to stop the server? (yes/no): ");
-
-                if(!answer.equalsIgnoreCase("yes")) {
-                    System.out.println("Shutdown cancelled");
-                    return;
-                }
-            }
-            //notify clients before shutting down
-            serverConnection.broadcastShutdownMessage();
-            try {
-                Thread.sleep(200); //small delay for message to be delivered
-            }catch(InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            serverConnection.stopServer();
-            System.exit(0);
+        }
+        //notify clients before shutting down
+        serverConnection.broadcastShutdownMessage();
+        try {
+            Thread.sleep(200); //small delay for message to be delivered
+        }catch(InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        serverConnection.stopServer();
+        System.exit(0);
     }
 }

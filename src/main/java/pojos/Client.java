@@ -3,6 +3,11 @@ package pojos;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Represents a patient in the system. Stores personal information,
+ * physical data, medical history records and the doctor assigned.
+ */
+
 public class Client {
 
     private int clientId;
@@ -17,9 +22,26 @@ public class Client {
     private int doctorId;
     private int  userId;
 
-    public Client(){
+    /**
+     * Creates an empty Client instance.
+     */
+    public Client(){}
 
-    }
+    /**
+     * Creates a Client with all its fields.
+     *
+     * @param clientId     unique ID of the client
+     * @param name         patient's name
+     * @param surname      patient's surname
+     * @param dob          date of birth
+     * @param mail         email address
+     * @param sex          biological sex
+     * @param medicalHistory list with the patient's medical history
+     * @param weight       weight in kg
+     * @param height       height in meters
+     * @param doctorId     assigned doctor ID
+     * @param userId       user account ID
+     */
 
     public Client(int clientId, String name, String surname, LocalDate dob, String mail, Sex sex, List<MedicalHistory> medicalHistory, double weight, double height, int doctorId, int userId) {
         this.clientId = clientId;
@@ -34,7 +56,6 @@ public class Client {
         this.doctorId = doctorId;
         this.userId = userId;
     }
-
 
     public int getClientId() {
         return clientId;
@@ -137,7 +158,3 @@ public class Client {
                 '}';
     }
 }
-
-
-
-

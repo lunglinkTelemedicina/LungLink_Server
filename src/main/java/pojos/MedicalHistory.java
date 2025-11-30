@@ -1,9 +1,13 @@
 package pojos;
 
-
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Represents a single medical history record for a patient.
+ * Stores the date, symptoms, observations, and the IDs of both
+ * the patient and the doctor who handled the entry.
+ */
 public class MedicalHistory {
 
     private int recordId;
@@ -13,10 +17,20 @@ public class MedicalHistory {
     private int clientId;
     private int doctorId;
 
-    public MedicalHistory() {
-        //empty constructor
-    }
+    /**
+     * Creates an empty medical history record
+     */
+    public MedicalHistory() {}
 
+    /**
+     * Creates a full medical history entry.
+     * @param recordId      unique ID of the record
+     * @param date          date of the consultation or data entry
+     * @param observations  doctor's observations
+     * @param symptomsList  list of reported symptoms
+     * @param clientId      ID of the patient
+     * @param doctorId      ID of the doctor who reviewed the record
+     */
     public MedicalHistory(int recordId, LocalDate date, String observations, List<String> symptomsList, int clientId,  int doctorId) {
         this.recordId = recordId;
         this.date = date;

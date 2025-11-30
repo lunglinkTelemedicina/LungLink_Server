@@ -5,7 +5,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Represents a physiological signal (ECG, EMG...) recorded from a patient.
+ * Stores the raw values, the sampling rate, the type of signal and the
+ * file where the data is saved.
+ */
 public class Signal {
 
     private int signalId;
@@ -15,15 +19,24 @@ public class Signal {
     private int samplingRate = 100;
     private int recordId;
 
+    /**
+     * Creates an empty signal container.
+     */
     public Signal() {
         this.signal_values = new ArrayList<>();
     }
 
+    /**
+     * Creates a signal with a specific type.
+     * @param type type of the signal (ECG, EMG, etc.)
+     */
     public Signal(TypeSignal type) {
         this.type = type;
         this.signal_values = new ArrayList<>();
     }
-
+    /**
+     * Creates a complete signal record.
+     */
     public Signal(int signalId, TypeSignal type, List<Integer> signal_values, String signalFile, int samplingRate, int recordId) {
         this.signalId = signalId;
         this.type = type;
@@ -59,6 +72,10 @@ public class Signal {
 
     public void setSamplingRate(int samplingRate) {this.samplingRate = samplingRate;}
 
+    /**
+     * Converts a byte array into a list of integer samples.
+     * @param raw the raw 16-bit signal data
+     */
     public void fromByteArray(byte[] raw) {
         signal_values.clear();
         if(raw==null||raw.length==0) return;
@@ -68,6 +85,11 @@ public class Signal {
         }
     }
 
+    /**
+     * Saves the signal samples into a CSV file and returns the file name.
+     * @return the generated file name
+     * @throws IOException if writing the file fails
+     */
     public String saveAsFile() throws IOException {
 
         String folder = "signals/";
@@ -83,10 +105,6 @@ public class Signal {
                 fw.write(v + ",");
             }
         }
-
-
         return fileName;
     }
-
-
 }

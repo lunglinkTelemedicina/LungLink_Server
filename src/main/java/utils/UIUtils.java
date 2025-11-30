@@ -4,11 +4,22 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+/**
+ * Utility class used to safely read user input from the console.
+ * Provides simple methods for reading integers and strings while
+ * handling invalid input and avoiding program crashes.
+ */
 public class UIUtils {
 
     private static final BufferedReader reader =
             new BufferedReader(new InputStreamReader(System.in));
 
+    /**
+     * Reads an integer from the console. If the user enters something
+     * invalid, the method asks again until a valid number is provided.
+     * @param message the prompt shown to the user
+     * @return the integer entered by the user
+     */
     public static int readInt(String message) {
 
         while (true) {
@@ -26,6 +37,13 @@ public class UIUtils {
         }
     }
 
+    /**
+     * Reads a string from the console. Keeps asking until a non-null
+     * string is entered. Leading and trailing spaces are removed.
+     *
+     * @param message the prompt shown to the user
+     * @return the trimmed string entered by the user
+     */
     public static String readString (String message) {
         while (true) {
             try {
@@ -39,5 +57,4 @@ public class UIUtils {
             }
         }
     }
-
 }

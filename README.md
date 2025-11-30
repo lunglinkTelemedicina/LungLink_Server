@@ -6,9 +6,9 @@ LungLink_Server IS DESIGNED FOR:
 - Managing patient medicalHitsory and observations from the doctor
 - Interacting with the SQLite database
 
-  ## PROJECT STRUCTURE
+## PROJECT STRUCTURE
 
-  ```
+```
 
   src/main/java/
  ├── main/
@@ -56,7 +56,7 @@ database/
 signals/
  └── (CSV signals stored here)
 
- ```
+```
 
 ## GUIDE
 

@@ -53,5 +53,4 @@ public interface MedicalHistoryManager {
      * @param specialty The {@code DoctorSpecialty} used to filter and assign relevant pending records.
      */
     void assignPendingRecordsToDoctor(int doctorId, DoctorSpecialty specialty);
-
 }

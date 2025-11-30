@@ -216,6 +216,4 @@ public class JDBCClient implements ClientManager {
 
         return 0;
     }
-
-
 }

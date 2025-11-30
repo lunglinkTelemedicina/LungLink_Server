@@ -270,5 +270,4 @@ public class JDBCMedicalHistory implements MedicalHistoryManager {
             e.printStackTrace();
         }
     }
-
 }

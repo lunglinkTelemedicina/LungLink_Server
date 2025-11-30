@@ -223,13 +223,6 @@ public class JDBCSignal implements SignalManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return -1;
     }
-
-
-
-
 }
-
-

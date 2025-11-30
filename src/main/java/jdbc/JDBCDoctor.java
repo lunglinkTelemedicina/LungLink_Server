@@ -284,10 +284,7 @@ public class JDBCDoctor implements DoctorManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return -1;
     }
-
-
 }
 

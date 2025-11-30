@@ -174,10 +174,6 @@ public class JDBCUser implements UserManager {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return -1;
     }
-
-
 }
-

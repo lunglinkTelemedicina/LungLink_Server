@@ -31,7 +31,6 @@ public class MainServer {
         JDBCDoctor jdbcDoctor = new JDBCDoctor();
         List<Doctor> doctors = jdbcDoctor.getDoctors();
 
-
         int port = 9000;
         //Create the server socket
         ServerConnection server = new ServerConnection(port, doctorAssignmentService);

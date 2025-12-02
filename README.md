@@ -1,84 +1,39 @@
-LungLink_Server IS DESIGNED FOR:
-- Managging all client and doctor connections through TCP
-- Handling login and registration requests
-- Managing doctor-patient connection
-- Receiving and storing signals (EMG/ECG) in CSV format
-- Managing patient medicalHitsory and observations from the doctor
-- Interacting with the SQLite database
+Before cloning the GitHub repository, ensure that the following components are installed:
 
-## PROJECT STRUCTURE
+Required Software 
+- Java 21 (JDK 21)
 
-```
+- A Java-compatible IDE (IntelliJ IDEA, Eclipse, etc.)
 
-  src/main/java/
- ├── main/
- │   └── ServerMain.java
+- Windows OS (recommended due to Bluetooth compatibility)
 
- ├── network/
- │   ├── ServerConnection.java
- │   ├── ClientHandler.java
- │   ├── DataReceiver.java
- │   ├── DataSender.java
- │   └── FileUtils.java
+Project Dependencies
 
- ├── services/
- │   ├── ServerService.java
- │   ├── AuthenticationService.java
- │   ├── MedicalHistoryService.java
- │   ├── AssignmentService.java
- │   └── SignalService.java
+- org.xerial:sqlite-jdbc:3.45.1.0 — SQLite JDBC driver
 
- ├── jdbc/
- │   ├── JDBCConnectionManager.java
- │   ├── JDBCUser.java
- │   ├── JDBCClient.java
- │   ├── JDBCDoctor.java
- │   ├── JDBCSignal.java
- │   └── JDBCMedicalHistory.java
+- org.slf4j:slf4j-simple:1.7.36 — SLF4J simple logger
 
- ├── pojos/
- │   ├── User.java
- │   ├── Client.java
- │   ├── Doctor.java
- │   ├── DoctorSpecialty.java
- │   ├── Signal.java
- │   ├── TypeSignal.java
- │   └── MedicalHistory.java
+If you want to run the project through IntelliJ:
 
- └── utils/
-     ├── SecurityUtils.java
-     ├── UIUtils.java
-     └── DateUtils.java
+- Clone the repository to your local machine.
 
-database/
- └── lunglink.db
+- Build the project using:
+mvn clean install
 
-signals/
- └── (CSV signals stored here)
+- Run the Main class.
 
-```
+If you prefer to run it directly from the terminal of your machine:
 
-## GUIDE
-
-```
-1- Open the project
-2- Run: main.ServerMain
-3- Once the server start listening on port 9000 clients and doctors can connect through TCP
-4- The server will automatically: 
-a) Handle login and register requests
-b) Manage doctor-patient connectionç
-c) Recieve signals
-d) Store data in the database
-6- Stop the server (terminate execution)
-
-```
+- Download the executableJar folder located in the LungLink_Server directory.
+- Open a terminal and navigate through your directories using cd and ls until you reach the Server_Repository-1.0-SNAPSHOT.jar file.
+- Execute the application with:
+java -jar executableJar/Server_Repository-1.0-SNAPSHOT.jar
 
 ## AUTHORS
-- Martina Zandio
+- Jimena Aineto 
 - Ana Losada
-- Jimena Aineto
+- Sara Menor
 - Paula Reyero
-- Sara Menor 
-
+- Martina Zandio
 
   
